@@ -4,7 +4,7 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>حاسبة تكلفة بناء منزل مع أسعار المواد الحالية  v1</title>
+  <title>حاسبة تكلفة بناء منزل مع أسعار المواد الحالية</title>
  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -12,6 +12,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+
+
+
 
   <style>
     .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -263,25 +267,27 @@
 <body class="bg-gray-100 font-sans">
   <div class="container mx-auto p-6 max-w-4xl">
     <h1 class="text-3xl font-bold text-center mb-4 text-blue-800">حاسبة تكلفة بناء منزل مع أسعار المواد الحالية</h1>
-    <p class="text-center text-lg mb-6">📌 يمكنك تعديل المساحة وعدد الطوابق حسب مشروعك، ثم الضغط على "احسب التكلفة" للحصول على تقدير تقريبي.</p>
 
     <!-- Input Form -->
     <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-      <h2 class="text-xl font-semibold mb-4 text-blue-700">إدخال البيانات</h2>
-      <div id="errorMessage" class="text-red-600 mb-4 hidden"></div>
+	
+   <div style="background-color:#f0f8ff; border: 2px solid #4a90e2; padding: 15px; border-radius: 8px; font-family: 'Arial', sans-serif; color: #333; max-width: 800px; line-height: 1.5; margin: 50px auto; text-align: center;">
+  <p style="font-size: 18px; margin: 0; display: inline-block; text-align: right;">
+    <span style="color: #e67e22; font-weight: bold;">📌</span> يمكنك تعديل <strong>المساحة</strong> وعدد <strong>الطوابق</strong> حسب مشروعك، ثم الضغط على 
+    <span style="background-color: #4a90e2; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold;">احسب التكلفة</span> 
+    للحصول على تقدير تقريبي يوضح فكرة عامة عن التكلفة. يمكنك أيضاً طباعة النتائج بصيغتي <strong>PDF</strong> أو <strong>Excel</strong> للاحتفاظ بها.
+  </p>
+   </div>
+	
+	
+	
+	
+    <div id="errorMessage" class="text-red-600 mb-4 hidden"></div>
 
       <!-- Dimensions Section -->
       <h3 class="text-lg font-semibold mb-3 text-blue-600">الأبعاد</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium" for="landLength">طول الأرض (متر):</label>
-          <input id="landLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" placeholder="مثال: 10" aria-label="طول الأرض بالمتر">
-        </div>
-        <div>
-          <label class="block text-sm font-medium" for="landWidth">عرض الأرض (متر):</label>
-          <input id="landWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض الأرض بالمتر">
-        </div>
-        <div>
+          <div>
           <label class="block text-sm font-medium" for="buildLength">طول المبنى (متر):</label>
           <input id="buildLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="10" placeholder="مثال: 10" aria-label="طول المبنى بالمتر">
         </div>
@@ -289,6 +295,16 @@
           <label class="block text-sm font-medium" for="buildWidth">عرض المبنى (متر):</label>
           <input id="buildWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض المبنى بالمتر">
         </div>
+		
+		      <div>
+          <label class="block text-sm font-medium" for="landLength">طول الأرض (متر):</label>
+          <input id="landLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="10" placeholder="مثال: 10" aria-label="طول الأرض بالمتر">
+        </div>
+        <div>
+          <label class="block text-sm font-medium" for="landWidth">عرض الأرض (متر):</label>
+          <input id="landWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض الأرض بالمتر">
+        </div>
+
         <div>
           <label class="block text-sm font-medium" for="numFloors">عدد الطوابق (بدون السطح):</label>
           <input id="numFloors" type="number" min="1" step="1" class="mt-1 p-2 w-full border rounded" value="2" placeholder="2ثال: 1" aria-label="عدد الطوابق">
@@ -299,7 +315,8 @@
           <input id="hasBasement" type="checkbox" class="mt-1" checked aria-label="إضافة قبو">
         </div>
 
-		
+	
+	
         <div>
           <label class="block text-sm font-medium" for="semelleCount">عدد السملات:</label>
           <input id="semelleCount" type="number" min="1" step="1" class="mt-1 p-2 w-full border rounded" value="16" placeholder="مثال: 16" aria-label="عدد السملات">
@@ -311,11 +328,11 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium" for="betonPrice">سعر البيتون (درهم مغربي/م³):</label>
-          <input id="betonPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="750" placeholder="750ل: 600" aria-label="سعر البيتون لكل متر مكعب">
+          <input id="betonPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="850" placeholder="مثال: 850" aria-label="سعر البيتون لكل متر مكعب">
         </div>
         <div>
           <label class="block text-sm font-medium" for="b15Price">سعر خرسانة النظافة B15 (درهم مغربي/م³):</label>
-          <input id="b15Price" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="750" placeholder="750ل: 600" aria-label="سعر خرسانة النظافة B15">
+          <input id="b15Price" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="850" placeholder="مثال: 850" aria-label="سعر خرسانة النظافة B15">
         </div>
         <div>
           <label class="block text-sm font-medium" for="ironPrice">سعر الحديد (درهم مغربي/كجم):</label>
@@ -337,18 +354,50 @@
           <label class="block text-sm font-medium" for="brickPrice">سعر الطوب (درهم مغربي/حبة):</label>
           <input id="brickPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="6.5" placeholder="مثال: 6.5" aria-label="سعر الطوب لكل حبة">
         </div>
-        <div>
-          <label class="block text-sm font-medium" for="sandPrice">سعر رمل البناء (درهم مغربي/م³):</label>
-          <input id="sandPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="240" placeholder="مثال: 240" aria-label="سعر رمل البناء">
-        </div>
-        <div>
+		
+		
+		
+
+
+<div class="tooltip-container">
+  <label for="sandPrice" class="block text-sm font-medium">سعر رمل البناء (درهم مغربي/م³):</label>
+  <input 
+    id="sandPrice" 
+    type="number" 
+    min="0" 
+    step="0.1" 
+    value="240" 
+    placeholder="مثال: 240" 
+    aria-label="سعر رمل البناء"
+  >
+  <div class="tooltip-text">
+    كمية 25 م² تكلف 6000 درهم، والتغطية (فياج) هي 240 درهم للمتر المكعب.
+  </div>
+</div>
+
+
+
+		
+         
+		
+		
+		
+		
+		<div>
           <label class="block text-sm font-medium" for="aggregatePrice">سعر الحصى (درهم مغربي/م³):</label>
           <input id="aggregatePrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="160" placeholder="مثال: 160" aria-label="سعر الحصى">
         </div>
+		
+		
         <div>
           <label class="block text-sm font-medium" for="laborPrice">سعر اليد العاملة (درهم مغربي/م²):</label>
-          <input id="laborPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="100" placeholder="مثال: 100" aria-label="سعر اليد العاملة لكل متر مربع">
+          <input id="laborPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="240" placeholder="مثال: 240" aria-label="سعر اليد العاملة لكل متر مربع">
         </div>
+		
+		
+		
+		
+		
         <div>
           <label class="block text-sm font-medium" for="combinedMaterialPrice">سعر الوردي والبودر والشبكة (درهم مغربي/م²):</label>
           <input id="combinedMaterialPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="85" placeholder="مثال: 85" aria-label="سعر الوردي والبودر والشبكة لكل متر مربع">
