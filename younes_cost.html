@@ -263,25 +263,24 @@
 <body class="bg-gray-100 font-sans">
   <div class="container mx-auto p-6 max-w-4xl">
     <h1 class="text-3xl font-bold text-center mb-4 text-blue-800">حاسبة تكلفة بناء منزل مع أسعار المواد الحالية</h1>
-	
-
-<div style="background-color:#f0f8ff; border: 2px solid #4a90e2; padding: 15px; border-radius: 8px; font-family: 'Arial', sans-serif; color: #333; max-width: 900px; line-height: 1.5; margin: 10px auto; text-align: center;">
-  <p style="font-size: 18px; margin: 0; display: inline-block; text-align: right;">
-    <span style="color: #e67e22; font-weight: bold;">📌</span> يمكنك تعديل <strong>المساحة</strong> وعدد <strong>الطوابق</strong> حسب مشروعك، ثم الضغط على 
-    <span style="background-color: #4a90e2; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold;">احسب التكلفة</span> 
-    للحصول على تقدير تقريبي يوضح فكرة عامة عن التكلفة. يمكنك أيضاً طباعة النتائج بصيغتي <strong>PDF</strong> أو <strong>Excel</strong> للاحتفاظ بها.
-  </p>
-</div>
-
+    <p class="text-center text-lg mb-6">📌 يمكنك تعديل المساحة وعدد الطوابق حسب مشروعك، ثم الضغط على "احسب التكلفة" للحصول على تقدير تقريبي.</p>
 
     <!-- Input Form -->
- <!--    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
       <h2 class="text-xl font-semibold mb-4 text-blue-700">إدخال البيانات</h2>
-      <div id="errorMessage" class="text-red-600 mb-4 hidden"></div> -->
+      <div id="errorMessage" class="text-red-600 mb-4 hidden"></div>
 
       <!-- Dimensions Section -->
       <h3 class="text-lg font-semibold mb-3 text-blue-600">الأبعاد</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium" for="landLength">طول الأرض (متر):</label>
+          <input id="landLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" placeholder="مثال: 10" aria-label="طول الأرض بالمتر">
+        </div>
+        <div>
+          <label class="block text-sm font-medium" for="landWidth">عرض الأرض (متر):</label>
+          <input id="landWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض الأرض بالمتر">
+        </div>
         <div>
           <label class="block text-sm font-medium" for="buildLength">طول المبنى (متر):</label>
           <input id="buildLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="10" placeholder="مثال: 10" aria-label="طول المبنى بالمتر">
@@ -289,16 +288,6 @@
         <div>
           <label class="block text-sm font-medium" for="buildWidth">عرض المبنى (متر):</label>
           <input id="buildWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض المبنى بالمتر">
-        </div>
-  
-  
-         <div>
-          <label class="block text-sm font-medium" for="landLength">طول الأرض (متر):</label>
-          <input id="landLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="10" placeholder="مثال: 10" aria-label="طول الأرض بالمتر">
-        </div>
-        <div>
-          <label class="block text-sm font-medium" for="landWidth">عرض الأرض (متر):</label>
-          <input id="landWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض الأرض بالمتر">
         </div>
         <div>
           <label class="block text-sm font-medium" for="numFloors">عدد الطوابق (بدون السطح):</label>
