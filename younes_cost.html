@@ -1,65 +1,54 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>حاسبة تكلفة بناء منزل مع أسعار المواد الحالية</title>
- <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-
-
-
-
   <style>
     .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    
-	
-	.tooltip-container {
-  position: relative;
-  display: inline-block; /* أو block حسب الحاجة */
-  width: 100%; /* أو حجم مناسب */
-}
-.tooltip-text {
-  visibility: hidden;
-  max-width: 300px;
-  background-color: #004080;
-  color: #fff;
-  text-align: center;
-  padding: 6px 10px;
-  border-radius: 6px;
-  position: absolute;
-  bottom: 125%; /* فوق العنصر */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  white-space: normal;
-  font-size: 14px;
-  line-height: 1.3;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.tooltip-container:hover .tooltip-text {
-  visibility: visible;
-  opacity: 1;
-}
-.tooltip-text::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -6px;
-  border-width: 6px;
-  border-style: solid;
-  border-color: #004080 transparent transparent transparent;
-}
-
+    .tooltip-container {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+    .tooltip-text {
+      visibility: hidden;
+      max-width: 300px;
+      background-color: #004080;
+      color: #fff;
+      text-align: center;
+      padding: 6px 10px;
+      border-radius: 6px;
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      white-space: normal;
+      font-size: 14px;
+      line-height: 1.3;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .tooltip-container:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -6px;
+      border-width: 6px;
+      border-style: solid;
+      border-color: #004080 transparent transparent transparent;
+    }
     html, body {
       margin: 0;
       padding: 0;
@@ -270,6 +259,12 @@
       transform: scale(1.05);
       box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     }
+    #errorMessage {
+      color: red;
+      font-size: 16px;
+      text-align: center;
+      margin: 10px 0;
+    }
     @media only screen and (max-width: 600px) {
       body {
         padding: 5px;
@@ -310,224 +305,138 @@
 
     <!-- Input Form -->
     <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-	
-   <div style="background-color:#f0f8ff; border: 2px solid #4a90e2; padding: 15px; border-radius: 8px; font-family: 'Arial', sans-serif; color: #333; max-width: 800px; line-height: 1.5; margin: 50px auto; text-align: center;">
-  <p style="font-size: 18px; margin: 0; display: inline-block; text-align: right;">
-    <span style="color: #e67e22; font-weight: bold;">📌</span> يمكنك تعديل <strong>المساحة</strong> وعدد <strong>الطوابق</strong> حسب مشروعك، ثم الضغط على 
-    <span style="background-color: #4a90e2; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold;">احسب التكلفة</span> 
-    للحصول على تقدير تقريبي يوضح فكرة عامة عن التكلفة. يمكنك أيضاً طباعة النتائج بصيغتي <strong>PDF</strong> أو <strong>Excel</strong> للاحتفاظ بها.
-  </p>
-   </div>
-	
-	
-	
-	
-    <div id="errorMessage" class="text-red-600 mb-4 hidden"></div>
+      <div style="background-color:#f0f8ff; border: 2px solid #4a90e2; padding: 15px; border-radius: 8px; font-family: 'Arial', sans-serif; color: #333; max-width: 800px; line-height: 1.5; margin: 50px auto; text-align: center;">
+        <p style="font-size: 18px; margin: 0; display: inline-block; text-align: right;">
+          <span style="color: #e67e22; font-weight: bold;">📌</span> يمكنك تعديل <strong>المساحة</strong> وعدد <strong>الطوابق</strong> حسب مشروعك، ثم الضغط على 
+          <span style="background-color: #4a90e2; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold;">احسب التكلفة</span> 
+          للحصول على تقدير تقريبي يوضح فكرة عامة عن التكلفة. يمكنك أيضاً طباعة النتائج بصيغتي <strong>PDF</strong> أو <strong>Excel</strong> للاحتفاظ بها.
+        </p>
+      </div>
+      <div id="errorMessage" class="text-red-600 mb-4 hidden"></div>
 
       <!-- Dimensions Section -->
       <h3 class="text-lg font-semibold mb-3 text-blue-600">الأبعاد</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+        <div>
           <label class="block text-sm font-medium" for="buildLength">طول المبنى (متر):</label>
-          <input id="buildLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="10" placeholder="مثال: 10" aria-label="طول المبنى بالمتر">
+          <input id="buildLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="10" placeholder="مثال: 10" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="طول المبنى بالمتر">
         </div>
         <div>
           <label class="block text-sm font-medium" for="buildWidth">عرض المبنى (متر):</label>
-          <input id="buildWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض المبنى بالمتر">
+          <input id="buildWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="عرض المبنى بالمتر">
         </div>
-		
-		      <div>
+        <div>
           <label class="block text-sm font-medium" for="landLength">طول الأرض (متر):</label>
-          <input id="landLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="10" placeholder="مثال: 10" aria-label="طول الأرض بالمتر">
+          <input id="landLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="10" placeholder="مثال: 10" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="طول الأرض بالمتر">
         </div>
         <div>
           <label class="block text-sm font-medium" for="landWidth">عرض الأرض (متر):</label>
-          <input id="landWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض الأرض بالمتر">
+          <input id="landWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="عرض الأرض بالمتر">
         </div>
-
         <div>
           <label class="block text-sm font-medium" for="numFloors">عدد الطوابق (بدون السطح):</label>
-          <input id="numFloors" type="number" min="1" step="1" class="mt-1 p-2 w-full border rounded" value="2" placeholder="2ثال: 1" aria-label="عدد الطوابق">
+          <input id="numFloors" type="number" min="1" step="1" class="mt-1 p-2 w-full border rounded" value="2" placeholder="مثال: 1" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="عدد الطوابق">
         </div>
-        
-
-		
-
-<div>
-  <label class="block text-lg font-medium" for="hasBasement" style="color: blue;">
-    هل يوجد قبو ؟ (La cave)
-  </label>
-  <small style="color: gray;">إذا كان لديك قبو، ضع علامة هنا</small><br>
-  <input 
-    id="hasBasement" 
-    type="checkbox" 
-    style="width: 16px; height: 16px;"
-    aria-label="إضافة قبو"
-  >
-</div>
-
-
-
-	
         <div>
-          <label class="block text-sm font-medium" for="semelleCount">
-		  
-		عدد السملات (Semelle) — القاعدة
-		  
-		  </label>
-          <input id="semelleCount" type="number" min="1" step="1" class="mt-1 p-2 w-full border rounded" value="16" placeholder="مثال: 16" aria-label="عدد السملات">
+          <label class="block text-lg font-medium" for="hasBasement" style="color: blue;">
+            هل يوجد قبو؟ (La cave)
+          </label>
+          <small style="color: gray;">إذا كان لديك قبو، ضع علامة هنا</small><br>
+          <input id="hasBasement" type="checkbox" style="width: 16px; height: 16px;" onclick="debouncedCalculateCost()" aria-label="إضافة قبو">
+        </div>
+        <div>
+          <label class="block text-sm font-medium" for="semelleCount">عدد السملات (Semelle) — القاعدة</label>
+          <input id="semelleCount" type="number" min="1" step="1" class="mt-1 p-2 w-full border rounded" value="16" placeholder="مثال: 16" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="عدد السملات">
         </div>
       </div>
-	  
 
       <!-- Material Prices Section -->
-      
-	<h3 class="text-lg font-semibold mt-6 mb-3 text-blue-600">
-  أسعار مواد البناء الخاصة بالأشغال الكبرى (gros œuvre)، وفق الأسعار الحالية. يمكنكم تعديلها عند تغيّر الأسعار.
-</h3>
-
-	  
+      <h3 class="text-lg font-semibold mt-6 mb-3 text-blue-600">
+        أسعار مواد البناء الخاصة بالأشغال الكبرى (gros œuvre)، وفق الأسعار الحالية. يمكنكم تعديلها عند تغيّر الأسعار.
+      </h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium" for="betonPrice">سعر البيتون (درهم مغربي/م³):</label>
-          <input id="betonPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="850" placeholder="مثال: 850" aria-label="سعر البيتون لكل متر مكعب">
+          <input id="betonPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="850" placeholder="مثال: 850" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر البيتون لكل متر مكعب">
         </div>
         <div>
           <label class="block text-sm font-medium" for="b15Price">سعر خرسانة النظافة B15 (درهم مغربي/م³):</label>
-          <input id="b15Price" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="850" placeholder="مثال: 850" aria-label="سعر خرسانة النظافة B15">
+          <input id="b15Price" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="850" placeholder="مثال: 850" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر خرسانة النظافة B15">
         </div>
         <div>
           <label class="block text-sm font-medium" for="ironPrice">سعر الحديد (درهم مغربي/كجم):</label>
-          <input id="ironPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="9.5" placeholder="مثال: 9.5" aria-label="سعر الحديد لكل كيلوغرام">
+          <input id="ironPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="9.5" placeholder="مثال: 9.5" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر الحديد لكل كيلوغرام">
         </div>
         <div>
           <label class="block text-sm font-medium" for="cementPrice">سعر الأسمنت (درهم مغربي/خنشة):</label>
-          <input id="cementPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="82" placeholder="مثال: 82" aria-label="سعر الأسمنت لكل خنشة">
+          <input id="cementPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="82" placeholder="مثال: 82" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر الأسمنت لكل خنشة">
         </div>
         <div>
           <label class="block text-sm font-medium" for="excavationPrice">سعر الحفر (درهم مغربي/م³):</label>
-          <input id="excavationPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="35" placeholder="مثال: 35" aria-label="سعر الحفر لكل متر مكعب">
+          <input id="excavationPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="35" placeholder="مثال: 35" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر الحفر لكل متر مكعب">
         </div>
-		
-		
-
-        
-		
-<div class="tooltip-container">
-  <label for="gravelPrice" class="block text-sm font-medium">سعر حصى الفياج (درهم مغربي/م³):</label>
-  <input 
-    id="gravelPrice" 
-    type="number" 
-    min="0" 
-    step="0.1" 
-    value="148" 
-    placeholder="مثال: 148" 
-    aria-label="سعر حصى الفياج"
-    class="mt-1 p-2 w-full border rounded"
-  >
-  <div class="tooltip-text" style="
-    background-color: #004080;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 6px;
-    margin-top: 5px;
-    font-size: 14px;
-  ">
-    التغطية (فياج) التي تساوي 25 م³ تكلف 3700 درهم، أي 148 درهم للمتر المكعب .
-  </div>
-</div>
-
-		
-		
-		<div>
+        <div class="tooltip-container">
+          <label for="gravelPrice" class="block text-sm font-medium">سعر حصى الفياج (درهم مغربي/م³):</label>
+          <input id="gravelPrice" type="number" min="0" step="0.1" value="148" placeholder="مثال: 148" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر حصى الفياج" class="mt-1 p-2 w-full border rounded">
+          <div class="tooltip-text">التغطية (فياج) التي تساوي 25 م³ تكلف 3700 درهم، أي 148 درهم للمتر المكعب.</div>
+        </div>
+        <div>
           <label class="block text-sm font-medium" for="brickPrice">سعر الطوب (درهم مغربي/حبة):</label>
-          <input id="brickPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="6.5" placeholder="مثال: 6.5" aria-label="سعر الطوب لكل حبة">
+          <input id="brickPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="6.5" placeholder="مثال: 6.5" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر الطوب لكل حبة">
         </div>
-		
-		
-		
-
-
-<div class="tooltip-container">
-  <label for="sandPrice" class="block text-sm font-medium">سعر رمل البناء (درهم مغربي/م³):</label>
-  <input 
-    id="sandPrice" 
-    type="number" 
-    min="0" 
-    step="0.1" 
-    value="240" 
-    placeholder="مثال: 240" 
-    aria-label="سعر رمل البناء"
-  >
-  <div class="tooltip-text">
-    كمية 25 م² تكلف 6000 درهم، والتغطية (فياج) هي 240 درهم للمتر المكعب.
-  </div>
-</div>
-
-
-		
-         
-		
-				<div>
+        <div class="tooltip-container">
+          <label for="sandPrice" class="block text-sm font-medium">سعر رمل البناء (درهم مغربي/م³):</label>
+          <input id="sandPrice" type="number" min="0" step="0.1" value="240" placeholder="مثال: 240" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر رمل البناء" class="mt-1 p-2 w-full border rounded">
+          <div class="tooltip-text">كمية 25 م² تكلف 6000 درهم، والتغطية (فياج) هي 240 درهم للمتر المكعب.</div>
+        </div>
+        <div>
           <label class="block text-sm font-medium" for="aggregatePrice">سعر الحصى (درهم مغربي/م³):</label>
-          <input id="aggregatePrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="160" placeholder="مثال: 160" aria-label="سعر الحصى">
+          <input id="aggregatePrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="160" placeholder="مثال: 160" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر الحصى">
         </div>
-		
-		
-		
-		
-
         <div>
           <label class="block text-sm font-medium" for="laborPrice">سعر اليد العاملة (درهم مغربي/م²):</label>
-          <input id="laborPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="240" placeholder="مثال: 240" aria-label="سعر اليد العاملة لكل متر مربع">
+          <input id="laborPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="240" placeholder="مثال: 240" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر اليد العاملة لكل متر مربع">
         </div>
-		
-		
-		
-		
-		
+        <div>
+          <label class="block text-sm font-medium" for="sandFayagePrice">سعر الرمل (درهم مغربي/فياج):</label>
+          <input id="sandFayagePrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="6000" placeholder="مثال: 6000" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر الرمل لكل فياج">
+        </div>
         <div>
           <label class="block text-sm font-medium" for="combinedMaterialPrice">سعر الوردي والبودر والشبكة (درهم مغربي/م²):</label>
-          <input id="combinedMaterialPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="85" placeholder="مثال: 85" aria-label="سعر الوردي والبودر والشبكة لكل متر مربع">
+          <input id="combinedMaterialPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="85" placeholder="مثال: 85" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر الوردي والبودر والشبكة لكل متر مربع">
         </div>
         <div>
           <label class="block text-sm font-medium" for="stonePrice">سعر الحجر للبلوكاج (درهم مغربي/فياج):</label>
-          <input id="stonePrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="3500" placeholder="مثال: 3500" aria-label="سعر الحجر للبلوكاج لكل فياج">
+          <input id="stonePrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="3500" placeholder="مثال: 3500" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر الحجر للبلوكاج لكل فياج">
         </div>
         <div>
           <label class="block text-sm font-medium" for="sacksPrice">سعر الكياس (درهم مغربي/فياج):</label>
-          <input id="sacksPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="3500" placeholder="مثال: 3500" aria-label="سعر الكياس لكل فياج">
+          <input id="sacksPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="3500" placeholder="مثال: 3500" oninput="restrictPositiveNumber(this)" onchange="debouncedCalculateCost()" aria-label="سعر الكياس لكل فياج">
         </div>
-
       </div>
 
       <div class="flex justify-center gap-4 mt-6">
         <button onclick="calculateCost()" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">احسب التكلفة الآن</button>
- 
- <!--      <button onclick="resetForm()" class="w-full bg-gray-600 text-white p-2 rounded hover:bg-gray-700">إعادة تعيين</button>  -->
-
-    </div>
+        <button onclick="resetForm()" class="w-full bg-gray-600 text-white p-2 rounded hover:bg-gray-700">إعادة تعيين</button>
+      </div>
     </div>
 
     <!-- Cost Output -->
     <div id="costOutput" class="bg-white p-6 rounded-lg shadow-md mb-6 hidden">
-	
-	
-	<h3 style="color: #004aad; font-size: 20px; text-align: center;">
-  
-  يمكنك إعادة حساب تكلفة المنزل مرة أخرى إذا تغيرت أسعار مواد البناء بناءً على الأسعار الواردة في الجدول أعلاه.
-  </h3>
-  <h3 style="color: #004aad; font-size: 20px; text-align: center;">
-   يمكنك تعديل "الكمية" حسب المطلوب، مع سعر الوحدة لكل مادة.
-   يمكنك تعديل تكلفة الحفر (مثلاً من 35 إلى 50) وسيتم تحديث السعر الإجمالي تلقائيًا.
-  </h3>
-    <h3 style="color: #004aad; font-size: 20px; text-align: center;">
-	
-وفي النهاية يمكنك رؤية السعر والملخص لكل مادة لكل المنزل بالكامل، ويمكنك أيضًا طباعة التقرير بصيغة PDF أو Excel 
-  </h3>
-
-	
-      <h2 class="text-xl font-semibold mb-4 text-blue-700">تفاصيل التكلفة</h2>
+      <h3 style="color: #004aad; font-size: 20px; text-align: center;">
+        يمكنك إعادة حساب تكلفة المنزل مرة أخرى إذا تغيرت أسعار مواد البناء بناءً على الأسعار الواردة في الجدول أعلاه.
+      </h3>
+      <h3 style="color: #004aad; font-size: 20px; text-align: center;">
+        يمكنك تعديل "الكمية" حسب المطلوب، مع سعر الوحدة لكل مادة.
+        يمكنك تعديل تكلفة الحفر (مثلاً من 35 إلى 50) وسيتم تحديث السعر الإجمالي تلقائيًا.
+      </h3>
+      <h3 style="color: #004aad; font-size: 20px; text-align: center;">
+        وفي النهاية يمكنك رؤية السعر والملخص لكل مادة لكل المنزل بالكامل، ويمكنك أيضاً طباعة التقرير بصيغة PDF أو Excel
+      </h3>
+      <h2 class="text-xl font-semibold mb-4 text-blue-700">
+        تفاصيل التكلفة
+        التكلفة ستظهر بشكل أفضل لرؤية الجدول بالكامل إذا قمت بتدوير الهاتف أفقيًا، أو يمكنك أيضاً رؤيتها من الكمبيوتر.
+      </h2>
       <table class="w-full border-collapse mb-6">
         <thead>
           <tr class="bg-blue-600 text-white">
@@ -542,8 +451,6 @@
         <tbody id="costTableBody"></tbody>
       </table>
       <h3 class="text-lg font-semibold mt-4 text-blue-800">الإجمالي: <span id="totalCost">0</span> درهم مغربي</h3>
-
-      <!-- Summary by Product -->
       <h2 class="text-xl font-semibold mt-6 mb-4 text-blue-700">ملخص التكلفة حسب المادة</h2>
       <table class="w-full border-collapse">
         <thead>
@@ -566,780 +473,817 @@
   </div>
 
   <script>
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-      if (
-        e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
-        (e.ctrlKey && e.key === 'U')
-      ) {
-        e.preventDefault();
-      }
-    });
-
     let costData = [];
 
+    // Utility function to restrict input to positive numbers
+    function restrictPositiveNumber(input) {
+      input.value = input.value.replace(/[^0-9.]/g, '');
+      if (input.value === '' || parseFloat(input.value) < 0 || input.value === '.') {
+        input.value = input.defaultValue || '0';
+      }
+      if (parseFloat(input.value) > 1000000) {
+        input.value = '1000000';
+        showError('القيمة كبيرة جدًا، الحد الأقصى هو 1,000,000');
+      }
+    }
+
+    // Utility function to get valid number with fallback
+    function getValidNumber(value, defaultValue, isInt = false) {
+      const parsed = isInt ? parseInt(value) : parseFloat(value.replace(',', '.'));
+      if (isNaN(parsed) || parsed < (isInt ? 1 : 0)) return defaultValue;
+      if (parsed > 1000000) {
+        showError('القيمة كبيرة جدًا، الحد الأقصى هو 1,000,000');
+        return defaultValue;
+      }
+      return parsed;
+    }
+
+    // Enhanced input validation
     function validateInputs(inputs) {
       const errors = [];
-      const requiredInputs = { ...inputs };
-      delete requiredInputs.landLength;
-      delete requiredInputs.landWidth;
-      delete requiredInputs.buildLength;
-      delete requiredInputs.buildWidth;
-      for (const [id, value] of Object.entries(requiredInputs)) {
+      for (const [id, value] of Object.entries(inputs)) {
         if (isNaN(value) || value <= 0) {
-          errors.push(`يرجى إدخال قيمة صحيحة وموجبة لـ ${document.querySelector(`label[for="${id}"]`).textContent}`);
+          const label = document.querySelector(`label[for="${id}"]`)?.textContent || id;
+          errors.push(`يرجى إدخال قيمة صحيحة وموجبة لـ ${label}`);
+        }
+        if (value > 1000000) {
+          const label = document.querySelector(`label[for="${id}"]`)?.textContent || id;
+          errors.push(`القيمة كبيرة جدًا لـ ${label}، الحد الأقصى هو 1,000,000`);
         }
       }
       return errors;
     }
 
+    // Show error with timeout
     function showError(message) {
       const errorDiv = document.getElementById('errorMessage');
       errorDiv.textContent = message;
       errorDiv.classList.remove('hidden');
+      setTimeout(() => errorDiv.classList.add('hidden'), 5000);
     }
 
+    // Clear error
     function clearError() {
       const errorDiv = document.getElementById('errorMessage');
       errorDiv.textContent = '';
       errorDiv.classList.add('hidden');
     }
 
+    // Debounce function to limit rapid calculateCost calls
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    const debouncedCalculateCost = debounce(calculateCost, 300);
+
+    // Reset form to default values
     function resetForm() {
       const inputs = document.querySelectorAll('input[type="number"], input[type="checkbox"]');
       inputs.forEach(input => {
         if (input.type === 'number') {
-          input.value = input.id === 'numFloors' ? 1 : input.id === 'semelleCount' ? 16 : input.id === 'betonPrice' ? 750 : 
-                        input.id === 'b15Price' ? 750 : input.id === 'ironPrice' ? 9.5 : input.id === 'cementPrice' ? 82 : 
-                        input.id === 'excavationPrice' ? 35 : input.id === 'gravelPrice' ? 200 : input.id === 'brickPrice' ? 6.5 : 
-                        input.id === 'sandPrice' ? 240 : input.id === 'aggregatePrice' ? 160 : input.id === 'laborPrice' ? 100 : 
-                        input.id === 'combinedMaterialPrice' ? 85 : input.id === 'stonePrice' ? 3500 : input.id === 'sacksPrice' ? 3500 : 
-                        input.id === 'buildLength' ? 10 : '';
+          input.value = input.id === 'numFloors' ? 2 : input.id === 'semelleCount' ? 16 : 
+                        input.id === 'betonPrice' ? 850 : input.id === 'b15Price' ? 850 : 
+                        input.id === 'ironPrice' ? 9.5 : input.id === 'cementPrice' ? 82 : 
+                        input.id === 'excavationPrice' ? 35 : input.id === 'gravelPrice' ? 148 : 
+                        input.id === 'brickPrice' ? 6.5 : input.id === 'sandPrice' ? 240 : 
+                        input.id === 'aggregatePrice' ? 160 : input.id === 'laborPrice' ? 240 : 
+                        input.id === 'combinedMaterialPrice' ? 85 : input.id === 'stonePrice' ? 3500 : 
+                        input.id === 'sacksPrice' ? 3500 : input.id === 'sandFayagePrice' ? 6000 : 
+                        input.id === 'landLength' ? 10 : input.id === 'landWidth' ? 12 : 
+                        input.id === 'buildLength' ? 10 : input.id === 'buildWidth' ? 12 : '0';
         } else if (input.type === 'checkbox') {
-          input.checked = input.id === 'hasBasement';
+          input.checked = false;
         }
       });
+      costData = [];
       document.getElementById('costOutput').classList.add('hidden');
       clearError();
     }
 
-    function updateTables() {
-      const totalCost = costData.reduce((sum, item) => sum + (item.stage.includes('للمعلومات') ? 0 : item.totalCost), 0);
-      const costTableBody = document.getElementById('costTableBody');
-      costTableBody.innerHTML = costData.map((item, idx) => `
-        <tr class="${item.material.startsWith('الحديد ') ? 'bg-gray-100' : item.material === 'الوردي والبودر والشبكة' || item.material === 'الحجر (للبلوكاج)' || item.material === 'الكياس' || item.material === 'الرمل' ? 'bg-blue-100' : idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
-          <td class="border p-2">${item.material}</td>
-          <td class="border p-2">${item.stage}</td>
-          <td class="border p-2"><input type="number" value="${item.quantity}" step="0.1" min="0" onchange="updateQuantity(${idx}, this.value)" class="w-full p-1 border rounded" aria-label="الكمية لـ ${item.material}"></td>
-          <td class="border p-2"><input type="number" value="${item.unitPrice}" step="0.1" min="0" onchange="updateUnitPrice(${idx}, this.value)" class="w-full p-1 border rounded" aria-label="سعر الوحدة لـ ${item.material}"></td>
-          <td class="border p-2">${item.totalCost.toFixed(2)}</td>
-          <td class="border p-2">${item.coveredArea.toFixed(2)}</td>
-        </tr>
-      `).join('');
-      const materials = [
-        'حفر الأساسات',
-        'الحديد',
-        'البيتون',
-        'خرسانة النظافة B15',
-        'الأسمنت',
-        'حصى الفياج',
-        'الطوب',
-        'رمل البناء',
-        'الحصى',
-        'اليد العاملة',
-        'الوردي والبودر والشبكة',
-        'الحجر (للبلوكاج)',
-        'الكياس',
-        'الرمل'
-      ];
-      const summaryData = materials.map(material => {
-        const items = costData.filter(item => (item.material === material || item.material.startsWith(material + ' ')) && !item.stage.includes('للمعلومات'));
-        const totalQuantity = items.reduce((sum, item) => sum + parseFloat(item.quantity), 0);
-        const totalCostItem = items.reduce((sum, item) => sum + item.totalCost, 0);
-        return {
-          material,
-          quantity: totalQuantity.toFixed(2),
-          unit: items.length > 0 ? items[0].unit : '',
-          totalCost: totalCostItem,
-          percentage: totalCost > 0 ? (totalCostItem / totalCost * 100).toFixed(2) : 0
-        };
-      }).filter(item => item.quantity > 0);
-      const summaryTableBody = document.getElementById('summaryTableBody');
-      summaryTableBody.innerHTML = summaryData.map(item => `
-        <tr class="${item.material === 'الوردي والبودر والشبكة' || item.material === 'الحجر (للبلوكاج)' || item.material === 'الكياس' || item.material === 'الرمل' ? 'bg-blue-100' : ''}">
-          <td class="border p-2">${item.material}</td>
-          <td class="border p-2">${item.quantity} ${item.unit}</td>
-          <td class="border p-2">${item.totalCost.toFixed(2)}</td>
-          <td class="border p-2">${item.percentage}%</td>
-        </tr>
-      `).join('');
-      document.getElementById('totalCost').textContent = totalCost.toFixed(2);
-    }
-
-// Assume numFloors is declared globally
-// let numFloors = 1;
-
-//const numFloors = inputs.numFloors || 2;
-
-
- 
- function getIronQuantity(area) {
-    /**
-     * Calculate iron quantity (kg) for a house based on area per floor and number of floors from DOM.
-     * Uses hard-coded iron costs from the Calculations table, divided by 980 DH/kg.
-     * If area is not in the table, picks the nearest area.
-     * 
-     * @param {number} area - Area per floor in square meters.
-     * @returns {number} - Iron quantity in kilograms, rounded to 2 decimal places.
-     * @throws {Error} - If area is invalid or DOM element is missing.
-     */
-    const ironCosts = {
+    // Calculate iron quantity
+    function getIronQuantity(area) {
+      /**
+       * Calculate iron quantity (kg) for a house based on area per floor and number of floors from DOM.
+       * Uses hard-coded iron costs from the Calculations table, divided by 980 DH/kg.
+       * If area is not in the table, picks the nearest area.
+       * 
+       * @param {number} area - Area per floor in square meters.
+       * @returns {number} - Iron quantity in kilograms, rounded to 2 decimal places.
+       * @throws {Error} - If area is invalid or DOM element is missing.
+       */
+      const ironCosts = {
         'R+1': {
-            80: 47040,  // 48 kg × 980 = 47040 DH
-            90: 52920,  // 54 kg × 980 = 52920 DH
-            100: 58800, // 60 kg × 980 = 58800 DH
-            110: 64680, // 66 kg × 980 = 64680 DH
-            120: 73500, // 75 kg × 980 = 73500 DH
-            130: 76440, // 78 kg × 980 = 76440 DH
-            140: 82320, // 84 kg × 980 = 82320 DH
-            150: 88200, // 90 kg × 980 = 88200 DH
-            160: 94080, // 96 kg × 980 = 94080 DH
-            170: 99960  // 102 kg × 980 = 99960 DH
+          80: 47040, 90: 52920, 100: 58800, 110: 64680, 120: 73500,
+          130: 76440, 140: 82320, 150: 88200, 160: 94080, 170: 99960
         },
         'R+2': {
-            80: 57432, 90: 64611, 100: 71790, 110: 78969, 120: 86148,
-            130: 93327, 140: 100506, 150: 107685, 160: 114864, 170: 122043
+          80: 57432, 90: 64611, 100: 71790, 110: 78969, 120: 86148,
+          130: 93327, 140: 100506, 150: 107685, 160: 114864, 170: 122043
         },
         'R+3': {
-            80: 80221, 90: 90248, 100: 100276, 110: 110304, 120: 120331,
-            130: 130359, 140: 140386, 150: 150414, 160: 160442, 170: 170469
+          80: 80221, 90: 90248, 100: 100276, 110: 110304, 120: 120331,
+          130: 130359, 140: 140386, 150: 150414, 160: 160442, 170: 170469
         }
-    };
+      };
 
-    // Map number of floors to house type
-    const floorToHouseType = {
+      // Map number of floors to house type
+      const floorToHouseType = {
         2: 'R+1',
         3: 'R+2',
         4: 'R+3'
-    };
-
-    // Get numFloors from DOM
-    const numFloorsElement = document.getElementById('numFloors');
-    if (!numFloorsElement) {
-        throw new Error('DOM element with ID "numFloors" not found.');
-    }
-    const numFloorsValue = numFloorsElement.value.trim();
-    if (numFloorsValue === '') {
-        throw new Error('Number of floors input is empty. Please enter a number.');
-    }
-    const numFloors = parseInt(numFloorsValue);
-    
-    // Validate area
-    if (isNaN(area) || area <= 0) {
-        throw new Error('Area must be a positive number.');
-    }
-
-    // Map numFloors to house type (handle 1 or >4)
-    let houseType;
-    if (numFloors <= 1) {
-        houseType = 'R+1'; // Treat 1 floor as R+1 (2 floors total)
-    } else if (numFloors >= 4) {
-        houseType = 'R+3'; // Cap at R+3 for 4+ floors
-    } else {
-        houseType = floorToHouseType[numFloors]; // 2 → R+1, 3 → R+2, 4 → R+3
-    }
-
-    // Available areas from the table
-    const availableAreas = [80, 90, 100, 110, 120, 130, 140, 150, 160, 170];
-
-    // Find nearest area if input area is not in the table
-    let closestArea = area;
-    if (!ironCosts['R+1'][area]) {
-        closestArea = availableAreas.reduce((prev, curr) =>
-            Math.abs(curr - area) < Math.abs(prev - area) ? curr : prev
-        );
-    }
-
-    // Get total iron cost
-    const totalCost = ironCosts[houseType][closestArea];
-
-    // Calculate iron quantity (kg) using cost per kg (980 DH/kg)
-    const ironQuantity = totalCost / 980;
-
-    // Log floor area, numFloors, closestArea, and ironQuantity for debugging
-    console.log(`Input Floor Area: ${area} m²`);
-    console.log(`Number of Floors: ${numFloors}`);
-    console.log(`Closest Table Area: ${closestArea} m²`);
-    console.log(`Iron Quantity: ${ironQuantity.toFixed(2)} kg`);
-
-    return Number(ironQuantity.toFixed(2)*100);
-}
-
-
-
-
-
-
-function x1getIronQuantity(area) {
-    const inputs = {
-        landLength: parseFloat(document.getElementById('landLength').value),
-        landWidth: parseFloat(document.getElementById('landWidth').value),
-        buildLength: parseFloat(document.getElementById('buildLength').value),
-        buildWidth: parseFloat(document.getElementById('buildWidth').value),
-        numFloors: parseInt(document.getElementById('numFloors').value),
-        semelleCount: parseInt(document.getElementById('semelleCount').value),
-        betonPrice: parseFloat(document.getElementById('betonPrice').value),
-        b15Price: parseFloat(document.getElementById('b15Price').value),
-        ironPrice: parseFloat(document.getElementById('ironPrice').value),
-        cementPrice: parseFloat(document.getElementById('cementPrice').value),
-        excavationPrice: parseFloat(document.getElementById('excavationPrice').value),
-        gravelPrice: parseFloat(document.getElementById('gravelPrice').value),
-        brickPrice: parseFloat(document.getElementById('brickPrice').value),
-        sandPrice: parseFloat(document.getElementById('sandPrice').value),
-        aggregatePrice: parseFloat(document.getElementById('aggregatePrice').value),
-        laborPrice: parseFloat(document.getElementById('laborPrice').value),
-        combinedMaterialPrice: parseFloat(document.getElementById('combinedMaterialPrice').value),
-        stonePrice: parseFloat(document.getElementById('stonePrice').value),
-        sacksPrice: parseFloat(document.getElementById('sacksPrice').value)
-    };
-
-    return Math.ceil(area * 40 * inputs.numFloors);
-}
-
-	
-
-   function XXXgetIronQuantity(area) {
-   
-   
-      const ironData = [
-        { area: 80, iron: 5000 },
-        { area: 100, iron: 6000 },
-        { area: 110, iron: 7000 },
-        { area: 120, iron: 7500 }
-      ];
-      if (area <= 80) return 5000;
-      if (area >= 120) return 7500;
-      ironData.sort((a, b) => a.area - b.area);
-      for (let i = 0; i < ironData.length - 1; i++) {
-        if (area >= ironData[i].area && area <= ironData[i + 1].area) {
-          const x0 = ironData[i].area, y0 = ironData[i].iron;
-          const x1 = ironData[i + 1].area, y1 = ironData[i + 1].iron;
-          return y0 + (y1 - y0) * (area - x0) / (x1 - x0);
-        }
-      }
-      return 7500;
-    }
-
-
-
-
-  
-
-    function calculateCost() {
-      const inputs = {
-        landLength: parseFloat(document.getElementById('landLength').value),
-        landWidth: parseFloat(document.getElementById('landWidth').value),
-        buildLength: parseFloat(document.getElementById('buildLength').value),
-        buildWidth: parseFloat(document.getElementById('buildWidth').value),
-        numFloors: parseInt(document.getElementById('numFloors').value),
-        semelleCount: parseInt(document.getElementById('semelleCount').value),
-        betonPrice: parseFloat(document.getElementById('betonPrice').value),
-        b15Price: parseFloat(document.getElementById('b15Price').value),
-        ironPrice: parseFloat(document.getElementById('ironPrice').value),
-        cementPrice: parseFloat(document.getElementById('cementPrice').value),
-        excavationPrice: parseFloat(document.getElementById('excavationPrice').value),
-        gravelPrice: parseFloat(document.getElementById('gravelPrice').value),
-        brickPrice: parseFloat(document.getElementById('brickPrice').value),
-        sandPrice: parseFloat(document.getElementById('sandPrice').value),
-        aggregatePrice: parseFloat(document.getElementById('aggregatePrice').value),
-        laborPrice: parseFloat(document.getElementById('laborPrice').value),
-        combinedMaterialPrice: parseFloat(document.getElementById('combinedMaterialPrice').value),
-        stonePrice: parseFloat(document.getElementById('stonePrice').value),
-        sacksPrice: parseFloat(document.getElementById('sacksPrice').value)
-  
       };
 
-      const errors = validateInputs(inputs);
-      if (errors.length > 0) {
-        showError(errors.join('\n'));
-        return;
+      // Get numFloors from DOM
+      const numFloorsElement = document.getElementById('numFloors');
+      if (!numFloorsElement) {
+        throw new Error('DOM element with ID "numFloors" not found.');
       }
-      clearError();
-
-      const landLength = isNaN(inputs.landLength) || inputs.landLength <= 0 ? 10 : inputs.landLength;
-      const landWidth = isNaN(inputs.landWidth) || inputs.landWidth <= 0 ? 12 : inputs.landWidth;
-      const buildLength = isNaN(inputs.buildLength) || inputs.buildLength <= 0 ? 10 : inputs.buildLength;
-      const buildWidth = isNaN(inputs.buildWidth) || inputs.buildWidth <= 0 ? 12 : inputs.buildWidth;
+      const numFloorsValue = numFloorsElement.value.trim();
+      if (numFloorsValue === '') {
+        throw new Error('Number of floors input is empty. Please enter a number.');
+      }
+      const numFloors = parseInt(numFloorsValue);
       
-      const hasBasement = document.getElementById('hasBasement').checked;
-      const semelleCount = inputs.semelleCount || 16;
-      const semelleLength = 1.5;
-      const semelleWidth = 1.5;
-      const semelleHeight = 0.3;
-      const betonPrice = inputs.betonPrice || 750;
-      const b15Price = inputs.b15Price || 750;
-      const ironPrice = inputs.ironPrice || 9.5;
-      const cementPrice = inputs.cementPrice || 82;
-      const excavationPrice = inputs.excavationPrice || 35;
-      const gravelPrice = inputs.gravelPrice || 200;
-      const brickPrice = inputs.brickPrice || 6.5;
-      const sandPrice = inputs.sandPrice || 240;
-      const aggregatePrice = inputs.aggregatePrice || 160;
-      const laborPrice = inputs.laborPrice || 100;
-      const combinedMaterialPrice = inputs.combinedMaterialPrice || 85;
-      const stonePrice = inputs.stonePrice || 3500;
-      const sacksPrice = inputs.sacksPrice || 3500;
- 
-      const baseBuildArea = buildLength * buildWidth;
-      const upperFloorArea = buildLength * (buildWidth + 1);
-      const landArea = landLength * landWidth;
-      const projectionArea = 10;
-
-      const floorAreas = [baseBuildArea];
-      let totalArea = baseBuildArea;
-      for (let i = 1; i <= numFloors; i++) {
-        floorAreas.push(upperFloorArea);
-        totalArea += upperFloorArea;
+      // Validate area
+      if (isNaN(area) || area <= 0) {
+        throw new Error('Area must be a positive number.');
       }
-      const terraceArea = baseBuildArea * 0.4;
-      totalArea += terraceArea;
-      if (hasBasement) totalArea += (baseBuildArea + projectionArea);
 
-      costData = [];
-
-      const excavationVolume = baseBuildArea * 3;
-      const excavationCost = excavationVolume * excavationPrice;
-      costData.push({
-        material: 'حفر الأساسات',
-        stage: 'الأساسات',
-        quantity: excavationVolume.toFixed(2),
-        unit: 'م³',
-        unitPrice: excavationPrice,
-        coveredArea: baseBuildArea,
-        totalCost: excavationCost,
-        costPerM2: excavationCost / baseBuildArea
-      });
-
-      let mainIronKg = getIronQuantity(baseBuildArea);
-      let basementIronKg = 0;
-      let totalIronKg = mainIronKg;
-      if (hasBasement) {
-        basementIronKg = (2250 * baseBuildArea) / 120;
-        totalIronKg += basementIronKg;
+      // Map numFloors to house type (handle 1 or >4)
+      let houseType;
+      if (numFloors <= 1) {
+        houseType = 'R+1'; // Treat 1 floor as R+1 (2 floors total)
+      } else if (numFloors >= 4) {
+        houseType = 'R+3'; // Cap at R+3 for 4+ floors
+      } else {
+        houseType = floorToHouseType[numFloors]; // 2 → R+1, 3 → R+2, 4 → R+3
       }
-      costData.push({
-        material: 'الحديد',
-        stage: 'كامل المشروع (بدون قبو)',
-        quantity: mainIronKg.toFixed(2),
-        unit: 'كجم',
-        unitPrice: ironPrice,
-        coveredArea: totalArea,
-        totalCost: mainIronKg * ironPrice,
-        costPerM2: (mainIronKg * ironPrice) / totalArea
-      });
-      if (hasBasement) {
+
+      // Available areas from the table
+      const availableAreas = [80, 90, 100, 110, 120, 130, 140, 150, 160, 170];
+
+      // Find nearest area if input area is not in the table
+      let closestArea = area;
+      if (!ironCosts['R+1'][area]) {
+        closestArea = availableAreas.reduce((prev, curr) =>
+          Math.abs(curr - area) < Math.abs(prev - area) ? curr : prev
+        );
+      }
+
+      // Get total iron cost
+      const totalCost = ironCosts[houseType][closestArea];
+
+      // Calculate iron quantity (kg) using cost per kg (980 DH/kg)
+      const ironQuantity = totalCost / 980;
+
+      // Log floor area, numFloors, closestArea, and ironQuantity for debugging
+     // console.log(`Input Floor Area: ${area} m²`);
+     // console.log(`Number of Floors: ${numFloors}`);
+     // console.log(`Closest Table Area: ${closestArea} m²`);
+     // console.log(`Iron Quantity: ${ironQuantity.toFixed(2)} kg`);
+
+      // Removed *100 as it incorrectly scales the quantity
+      return Number(ironQuantity.toFixed(2));
+    }
+
+    // Update tables with cost data
+    function updateTables() {
+      try {
+        const totalCost = costData.reduce((sum, item) => sum + (item.stage.includes('للمعلومات') ? 0 : (isNaN(item.totalCost) ? 0 : item.totalCost)), 0);
+        const costTableBody = document.getElementById('costTableBody');
+        costTableBody.innerHTML = costData.map((item, idx) => `
+          <tr class="${item.material.startsWith('الحديد ') ? 'bg-gray-100' : item.material === 'الوردي والبودر والشبكة' || item.material === 'الحجر (للبلوكاج)' || item.material === 'الكياس' || item.material === 'الرمل' ? 'bg-blue-100' : idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
+            <td class="border p-2">${item.material}</td>
+            <td class="border p-2">${item.stage}</td>
+            <td class="border p-2"><input type="number" value="${parseFloat(item.quantity).toFixed(2)}" step="0.1" min="0" onchange="updateQuantity(${idx}, this.value)" class="w-full p-1 border rounded" aria-label="الكمية لـ ${item.material}"></td>
+            <td class="border p-2"><input type="number" value="${item.unitPrice.toFixed(2)}" step="0.1" min="0" onchange="updateUnitPrice(${idx}, this.value)" class="w-full p-1 border rounded" aria-label="سعر الوحدة لـ ${item.material}"></td>
+            <td class="border p-2">${isNaN(item.totalCost) ? '0.00' : item.totalCost.toFixed(2)}</td>
+            <td class="border p-2">${isNaN(item.costPerM2) ? '0.00' : item.costPerM2.toFixed(2)}</td>
+          </tr>
+        `).join('');
+        const materials = [
+          'حفر الأساسات',
+          'الحديد',
+          'البيتون',
+          'خرسانة النظافة B15',
+          'الأسمنت',
+          'حصى الفياج',
+          'الطوب',
+          'رمل البناء',
+          'الحصى',
+          'اليد العاملة',
+          'الوردي والبودر والشبكة',
+          'الحجر (للبلوكاج)',
+          'الكياس',
+          'الرمل'
+        ];
+        const summaryData = materials.map(material => {
+          const items = costData.filter(item => (item.material === material || item.material.startsWith(material + ' ')) && !item.stage.includes('للمعلومات'));
+          const totalQuantity = items.reduce((sum, item) => sum + parseFloat(item.quantity || 0), 0);
+          const totalCostItem = items.reduce((sum, item) => sum + (isNaN(item.totalCost) ? 0 : item.totalCost), 0);
+          return {
+            material,
+            quantity: totalQuantity.toFixed(2),
+            unit: items.length > 0 ? items[0].unit : '',
+            totalCost: totalCostItem,
+            percentage: totalCost > 0 ? (totalCostItem / totalCost * 100).toFixed(2) : 0
+          };
+        }).filter(item => item.quantity > 0);
+        const summaryTableBody = document.getElementById('summaryTableBody');
+        summaryTableBody.innerHTML = summaryData.map(item => `
+          <tr class="${item.material === 'الوردي والبودر والشبكة' || item.material === 'الحجر (للبلوكاج)' || item.material === 'الكياس' || item.material === 'الرمل' ? 'bg-blue-100' : ''}">
+            <td class="border p-2">${item.material}</td>
+            <td class="border p-2">${item.quantity} ${item.unit}</td>
+            <td class="border p-2">${isNaN(item.totalCost) ? '0.00' : item.totalCost.toFixed(2)}</td>
+            <td class="border p-2">${item.percentage}%</td>
+          </tr>
+        `).join('');
+        document.getElementById('totalCost').textContent = isNaN(totalCost) ? '0.00' : totalCost.toFixed(2);
+      } catch (error) {
+        console.error('Error in updateTables:', error);
+        showError('حدث خطأ أثناء تحديث الجداول. يرجى التحقق من المدخلات.');
+      }
+    }
+
+    // Calculate construction cost
+    function calculateCost() {
+	
+      try {
+        const inputs = {
+          landLength: document.getElementById('landLength').value,
+          landWidth: document.getElementById('landWidth').value,
+          buildLength: document.getElementById('buildLength').value,
+          buildWidth: document.getElementById('buildWidth').value,
+          numFloors: document.getElementById('numFloors').value,
+          semelleCount: document.getElementById('semelleCount').value,
+          betonPrice: document.getElementById('betonPrice').value,
+          b15Price: document.getElementById('b15Price').value,
+          ironPrice: document.getElementById('ironPrice').value,
+          cementPrice: document.getElementById('cementPrice').value,
+          excavationPrice: document.getElementById('excavationPrice').value,
+          gravelPrice: document.getElementById('gravelPrice').value,
+          brickPrice: document.getElementById('brickPrice').value,
+          sandPrice: document.getElementById('sandPrice').value,
+          aggregatePrice: document.getElementById('aggregatePrice').value,
+          laborPrice: document.getElementById('laborPrice').value,
+          combinedMaterialPrice: document.getElementById('combinedMaterialPrice').value,
+          stonePrice: document.getElementById('stonePrice').value,
+          sacksPrice: document.getElementById('sacksPrice').value,
+          sandFayagePrice: document.getElementById('sandFayagePrice').value
+        };
+
+        // Validate inputs
+        const validatedInputs = {
+          landLength: getValidNumber(inputs.landLength, 10),
+          landWidth: getValidNumber(inputs.landWidth, 12),
+          buildLength: getValidNumber(inputs.buildLength, 10),
+          buildWidth: getValidNumber(inputs.buildWidth, 12),
+          numFloors: getValidNumber(inputs.numFloors, 2, true),
+          semelleCount: getValidNumber(inputs.semelleCount, 16, true),
+          betonPrice: getValidNumber(inputs.betonPrice, 850),
+          b15Price: getValidNumber(inputs.b15Price, 850),
+          ironPrice: getValidNumber(inputs.ironPrice, 9.5),
+          cementPrice: getValidNumber(inputs.cementPrice, 82),
+          excavationPrice: getValidNumber(inputs.excavationPrice, 35),
+          gravelPrice: getValidNumber(inputs.gravelPrice, 148),
+          brickPrice: getValidNumber(inputs.brickPrice, 6.5),
+          sandPrice: getValidNumber(inputs.sandPrice, 240),
+          aggregatePrice: getValidNumber(inputs.aggregatePrice, 160),
+          laborPrice: getValidNumber(inputs.laborPrice, 240),
+          combinedMaterialPrice: getValidNumber(inputs.combinedMaterialPrice, 85),
+          stonePrice: getValidNumber(inputs.stonePrice, 3500),
+          sacksPrice: getValidNumber(inputs.sacksPrice, 3500),
+          sandFayagePrice: getValidNumber(inputs.sandFayagePrice, 6000)
+        };
+
+        const errors = validateInputs(validatedInputs);
+        if (errors.length > 0) {
+          showError(errors.join('\n'));
+          return;
+        }
+        clearError();
+
+        const landLength = validatedInputs.landLength;
+        const landWidth = validatedInputs.landWidth;
+        const buildLength = validatedInputs.buildLength;
+        const buildWidth = validatedInputs.buildWidth;
+        const numFloors = validatedInputs.numFloors;
+        const hasBasement = document.getElementById('hasBasement').checked;
+        const semelleCount = validatedInputs.semelleCount;
+        const semelleLength = 1.5;
+        const semelleWidth = 1.5;
+        const semelleHeight = 0.3;
+        const betonPrice = validatedInputs.betonPrice;
+        const b15Price = validatedInputs.b15Price;
+        const ironPrice = validatedInputs.ironPrice;
+        const cementPrice = validatedInputs.cementPrice;
+        const excavationPrice = validatedInputs.excavationPrice;
+        const gravelPrice = validatedInputs.gravelPrice;
+        const brickPrice = validatedInputs.brickPrice;
+        const sandPrice = validatedInputs.sandPrice;
+        const aggregatePrice = validatedInputs.aggregatePrice;
+        const laborPrice = validatedInputs.laborPrice;
+        const combinedMaterialPrice = validatedInputs.combinedMaterialPrice;
+        const stonePrice = validatedInputs.stonePrice;
+        const sacksPrice = validatedInputs.sacksPrice;
+        const sandFayagePrice = validatedInputs.sandFayagePrice;
+
+        const baseBuildArea = buildLength * buildWidth;
+        if (baseBuildArea <= 0) throw new Error('مساحة المبنى الأساسية غير صالحة');
+        const upperFloorArea = buildLength * (buildWidth + 1);
+        const landArea = landLength * landWidth;
+        const projectionArea = 10;
+
+        const floorAreas = [baseBuildArea];
+        let totalArea = baseBuildArea;
+        for (let i = 1; i <= numFloors; i++) {
+          floorAreas.push(upperFloorArea);
+          totalArea += upperFloorArea;
+        }
+        const terraceArea = baseBuildArea * 0.4;
+        totalArea += terraceArea;
+        if (hasBasement) totalArea += (baseBuildArea + projectionArea);
+
+        costData = [];
+
+        // Excavation
+        const excavationVolume = baseBuildArea * 3;
+        const excavationCost = excavationVolume * excavationPrice;
+        costData.push({
+          material: 'حفر الأساسات',
+          stage: 'الأساسات',
+          quantity: excavationVolume.toFixed(2),
+          unit: 'م³',
+          unitPrice: excavationPrice,
+          coveredArea: baseBuildArea,
+          totalCost: excavationCost,
+          costPerM2: baseBuildArea > 0 ? excavationCost / baseBuildArea : 0
+        });
+
+        // Iron
+        const mainIronKg = getIronQuantity(baseBuildArea);
+        let basementIronKg = 0;
+        let totalIronKg = mainIronKg;
+        if (hasBasement) {
+          basementIronKg = getIronQuantity(baseBuildArea + projectionArea);
+          totalIronKg += basementIronKg;
+        }
         costData.push({
           material: 'الحديد',
-          stage: 'القبو',
-          quantity: basementIronKg.toFixed(2),
+          stage: 'كامل المشروع (بدون قبو)',
+          quantity: mainIronKg.toFixed(2),
           unit: 'كجم',
           unitPrice: ironPrice,
-          coveredArea: baseBuildArea + projectionArea,
-          totalCost: basementIronKg * ironPrice,
-          costPerM2: (basementIronKg * ironPrice) / (baseBuildArea + projectionArea)
+          coveredArea: totalArea,
+          totalCost: mainIronKg * ironPrice,
+          costPerM2: totalArea > 0 ? (mainIronKg * ironPrice) / totalArea : 0
         });
-      }
+        if (hasBasement) {
+          costData.push({
+            material: 'الحديد',
+            stage: 'القبو',
+            quantity: basementIronKg.toFixed(2),
+            unit: 'كجم',
+            unitPrice: ironPrice,
+            coveredArea: baseBuildArea + projectionArea,
+            totalCost: basementIronKg * ironPrice,
+            costPerM2: (baseBuildArea + projectionArea) > 0 ? (basementIronKg * ironPrice) / (baseBuildArea + projectionArea) : 0
+          });
+        }
 
-      const ironSizes = [
-        { size: '6 مم', quantityKg: 1.50 },
-        { size: '8 مم', quantityKg: 0.20 },
-        { size: '10 مم', quantityKg: 3.50 },
-        { size: '14 مم', quantityKg: 0.30 }
-      ];
-      ironSizes.forEach(({ size, quantityKg }) => {
-        const scaledQuantity = (quantityKg * baseBuildArea / 120).toFixed(2);
+        // Iron sizes (informational)
+        const ironSizes = [
+          { size: '6 مم', quantityKg: 1.50 },
+          { size: '8 مم', quantityKg: 0.20 },
+          { size: '10 مم', quantityKg: 3.50 },
+          { size: '14 مم', quantityKg: 0.30 }
+        ];
+        ironSizes.forEach(({ size, quantityKg }) => {
+          const scaledQuantity = (quantityKg * baseBuildArea / 120).toFixed(2);
+          costData.push({
+            material: `الحديد ${size}`,
+            stage: 'الطبلة (للمعلومات)',
+            quantity: scaledQuantity,
+            unit: 'كجم',
+            unitPrice: ironPrice,
+            coveredArea: baseBuildArea,
+            totalCost: 0,
+            costPerM2: 0
+          });
+        });
+
+        // Concrete (Beton)
+        const semelleBeton = Math.ceil(semelleCount * 0.675);
+        const dalleBeton = Math.ceil(baseBuildArea * 0.12);
+        const terraceBeton = Math.ceil(terraceArea * 0.12);
+        let basementBeton = 0;
+        if (hasBasement) {
+          basementBeton = Math.ceil((baseBuildArea + projectionArea) * 0.12);
+        }
         costData.push({
-          material: `الحديد ${size}`,
-          stage: 'الطبلة (للمعلومات)',
-          quantity: scaledQuantity,
-          unit: 'كجم',
-          unitPrice: ironPrice,
+          material: 'البيتون',
+          stage: 'الأساسات (Semelle)',
+          quantity: semelleBeton.toFixed(2),
+          unit: 'م³',
+          unitPrice: betonPrice,
           coveredArea: baseBuildArea,
-          totalCost: 0,
-          costPerM2: 0
+          totalCost: semelleBeton * betonPrice,
+          costPerM2: baseBuildArea > 0 ? (semelleBeton * betonPrice) / baseBuildArea : 0
         });
-      });
-
-      const semelleBeton = Math.ceil(semelleCount * 0.675);
-      const dalleBeton = Math.ceil(baseBuildArea * 0.12);
-      const terraceBeton = Math.ceil(terraceArea * 0.12);
-      let basementBeton = 0;
-      if (hasBasement) {
-        basementBeton = Math.ceil((baseBuildArea + projectionArea) * 0.12);
-      }
-      costData.push({
-        material: 'البيتون',
-        stage: 'الأساسات (Semelle)',
-        quantity: semelleBeton.toFixed(2),
-        unit: 'م³',
-        unitPrice: betonPrice,
-        coveredArea: baseBuildArea,
-        totalCost: semelleBeton * betonPrice,
-        costPerM2: (semelleBeton * betonPrice) / baseBuildArea
-      });
-      costData.push({
-        material: 'البيتون',
-        stage: 'الأساسات (Dalle)',
-        quantity: dalleBeton.toFixed(2),
-        unit: 'م³',
-        unitPrice: betonPrice,
-        coveredArea: baseBuildArea,
-        totalCost: dalleBeton * betonPrice,
-        costPerM2: (dalleBeton * betonPrice) / baseBuildArea
-      });
-      const rdcBeton = Math.ceil(upperFloorArea * 0.12);
-      costData.push({
-        material: 'البيتون',
-        stage: 'الطابق الأرضي (RDC)',
-        quantity: rdcBeton.toFixed(2),
-        unit: 'م³',
-        unitPrice: betonPrice,
-        coveredArea: baseBuildArea,
-        totalCost: rdcBeton * betonPrice,
-        costPerM2: (rdcBeton * betonPrice) / baseBuildArea
-      });
-      for (let i = 1; i <= numFloors; i++) {
-        const floorBeton = Math.ceil(upperFloorArea * 0.12);
         costData.push({
           material: 'البيتون',
-          stage: `الطابق ${i} (R+${i})`,
-          quantity: floorBeton.toFixed(2),
+          stage: 'الأساسات (Dalle)',
+          quantity: dalleBeton.toFixed(2),
           unit: 'م³',
           unitPrice: betonPrice,
-          coveredArea: upperFloorArea,
-          totalCost: floorBeton * betonPrice,
-          costPerM2: (floorBeton * betonPrice) / upperFloorArea
+          coveredArea: baseBuildArea,
+          totalCost: dalleBeton * betonPrice,
+          costPerM2: baseBuildArea > 0 ? (dalleBeton * betonPrice) / baseBuildArea : 0
         });
-      }
-      costData.push({
-        material: 'البيتون',
-        stage: 'السطح (Terrace)',
-        quantity: terraceBeton.toFixed(2),
-        unit: 'م³',
-        unitPrice: betonPrice,
-        coveredArea: terraceArea,
-        totalCost: terraceBeton * betonPrice,
-        costPerM2: (terraceBeton * betonPrice) / terraceArea
-      });
-      if (hasBasement) {
+        const rdcBeton = Math.ceil(baseBuildArea * 0.12);
         costData.push({
           material: 'البيتون',
-          stage: 'القبو',
-          quantity: basementBeton.toFixed(2),
+          stage: 'الطابق الأرضي (RDC)',
+          quantity: rdcBeton.toFixed(2),
           unit: 'م³',
           unitPrice: betonPrice,
-          coveredArea: baseBuildArea + projectionArea,
-          totalCost: basementBeton * betonPrice,
-          costPerM2: (basementBeton * betonPrice) / (baseBuildArea + projectionArea)
+          coveredArea: baseBuildArea,
+          totalCost: rdcBeton * betonPrice,
+          costPerM2: baseBuildArea > 0 ? (rdcBeton * betonPrice) / baseBuildArea : 0
         });
-      }
+        for (let i = 1; i <= numFloors; i++) {
+          const floorBeton = Math.ceil(upperFloorArea * 0.12);
+//		  console.log("khalid:", `الطابق ${i} (R+${i})`);
+//		  console.log("floorBeton", floorBeton);
+		  
+          costData.push({
+            material: 'البيتون',
+            stage: `الطابق ${i} (R+${i})`,
+            quantity: floorBeton.toFixed(2),
+            unit: 'م³',
+            unitPrice: betonPrice,
+            coveredArea: upperFloorArea,
+            totalCost: floorBeton * betonPrice,
+            costPerM2: upperFloorArea > 0 ? (floorBeton * betonPrice) / upperFloorArea : 0
+          });
+        }
+        costData.push({
+          material: 'البيتون',
+          stage: 'السطح (Terrace)',
+          quantity: terraceBeton.toFixed(2),
+          unit: 'م³',
+          unitPrice: betonPrice,
+          coveredArea: terraceArea,
+          totalCost: terraceBeton * betonPrice,
+          costPerM2: terraceArea > 0 ? (terraceBeton * betonPrice) / terraceArea : 0
+        });
+	
+		
+        if (hasBasement) {
+          costData.push({
+            material: 'البيتون',
+            stage: 'القبو',
+            quantity: basementBeton.toFixed(2),
+            unit: 'م³',
+            unitPrice: betonPrice,
+            coveredArea: baseBuildArea + projectionArea,
+            totalCost: basementBeton * betonPrice,
+            costPerM2: (baseBuildArea + projectionArea) > 0 ? (basementBeton * betonPrice) / (baseBuildArea + projectionArea) : 0
+          });
+        }
 
-      const b15Beton = Math.ceil(semelleCount === 16 ? 11 : (11 * (semelleCount / 16)));
-      const b15Cost = b15Beton * b15Price;
-      costData.push({
-        material: 'خرسانة النظافة B15',
-        stage: 'الطبلة',
-        quantity: b15Beton.toFixed(2),
-        unit: 'م³',
-        unitPrice: b15Price,
-        coveredArea: baseBuildArea,
-        totalCost: b15Cost,
-        costPerM2: b15Cost / baseBuildArea
-      });
+        // B15 Concrete
+        const b15Beton = Math.ceil(semelleCount === 16 ? 11 : (11 * (semelleCount / 16)));
+        const b15Cost = b15Beton * b15Price;
+        costData.push({
+          material: 'خرسانة النظافة B15',
+          stage: 'الطبلة',
+          quantity: b15Beton.toFixed(2),
+          unit: 'م³',
+          unitPrice: b15Price,
+          coveredArea: baseBuildArea,
+          totalCost: b15Cost,
+          costPerM2: baseBuildArea > 0 ? b15Cost / baseBuildArea : 0
+        });
 
-      const cementPerStage = {
-        'Fondation': 92,
-        'RDC': 85,
-        'R+1': 85,
-        'R+2': 85,
-        'Terrace': 20,
-        'Basement': 68
-      };
-      let totalCementBags = cementPerStage['Fondation'] * (baseBuildArea / 120);
-      totalCementBags += cementPerStage['RDC'] * (baseBuildArea / 120);
-      for (let i = 1; i <= numFloors; i++) {
-        totalCementBags += cementPerStage[`R+${i}`] * (upperFloorArea / 120);
-      }
-      totalCementBags += cementPerStage['Terrace'] * (baseBuildArea / 120);
-      if (hasBasement) totalCementBags += cementPerStage['Basement'] * (baseBuildArea / 120);
-      costData.push({
-        material: 'الأسمنت',
-        stage: 'الأساسات',
-        quantity: (cementPerStage['Fondation'] * baseBuildArea / 120).toFixed(2),
-        unit: 'خنشة',
-        unitPrice: cementPrice,
-        coveredArea: baseBuildArea,
-        totalCost: (cementPerStage['Fondation'] * baseBuildArea / 120) * cementPrice,
-        costPerM2: ((cementPerStage['Fondation'] * baseBuildArea / 120) * cementPrice) / baseBuildArea
-      });
-      costData.push({
-        material: 'الأسمنت',
-        stage: 'الطابق الأرضي (RDC)',
-        quantity: (cementPerStage['RDC'] * baseBuildArea / 120).toFixed(2),
-        unit: 'خنشة',
-        unitPrice: cementPrice,
-        coveredArea: baseBuildArea,
-        totalCost: (cementPerStage['RDC'] * baseBuildArea / 120) * cementPrice,
-        costPerM2: ((cementPerStage['RDC'] * baseBuildArea / 120) * cementPrice) / baseBuildArea
-      });
-      for (let i = 1; i <= numFloors; i++) {
+        // Cement
+        const cementPerStage = {
+          'Fondation': 92,
+          'RDC': 85,
+          'R+1': 85,
+          'R+2': 85,
+          'R+3': 85,
+          'R+4': 85,
+          'Terrace': 20,
+          'Basement': 68
+        };
+        let totalCementBags = cementPerStage['Fondation'] * (baseBuildArea / 120);
+        totalCementBags += cementPerStage['RDC'] * (baseBuildArea / 120);
+        for (let i = 1; i <= numFloors; i++) {
+          totalCementBags += cementPerStage[`R+${i}`] * (upperFloorArea / 120);
+        }
+        totalCementBags += cementPerStage['Terrace'] * (baseBuildArea / 120);
+        if (hasBasement) totalCementBags += cementPerStage['Basement'] * (baseBuildArea / 120);
         costData.push({
           material: 'الأسمنت',
-          stage: `الطابق ${i} (R+${i})`,
-          quantity: (cementPerStage[`R+${i}`] * upperFloorArea / 120).toFixed(2),
+          stage: 'الأساسات',
+          quantity: (cementPerStage['Fondation'] * baseBuildArea / 120).toFixed(2),
           unit: 'خنشة',
           unitPrice: cementPrice,
-          coveredArea: upperFloorArea,
-          totalCost: (cementPerStage[`R+${i}`] * upperFloorArea / 120) * cementPrice,
-          costPerM2: ((cementPerStage[`R+${i}`] * upperFloorArea / 120) * cementPrice) / upperFloorArea
+          coveredArea: baseBuildArea,
+          totalCost: (cementPerStage['Fondation'] * baseBuildArea / 120) * cementPrice,
+          costPerM2: baseBuildArea > 0 ? ((cementPerStage['Fondation'] * baseBuildArea / 120) * cementPrice) / baseBuildArea : 0
         });
-      }
-      costData.push({
-        material: 'الأسمنت',
-        stage: 'السطح (Terrace)',
-        quantity: (cementPerStage['Terrace'] * baseBuildArea / 120).toFixed(2),
-        unit: 'خنشة',
-        unitPrice: cementPrice,
-        coveredArea: terraceArea,
-        totalCost: (cementPerStage['Terrace'] * baseBuildArea / 120) * cementPrice,
-        costPerM2: ((cementPerStage['Terrace'] * baseBuildArea / 120) * cementPrice) / terraceArea
-      });
-      if (hasBasement) {
         costData.push({
           material: 'الأسمنت',
-          stage: 'القبو',
-          quantity: (cementPerStage['Basement'] * baseBuildArea / 120).toFixed(2),
+          stage: 'الطابق الأرضي (RDC)',
+          quantity: (cementPerStage['RDC'] * baseBuildArea / 120).toFixed(2),
           unit: 'خنشة',
           unitPrice: cementPrice,
-          coveredArea: baseBuildArea + projectionArea,
-          totalCost: (cementPerStage['Basement'] * baseBuildArea / 120) * cementPrice,
-          costPerM2: ((cementPerStage['Basement'] * baseBuildArea / 120) * cementPrice) / (baseBuildArea + projectionArea)
+          coveredArea: baseBuildArea,
+          totalCost: (cementPerStage['RDC'] * baseBuildArea / 120) * cementPrice,
+          costPerM2: baseBuildArea > 0 ? ((cementPerStage['RDC'] * baseBuildArea / 120) * cementPrice) / baseBuildArea : 0
         });
-      }
+        for (let i = 1; i <= numFloors; i++) {
+          costData.push({
+            material: 'الأسمنت',
+            stage: `الطابق ${i} (R+${i})`,
+            quantity: (cementPerStage[`R+${i}`] * upperFloorArea / 120).toFixed(2),
+            unit: 'خنشة',
+            unitPrice: cementPrice,
+            coveredArea: upperFloorArea,
+            totalCost: (cementPerStage[`R+${i}`] * upperFloorArea / 120) * cementPrice,
+            costPerM2: upperFloorArea > 0 ? ((cementPerStage[`R+${i}`] * upperFloorArea / 120) * cementPrice) / upperFloorArea : 0
+          });
+        }
+        costData.push({
+          material: 'الأسمنت',
+          stage: 'السطح (Terrace)',
+          quantity: (cementPerStage['Terrace'] * baseBuildArea / 120).toFixed(2),
+          unit: 'خنشة',
+          unitPrice: cementPrice,
+          coveredArea: terraceArea,
+          totalCost: (cementPerStage['Terrace'] * baseBuildArea / 120) * cementPrice,
+          costPerM2: terraceArea > 0 ? ((cementPerStage['Terrace'] * baseBuildArea / 120) * cementPrice) / terraceArea : 0
+        });
+		
+		
+	
+		
+        if (hasBasement) {
+          costData.push({
+            material: 'الأسمنت',
+            stage: 'القبو',
+            quantity: (cementPerStage['Basement'] * baseBuildArea / 120).toFixed(2),
+            unit: 'خنشة',
+            unitPrice: cementPrice,
+            coveredArea: baseBuildArea + projectionArea,
+            totalCost: (cementPerStage['Basement'] * baseBuildArea / 120) * cementPrice,
+            costPerM2: (baseBuildArea + projectionArea) > 0 ? ((cementPerStage['Basement'] * baseBuildArea / 120) * cementPrice) / (baseBuildArea + projectionArea) : 0
+          });
+        }
 
-      const gravelVolume = (25 * baseBuildArea) / 120;
-      const gravelCost = gravelVolume * gravelPrice;
-      costData.push({
-        material: 'حصى الفياج',
-        stage: 'الأساسات',
-        quantity: gravelVolume.toFixed(2),
-        unit: 'م³',
-        unitPrice: gravelPrice,
-        coveredArea: baseBuildArea,
-        totalCost: gravelCost,
-        costPerM2: gravelCost / baseBuildArea
-      });
+        // Gravel
+        const gravelVolume = (25 * baseBuildArea) / 120;
+        const gravelCost = gravelVolume * gravelPrice;
+        costData.push({
+          material: 'حصى الفياج',
+          stage: 'الأساسات',
+          quantity: gravelVolume.toFixed(2),
+          unit: 'م³',
+          unitPrice: gravelPrice,
+          coveredArea: baseBuildArea,
+          totalCost: gravelCost,
+          costPerM2: baseBuildArea > 0 ? gravelCost / baseBuildArea : 0
+        });
 
-      const mainBricks = (4000 * baseBuildArea) / 120;
-      const partitionBricks = (5000 * baseBuildArea) / 120;
-      const totalBricks = mainBricks + partitionBricks;
-      const brickCost = totalBricks * brickPrice;
-      costData.push({
-        material: 'الطوب',
-        stage: 'كامل المشروع',
-        quantity: totalBricks.toFixed(2),
-        unit: 'حبة',
-        unitPrice: brickPrice,
-        coveredArea: totalArea,
-        totalCost: brickCost,
-        costPerM2: brickCost / totalArea
-      });
+        // Bricks
+        const mainBricks = (4000 * baseBuildArea) / 120;
+        const partitionBricks = (5000 * baseBuildArea) / 120;
+        const totalBricks = mainBricks + partitionBricks;
+        const brickCost = totalBricks * brickPrice;
+        costData.push({
+          material: 'الطوب',
+          stage: 'كامل المشروع',
+          quantity: totalBricks.toFixed(2),
+          unit: 'حبة',
+          unitPrice: brickPrice,
+          coveredArea: totalArea,
+          totalCost: brickCost,
+          costPerM2: totalArea > 0 ? brickCost / totalArea : 0
+        });
 
-      const sandVolume = (25 * baseBuildArea) / 120;
-      const sandCost = sandVolume * sandPrice;
-      costData.push({
-        material: 'رمل البناء',
-        stage: 'كامل المشروع',
-        quantity: sandVolume.toFixed(2),
-        unit: 'م³',
-        unitPrice: sandPrice,
-        coveredArea: totalArea,
-        totalCost: sandCost,
-        costPerM2: sandCost / totalArea
-      });
+        // Sand
+        const sandVolume = (25 * baseBuildArea) / 120;
+        const sandCost = sandVolume * sandPrice;
+        costData.push({
+          material: 'رمل البناء',
+          stage: 'كامل المشروع',
+          quantity: sandVolume.toFixed(2),
+          unit: 'م³',
+          unitPrice: sandPrice,
+          coveredArea: totalArea,
+          totalCost: sandCost,
+          costPerM2: totalArea > 0 ? sandCost / totalArea : 0
+        });
 
-      const aggregateVolume = (25 * baseBuildArea) / 120;
-      const aggregateCost = aggregateVolume * aggregatePrice;
-      costData.push({
-        material: 'الحصى',
-        stage: 'كامل المشروع',
-        quantity: aggregateVolume.toFixed(2),
-        unit: 'م³',
-        unitPrice: aggregatePrice,
-        coveredArea: totalArea,
-        totalCost: aggregateCost,
-        costPerM2: aggregateCost / totalArea
-      });
+        // Aggregate
+        const aggregateVolume = (25 * baseBuildArea) / 120;
+        const aggregateCost = aggregateVolume * aggregatePrice;
+        costData.push({
+          material: 'الحصى',
+          stage: 'كامل المشروع',
+          quantity: aggregateVolume.toFixed(2),
+          unit: 'م³',
+          unitPrice: aggregatePrice,
+          coveredArea: totalArea,
+          totalCost: aggregateCost,
+          costPerM2: totalArea > 0 ? aggregateCost / totalArea : 0
+        });
 
-      const laborPerStage = 100;
-      let totalLaborCost = laborPerStage * baseBuildArea;
-      totalLaborCost += laborPerStage * baseBuildArea;
-      for (let i = 1; i <= numFloors; i++) {
-        totalLaborCost += laborPerStage * upperFloorArea;
-      }
-      totalLaborCost += laborPerStage * terraceArea;
-      if (hasBasement) totalLaborCost += laborPerStage * (baseBuildArea + projectionArea);
-      totalLaborCost *= laborPrice / 100;
-      costData.push({
-        material: 'اليد العاملة',
-        stage: 'الأساسات',
-        quantity: baseBuildArea.toFixed(2),
-        unit: 'م²',
-        unitPrice: laborPrice,
-        coveredArea: baseBuildArea,
-        totalCost: laborPerStage * baseBuildArea * (laborPrice / 100),
-        costPerM2: laborPerStage * (laborPrice / 100)
-      });
-      costData.push({
-        material: 'اليد العاملة',
-        stage: 'الطابق الأرضي (RDC)',
-        quantity: baseBuildArea.toFixed(2),
-        unit: 'م²',
-        unitPrice: laborPrice,
-        coveredArea: baseBuildArea,
-        totalCost: laborPerStage * baseBuildArea * (laborPrice / 100),
-        costPerM2: laborPerStage * (laborPrice / 100)
-      });
-      for (let i = 1; i <= numFloors; i++) {
+        // Labor
+        const laborPerStage = 100;
+        let totalLaborCost = laborPerStage * baseBuildArea;
+        totalLaborCost += laborPerStage * baseBuildArea;
+        for (let i = 1; i <= numFloors; i++) {
+          totalLaborCost += laborPerStage * upperFloorArea;
+        }
+        totalLaborCost += laborPerStage * terraceArea;
+        if (hasBasement) totalLaborCost += laborPerStage * (baseBuildArea + projectionArea);
+        totalLaborCost *= laborPrice / 100;
         costData.push({
           material: 'اليد العاملة',
-          stage: `الطابق ${i} (R+${i})`,
-          quantity: upperFloorArea.toFixed(2),
+          stage: 'الأساسات',
+          quantity: baseBuildArea.toFixed(2),
           unit: 'م²',
           unitPrice: laborPrice,
-          coveredArea: upperFloorArea,
-          totalCost: laborPerStage * upperFloorArea * (laborPrice / 100),
+          coveredArea: baseBuildArea,
+          totalCost: laborPerStage * baseBuildArea * (laborPrice / 100),
           costPerM2: laborPerStage * (laborPrice / 100)
         });
-      }
-      costData.push({
-        material: 'اليد العاملة',
-        stage: 'السطح (Terrace)',
-        quantity: terraceArea.toFixed(2),
-        unit: 'م²',
-        unitPrice: laborPrice,
-        coveredArea: terraceArea,
-        totalCost: laborPerStage * terraceArea * (laborPrice / 100),
-        costPerM2: laborPerStage * (laborPrice / 100)
-      });
-      if (hasBasement) {
         costData.push({
           material: 'اليد العاملة',
-          stage: 'القبو',
-          quantity: (baseBuildArea + projectionArea).toFixed(2),
+          stage: 'الطابق الأرضي (RDC)',
+          quantity: baseBuildArea.toFixed(2),
           unit: 'م²',
           unitPrice: laborPrice,
-          coveredArea: baseBuildArea + projectionArea,
-          totalCost: laborPerStage * (baseBuildArea + projectionArea) * (laborPrice / 100),
+          coveredArea: baseBuildArea,
+          totalCost: laborPerStage * baseBuildArea * (laborPrice / 100),
           costPerM2: laborPerStage * (laborPrice / 100)
         });
-      }
+        for (let i = 1; i <= numFloors; i++) {
+          costData.push({
+            material: 'اليد العاملة',
+            stage: `الطابق ${i} (R+${i})`,
+            quantity: upperFloorArea.toFixed(2),
+            unit: 'م²',
+            unitPrice: laborPrice,
+            coveredArea: upperFloorArea,
+            totalCost: laborPerStage * upperFloorArea * (laborPrice / 100),
+            costPerM2: laborPerStage * (laborPrice / 100)
+          });
+        }
+        costData.push({
+          material: 'اليد العاملة',
+          stage: 'السطح (Terrace)',
+          quantity: terraceArea.toFixed(2),
+          unit: 'م²',
+          unitPrice: laborPrice,
+          coveredArea: terraceArea,
+          totalCost: laborPerStage * terraceArea * (laborPrice / 100),
+          costPerM2: laborPerStage * (laborPrice / 100)
+        });
+        if (hasBasement) {
+          costData.push({
+            material: 'اليد العاملة',
+            stage: 'القبو',
+            quantity: (baseBuildArea + projectionArea).toFixed(2),
+            unit: 'م²',
+            unitPrice: laborPrice,
+            coveredArea: baseBuildArea + projectionArea,
+            totalCost: laborPerStage * (baseBuildArea + projectionArea) * (laborPrice / 100),
+            costPerM2: laborPerStage * (laborPrice / 100)
+          });
+        }
 
-      // Modified: Break down "الوردي والبودر والشبكة" by stage, with RDC using upperFloorArea, excluding Basement
-      costData.push({
-        material: 'الوردي والبودر والشبكة',
-        stage: 'الطابق الأرضي (RDC)',
-        quantity: upperFloorArea.toFixed(2),
-        unit: 'م²',
-        unitPrice: combinedMaterialPrice,
-        coveredArea: upperFloorArea,
-        totalCost: upperFloorArea * combinedMaterialPrice,
-        costPerM2: combinedMaterialPrice
-      });
-      for (let i = 1; i <= numFloors; i++) {
+        // Combined Material
         costData.push({
           material: 'الوردي والبودر والشبكة',
-          stage: `الطابق ${i} (R+${i})`,
-          quantity: upperFloorArea.toFixed(2),
+          stage: 'كامل المشروع',
+          quantity: totalArea.toFixed(2),
           unit: 'م²',
           unitPrice: combinedMaterialPrice,
-          coveredArea: upperFloorArea,
-          totalCost: upperFloorArea * combinedMaterialPrice,
+          coveredArea: totalArea,
+          totalCost: totalArea * combinedMaterialPrice,
           costPerM2: combinedMaterialPrice
         });
+
+        // Additional Materials
+        const fayageQuantity = (baseBuildArea / 25).toFixed(2);
+        costData.push({
+          material: 'الحجر (للبلوكاج)',
+          stage: 'كامل المشروع',
+          quantity: fayageQuantity,
+          unit: 'فياج',
+          unitPrice: stonePrice,
+          coveredArea: baseBuildArea,
+          totalCost: fayageQuantity * stonePrice,
+          costPerM2: baseBuildArea > 0 ? (fayageQuantity * stonePrice) / baseBuildArea : 0
+        });
+        costData.push({
+          material: 'الكياس',
+          stage: 'كامل المشروع',
+          quantity: fayageQuantity,
+          unit: 'فياج',
+          unitPrice: sacksPrice,
+          coveredArea: baseBuildArea,
+          totalCost: fayageQuantity * sacksPrice,
+          costPerM2: baseBuildArea > 0 ? (fayageQuantity * sacksPrice) / baseBuildArea : 0
+        });
+        costData.push({
+          material: 'الرمل',
+          stage: 'كامل المشروع',
+          quantity: fayageQuantity,
+          unit: 'فياج',
+          unitPrice: sandFayagePrice,
+          coveredArea: baseBuildArea,
+          totalCost: fayageQuantity * sandFayagePrice,
+          costPerM2: baseBuildArea > 0 ? (fayageQuantity * sandFayagePrice) / baseBuildArea : 0
+        });
+
+        document.getElementById('costOutput').classList.remove('hidden');
+        updateTables();
+      } catch (error) {
+        console.error('Error in calculateCost:', {
+          message: error.message,
+          stack: error.stack,
+          inputs: {
+            landLength: document.getElementById('landLength').value,
+            landWidth: document.getElementById('landWidth').value,
+            buildLength: document.getElementById('buildLength').value,
+            buildWidth: document.getElementById('buildWidth').value,
+            numFloors: document.getElementById('numFloors').value,
+            semelleCount: document.getElementById('semelleCount').value
+          }
+        });
+        showError('حدث خطأ أثناء الحساب. يرجى التحقق من المدخلات وتأكد من أن جميع الحقول تحتوي على قيم صحيحة.');
       }
-      costData.push({
-        material: 'الوردي والبودر والشبكة',
-        stage: 'السطح (Terrace)',
-        quantity: terraceArea.toFixed(2),
-        unit: 'م²',
-        unitPrice: combinedMaterialPrice,
-        coveredArea: terraceArea,
-        totalCost: terraceArea * combinedMaterialPrice,
-        costPerM2: combinedMaterialPrice
-      });
-
-      const fayageQuantity = (baseBuildArea / 25).toFixed(2);
-      costData.push({
-        material: 'الحجر (للبلوكاج)',
-        stage: 'كامل المشروع',
-        quantity: fayageQuantity,
-        unit: 'فياج',
-        unitPrice: stonePrice,
-        coveredArea: baseBuildArea,
-        totalCost: fayageQuantity * stonePrice,
-        costPerM2: (fayageQuantity * stonePrice) / baseBuildArea
-      });
-      costData.push({
-        material: 'الكياس',
-        stage: 'كامل المشروع',
-        quantity: fayageQuantity,
-        unit: 'فياج',
-        unitPrice: sacksPrice,
-        coveredArea: baseBuildArea,
-        totalCost: fayageQuantity * sacksPrice,
-        costPerM2: (fayageQuantity * sacksPrice) / baseBuildArea
-      });
-
-
-      document.getElementById('costOutput').classList.remove('hidden');
-      updateTables();
     }
 
+    // Update unit price in costData
     function updateUnitPrice(index, newPrice) {
-      const price = parseFloat(newPrice);
-      if (isNaN(price) || price < 0) {
-        showError('يرجى إدخال سعر وحدة صالح وموجب');
-        return;
+      try {
+        const price = getValidNumber(newPrice, 0);
+        if (price < 0) {
+          showError('يرجى إدخال سعر وحدة صالح وموجب');
+          return;
+        }
+        costData[index].unitPrice = price;
+        costData[index].totalCost = parseFloat(costData[index].quantity) * costData[index].unitPrice;
+        costData[index].costPerM2 = costData[index].coveredArea > 0 ? costData[index].totalCost / costData[index].coveredArea : 0;
+        if (costData[index].stage.includes('للمعلومات')) {
+          costData[index].totalCost = 0;
+          costData[index].costPerM2 = 0;
+        }
+        clearError();
+        updateTables();
+      } catch (error) {
+        console.error('Error in updateUnitPrice:', error);
+        showError('حدث خطأ أثناء تحديث سعر الوحدة.');
       }
-      costData[index].unitPrice = price;
-      costData[index].totalCost = parseFloat(costData[index].quantity) * costData[index].unitPrice;
-      costData[index].costPerM2 = costData[index].coveredArea > 0 ? costData[index].totalCost / costData[index].coveredArea : 0;
-      if (costData[index].stage.includes('للمعلومات')) {
-        costData[index].totalCost = 0;
-        costData[index].costPerM2 = 0;
-      }
-      clearError();
-      updateTables();
     }
 
+    // Update quantity in costData
     function updateQuantity(index, newQuantity) {
-      const quantity = parseFloat(newQuantity);
-      if (isNaN(quantity) || quantity < 0) {
-        showError('يرجى إدخال كمية صالحة وموجبة');
-        return;
+      try {
+        const quantity = getValidNumber(newQuantity, 0);
+        if (quantity < 0) {
+          showError('يرجى إدخال كمية صالحة وموجبة');
+          return;
+        }
+        costData[index].quantity = quantity.toFixed(2);
+        costData[index].totalCost = parseFloat(costData[index].quantity) * costData[index].unitPrice;
+        costData[index].costPerM2 = costData[index].coveredArea > 0 ? costData[index].totalCost / costData[index].coveredArea : 0;
+        if (costData[index].stage.includes('للمعلومات')) {
+          costData[index].totalCost = 0;
+          costData[index].costPerM2 = 0;
+        }
+        clearError();
+        updateTables();
+      } catch (error) {
+        console.error('Error in updateQuantity:', error);
+        showError('حدث خطأ أثناء تحديث الكمية.');
       }
-      costData[index].quantity = quantity.toFixed(2);
-      costData[index].totalCost = parseFloat(costData[index].quantity) * costData[index].unitPrice;
-      costData[index].costPerM2 = costData[index].coveredArea > 0 ? costData[index].totalCost / costData[index].coveredArea : 0;
-      if (costData[index].stage.includes('للمعلومات')) {
-        costData[index].totalCost = 0;
-        costData[index].costPerM2 = 0;
-      }
-      clearError();
-      updateTables();
     }
+
 
     function exportToPDF() {
       const element = document.getElementById('costOutput');
@@ -1348,7 +1292,7 @@ function x1getIronQuantity(area) {
           <h2 class="text-xl font-semibold">ملخص المدخلات</h2>
           <p>طول الأرض: ${document.getElementById('landLength').value || 10} م</p>
           <p>عرض الأرض: ${document.getElementById('landWidth').value || 12} م</p>
-          <p>طول المبنى: ${document.getElementById('buildLength').value || 10} م</p>
+          <p>طول المبنى: ${document.getElementById('buildLength').value || 12} م</p>
           <p>عرض المبنى: ${document.getElementById('buildWidth').value || 12} م</p>
           <p>عدد الطوابق: ${document.getElementById('numFloors').value || 1}</p>
           <p>وجود قبو: ${document.getElementById('hasBasement').checked ? 'نعم' : 'لا'}</p>
@@ -1364,16 +1308,17 @@ function x1getIronQuantity(area) {
       const summaryTable = document.getElementById('summaryTableBody');
       const wb = XLSX.utils.book_new();
       const costRows = costTable.getElementsByTagName('tr');
-      const costData = [['المادة', 'المرحلة', 'الكمية', 'التكلفة لكل وحدة (درهم مغربي)', 'التكلفة (درهم مغربي)', 'المساحة المغطاة (م²)']];
+      const costData = [['المادة', 'المرحلة', 'الكمية', 'المساحة المغطاة (م²)', 'التكلفة لكل وحدة (درهم مغربي)', 'التكلفة (درهم مغربي)', 'التكلفة لكل م² (درهم مغربي)']];
       for (let row of costRows) {
         const cells = row.getElementsByTagName('td');
         costData.push([
           cells[0].textContent,
           cells[1].textContent,
           cells[2].getElementsByTagName('input')[0].value,
-          cells[3].getElementsByTagName('input')[0].value,
-          cells[4].textContent,
-          cells[5].textContent
+          cells[3].textContent,
+          cells[4].getElementsByTagName('input')[0].value,
+          cells[5].textContent,
+          cells[6].textContent
         ]);
       }
       const costWs = XLSX.utils.aoa_to_sheet(costData);
@@ -1395,5 +1340,4 @@ function x1getIronQuantity(area) {
     }
   </script>
 </body>
-</html>
-
+</html>		  
