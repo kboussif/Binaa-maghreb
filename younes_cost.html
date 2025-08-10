@@ -337,12 +337,12 @@
         </div>
 		
 		      <div>
-          <label class="block text-sm font-medium" for="landLength">طول الأرض (متر):</label>
-          <input id="landLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="10" placeholder="مثال: 10" aria-label="طول الأرض بالمتر">
+          <label class="block text-sm font-medium" for="landLength">  </label>
+          <input id="landLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="10" placeholder="مثال: 10" aria-label="طول الأرض بالمتر"  style="display: none;" >
         </div>
         <div>
-          <label class="block text-sm font-medium" for="landWidth">عرض الأرض (متر):</label>
-          <input id="landWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض الأرض بالمتر">
+          <label class="block text-sm font-medium" for="landWidth"> </label>
+          <input id="landWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض الأرض بالمتر"  style="display: none;">
         </div>
 
         <div>
@@ -408,7 +408,6 @@
           <label class="block text-sm font-medium" for="excavationPrice">سعر الحفر (درهم مغربي/م³):</label>
           <input id="excavationPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="35" placeholder="مثال: 35" aria-label="سعر الحفر لكل متر مكعب">
         </div>
-		
 		
 
         
@@ -495,11 +494,20 @@
           <input id="stonePrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="3500" placeholder="مثال: 3500" aria-label="سعر الحجر للبلوكاج لكل فياج">
         </div>
         <div>
-          <label class="block text-sm font-medium" for="sacksPrice">سعر الكياس (درهم مغربي/فياج):</label>
-          <input id="sacksPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="3500" placeholder="مثال: 3500" aria-label="سعر الكياس لكل فياج">
+          <label class="block text-sm font-medium" for="sacksPrice"> </label>
+          <input id="sacksPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="3500" placeholder="مثال: 3500" aria-label="سعر الكياس لكل فياج"  style="display: none;" >
         </div>
 
+
+	  <div>
+    <label class="block text-sm font-medium" for="sandFayagePrice"> </label>
+    <input id="sandFayagePrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="6000" placeholder="مثال: 6000" aria-label="سعر الرمل لكل فياج" style="display: none;">
+</div>
+
+
       </div>
+
+
 
       <div class="flex justify-center gap-4 mt-6">
         <button onclick="calculateCost()" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">احسب التكلفة الآن</button>
@@ -565,18 +573,12 @@
     </div>
   </div>
 
-  <script>
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-      if (
-        e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
-        (e.ctrlKey && e.key === 'U')
-      ) {
-        e.preventDefault();
-      }
-    });
+ 
+ 
+ 
 
+
+ <script>
     let costData = [];
 
     function validateInputs(inputs) {
@@ -610,12 +612,12 @@
       const inputs = document.querySelectorAll('input[type="number"], input[type="checkbox"]');
       inputs.forEach(input => {
         if (input.type === 'number') {
-          input.value = input.id === 'numFloors' ? 1 : input.id === 'semelleCount' ? 16 : input.id === 'betonPrice' ? 750 : 
-                        input.id === 'b15Price' ? 750 : input.id === 'ironPrice' ? 9.5 : input.id === 'cementPrice' ? 82 : 
+          input.value = input.id === 'numFloors' ? 1 : input.id === 'semelleCount' ? 16 : input.id === 'betonPrice' ? 600 : 
+                        input.id === 'b15Price' ? 600 : input.id === 'ironPrice' ? 9.5 : input.id === 'cementPrice' ? 82 : 
                         input.id === 'excavationPrice' ? 35 : input.id === 'gravelPrice' ? 200 : input.id === 'brickPrice' ? 6.5 : 
                         input.id === 'sandPrice' ? 240 : input.id === 'aggregatePrice' ? 160 : input.id === 'laborPrice' ? 100 : 
                         input.id === 'combinedMaterialPrice' ? 85 : input.id === 'stonePrice' ? 3500 : input.id === 'sacksPrice' ? 3500 : 
-                        input.id === 'buildLength' ? 10 : '';
+                        input.id === 'sandFayagePrice' ? 6000 : input.id === 'landWidth' ? 12 : input.id === 'buildWidth' ? 12 : '';
         } else if (input.type === 'checkbox') {
           input.checked = input.id === 'hasBasement';
         }
@@ -632,9 +634,10 @@
           <td class="border p-2">${item.material}</td>
           <td class="border p-2">${item.stage}</td>
           <td class="border p-2"><input type="number" value="${item.quantity}" step="0.1" min="0" onchange="updateQuantity(${idx}, this.value)" class="w-full p-1 border rounded" aria-label="الكمية لـ ${item.material}"></td>
+          <td class="border p-2">${item.coveredArea.toFixed(2)}</td>
           <td class="border p-2"><input type="number" value="${item.unitPrice}" step="0.1" min="0" onchange="updateUnitPrice(${idx}, this.value)" class="w-full p-1 border rounded" aria-label="سعر الوحدة لـ ${item.material}"></td>
           <td class="border p-2">${item.totalCost.toFixed(2)}</td>
-          <td class="border p-2">${item.coveredArea.toFixed(2)}</td>
+          <td class="border p-2">${item.costPerM2.toFixed(2)}</td>
         </tr>
       `).join('');
       const materials = [
@@ -677,165 +680,6 @@
       document.getElementById('totalCost').textContent = totalCost.toFixed(2);
     }
 
-// Assume numFloors is declared globally
-// let numFloors = 1;
-
-//const numFloors = inputs.numFloors || 2;
-
-
- 
- function getIronQuantity(area) {
-    /**
-     * Calculate iron quantity (kg) for a house based on area per floor and number of floors from DOM.
-     * Uses hard-coded iron costs from the Calculations table, divided by 980 DH/kg.
-     * If area is not in the table, picks the nearest area.
-     * 
-     * @param {number} area - Area per floor in square meters.
-     * @returns {number} - Iron quantity in kilograms, rounded to 2 decimal places.
-     * @throws {Error} - If area is invalid or DOM element is missing.
-     */
-    const ironCosts = {
-        'R+1': {
-            80: 47040,  // 48 kg × 980 = 47040 DH
-            90: 52920,  // 54 kg × 980 = 52920 DH
-            100: 58800, // 60 kg × 980 = 58800 DH
-            110: 64680, // 66 kg × 980 = 64680 DH
-            120: 73500, // 75 kg × 980 = 73500 DH
-            130: 76440, // 78 kg × 980 = 76440 DH
-            140: 82320, // 84 kg × 980 = 82320 DH
-            150: 88200, // 90 kg × 980 = 88200 DH
-            160: 94080, // 96 kg × 980 = 94080 DH
-            170: 99960  // 102 kg × 980 = 99960 DH
-        },
-        'R+2': {
-            80: 57432, 90: 64611, 100: 71790, 110: 78969, 120: 86148,
-            130: 93327, 140: 100506, 150: 107685, 160: 114864, 170: 122043
-        },
-        'R+3': {
-            80: 80221, 90: 90248, 100: 100276, 110: 110304, 120: 120331,
-            130: 130359, 140: 140386, 150: 150414, 160: 160442, 170: 170469
-        }
-    };
-
-    // Map number of floors to house type
-    const floorToHouseType = {
-        2: 'R+1',
-        3: 'R+2',
-        4: 'R+3'
-    };
-
-    // Get numFloors from DOM
-    const numFloorsElement = document.getElementById('numFloors');
-    if (!numFloorsElement) {
-        throw new Error('DOM element with ID "numFloors" not found.');
-    }
-    const numFloorsValue = numFloorsElement.value.trim();
-    if (numFloorsValue === '') {
-        throw new Error('Number of floors input is empty. Please enter a number.');
-    }
-    const numFloors = parseInt(numFloorsValue);
-    
-    // Validate area
-    if (isNaN(area) || area <= 0) {
-        throw new Error('Area must be a positive number.');
-    }
-
-    // Map numFloors to house type (handle 1 or >4)
-    let houseType;
-    if (numFloors <= 1) {
-        houseType = 'R+1'; // Treat 1 floor as R+1 (2 floors total)
-    } else if (numFloors >= 4) {
-        houseType = 'R+3'; // Cap at R+3 for 4+ floors
-    } else {
-        houseType = floorToHouseType[numFloors]; // 2 → R+1, 3 → R+2, 4 → R+3
-    }
-
-    // Available areas from the table
-    const availableAreas = [80, 90, 100, 110, 120, 130, 140, 150, 160, 170];
-
-    // Find nearest area if input area is not in the table
-    let closestArea = area;
-    if (!ironCosts['R+1'][area]) {
-        closestArea = availableAreas.reduce((prev, curr) =>
-            Math.abs(curr - area) < Math.abs(prev - area) ? curr : prev
-        );
-    }
-
-    // Get total iron cost
-    const totalCost = ironCosts[houseType][closestArea];
-
-    // Calculate iron quantity (kg) using cost per kg (980 DH/kg)
-    const ironQuantity = totalCost / 980;
-
-    // Log floor area, numFloors, closestArea, and ironQuantity for debugging
-    console.log(`Input Floor Area: ${area} m²`);
-    console.log(`Number of Floors: ${numFloors}`);
-    console.log(`Closest Table Area: ${closestArea} m²`);
-    console.log(`Iron Quantity: ${ironQuantity.toFixed(2)} kg`);
-
-    return Number(ironQuantity.toFixed(2)*100);
-}
-
-
-
-
-
-
-function x1getIronQuantity(area) {
-    const inputs = {
-        landLength: parseFloat(document.getElementById('landLength').value),
-        landWidth: parseFloat(document.getElementById('landWidth').value),
-        buildLength: parseFloat(document.getElementById('buildLength').value),
-        buildWidth: parseFloat(document.getElementById('buildWidth').value),
-        numFloors: parseInt(document.getElementById('numFloors').value),
-        semelleCount: parseInt(document.getElementById('semelleCount').value),
-        betonPrice: parseFloat(document.getElementById('betonPrice').value),
-        b15Price: parseFloat(document.getElementById('b15Price').value),
-        ironPrice: parseFloat(document.getElementById('ironPrice').value),
-        cementPrice: parseFloat(document.getElementById('cementPrice').value),
-        excavationPrice: parseFloat(document.getElementById('excavationPrice').value),
-        gravelPrice: parseFloat(document.getElementById('gravelPrice').value),
-        brickPrice: parseFloat(document.getElementById('brickPrice').value),
-        sandPrice: parseFloat(document.getElementById('sandPrice').value),
-        aggregatePrice: parseFloat(document.getElementById('aggregatePrice').value),
-        laborPrice: parseFloat(document.getElementById('laborPrice').value),
-        combinedMaterialPrice: parseFloat(document.getElementById('combinedMaterialPrice').value),
-        stonePrice: parseFloat(document.getElementById('stonePrice').value),
-        sacksPrice: parseFloat(document.getElementById('sacksPrice').value)
-    };
-
-    return Math.ceil(area * 40 * inputs.numFloors);
-}
-
-	
-
-   function XXXgetIronQuantity(area) {
-   
-   
-      const ironData = [
-        { area: 80, iron: 5000 },
-        { area: 100, iron: 6000 },
-        { area: 110, iron: 7000 },
-        { area: 120, iron: 7500 }
-      ];
-      if (area <= 80) return 5000;
-      if (area >= 120) return 7500;
-      ironData.sort((a, b) => a.area - b.area);
-      for (let i = 0; i < ironData.length - 1; i++) {
-        if (area >= ironData[i].area && area <= ironData[i + 1].area) {
-          const x0 = ironData[i].area, y0 = ironData[i].iron;
-          const x1 = ironData[i + 1].area, y1 = ironData[i + 1].iron;
-          return y0 + (y1 - y0) * (area - x0) / (x1 - x0);
-        }
-      }
-      return 7500;
-    }
-
-
-
-
-  
-
     function calculateCost() {
       const inputs = {
         landLength: parseFloat(document.getElementById('landLength').value),
@@ -856,8 +700,8 @@ function x1getIronQuantity(area) {
         laborPrice: parseFloat(document.getElementById('laborPrice').value),
         combinedMaterialPrice: parseFloat(document.getElementById('combinedMaterialPrice').value),
         stonePrice: parseFloat(document.getElementById('stonePrice').value),
-        sacksPrice: parseFloat(document.getElementById('sacksPrice').value)
-  
+        sacksPrice: parseFloat(document.getElementById('sacksPrice').value),
+        sandFayagePrice: parseFloat(document.getElementById('sandFayagePrice').value)
       };
 
       const errors = validateInputs(inputs);
@@ -869,16 +713,16 @@ function x1getIronQuantity(area) {
 
       const landLength = isNaN(inputs.landLength) || inputs.landLength <= 0 ? 10 : inputs.landLength;
       const landWidth = isNaN(inputs.landWidth) || inputs.landWidth <= 0 ? 12 : inputs.landWidth;
-      const buildLength = isNaN(inputs.buildLength) || inputs.buildLength <= 0 ? 10 : inputs.buildLength;
+      const buildLength = isNaN(inputs.buildLength) || inputs.buildLength <= 0 ? 12 : inputs.buildLength;
       const buildWidth = isNaN(inputs.buildWidth) || inputs.buildWidth <= 0 ? 12 : inputs.buildWidth;
-      
+      const numFloors = inputs.numFloors || 1;
       const hasBasement = document.getElementById('hasBasement').checked;
       const semelleCount = inputs.semelleCount || 16;
       const semelleLength = 1.5;
       const semelleWidth = 1.5;
       const semelleHeight = 0.3;
-      const betonPrice = inputs.betonPrice || 750;
-      const b15Price = inputs.b15Price || 750;
+      const betonPrice = inputs.betonPrice || 600;
+      const b15Price = inputs.b15Price || 600;
       const ironPrice = inputs.ironPrice || 9.5;
       const cementPrice = inputs.cementPrice || 82;
       const excavationPrice = inputs.excavationPrice || 35;
@@ -890,7 +734,8 @@ function x1getIronQuantity(area) {
       const combinedMaterialPrice = inputs.combinedMaterialPrice || 85;
       const stonePrice = inputs.stonePrice || 3500;
       const sacksPrice = inputs.sacksPrice || 3500;
- 
+      const sandFayagePrice = inputs.sandFayagePrice || 6000;
+
       const baseBuildArea = buildLength * buildWidth;
       const upperFloorArea = buildLength * (buildWidth + 1);
       const landArea = landLength * landWidth;
@@ -921,7 +766,37 @@ function x1getIronQuantity(area) {
         costPerM2: excavationCost / baseBuildArea
       });
 
-      let mainIronKg = getIronQuantity(baseBuildArea);
+//      const mainIronPerM2 = 7500 / 120;
+      let mainIronPerM2;
+
+
+
+if (baseBuildArea < 80) {
+    mainIronPerM2 = 5000 / 120;
+} else if (baseBuildArea >= 80 && baseBuildArea < 90) {
+    mainIronPerM2 = 5000 / 120;
+} else if (baseBuildArea >= 90 && baseBuildArea < 100) {
+    mainIronPerM2 = 5500 / 120;
+} else if (baseBuildArea >= 100 && baseBuildArea < 110) {
+    mainIronPerM2 = 6000 / 120;
+} else if (baseBuildArea >= 110 && baseBuildArea < 120) {
+    mainIronPerM2 = 6500 / 120;
+} else if (baseBuildArea >= 120 && baseBuildArea < 130) {
+    mainIronPerM2 = 7000 / 120;
+} else if (baseBuildArea >= 130 && baseBuildArea < 140) {
+    mainIronPerM2 = 7500 / 120;
+} else if (baseBuildArea >= 140 && baseBuildArea < 150) {
+    mainIronPerM2 = 8000 / 120;
+} else if (baseBuildArea >= 180 && baseBuildArea <= 300) {
+    mainIronPerM2 = 8500 / 120;
+}
+
+console.log(mainIronPerM2);
+
+
+	  
+	  
+      let mainIronKg = mainIronPerM2 * baseBuildArea;
       let basementIronKg = 0;
       let totalIronKg = mainIronKg;
       if (hasBasement) {
@@ -998,7 +873,7 @@ function x1getIronQuantity(area) {
         totalCost: dalleBeton * betonPrice,
         costPerM2: (dalleBeton * betonPrice) / baseBuildArea
       });
-      const rdcBeton = Math.ceil(upperFloorArea * 0.12);
+      const rdcBeton = Math.ceil(baseBuildArea * 0.12);
       costData.push({
         material: 'البيتون',
         stage: 'الطابق الأرضي (RDC)',
@@ -1063,7 +938,9 @@ function x1getIronQuantity(area) {
         'RDC': 85,
         'R+1': 85,
         'R+2': 85,
-        'Terrace': 20,
+        'R+3': 85,
+        'R+4': 85,
+         'Terrace': 20,
         'Basement': 68
       };
       let totalCementBags = cementPerStage['Fondation'] * (baseBuildArea / 120);
@@ -1246,40 +1123,19 @@ function x1getIronQuantity(area) {
         });
       }
 
-      // Modified: Break down "الوردي والبودر والشبكة" by stage, with RDC using upperFloorArea, excluding Basement
+      // Combined Material: الوردي والبودر والشبكة
       costData.push({
         material: 'الوردي والبودر والشبكة',
-        stage: 'الطابق الأرضي (RDC)',
-        quantity: upperFloorArea.toFixed(2),
+        stage: 'كامل المشروع',
+        quantity: totalArea.toFixed(2),
         unit: 'م²',
         unitPrice: combinedMaterialPrice,
-        coveredArea: upperFloorArea,
-        totalCost: upperFloorArea * combinedMaterialPrice,
-        costPerM2: combinedMaterialPrice
-      });
-      for (let i = 1; i <= numFloors; i++) {
-        costData.push({
-          material: 'الوردي والبودر والشبكة',
-          stage: `الطابق ${i} (R+${i})`,
-          quantity: upperFloorArea.toFixed(2),
-          unit: 'م²',
-          unitPrice: combinedMaterialPrice,
-          coveredArea: upperFloorArea,
-          totalCost: upperFloorArea * combinedMaterialPrice,
-          costPerM2: combinedMaterialPrice
-        });
-      }
-      costData.push({
-        material: 'الوردي والبودر والشبكة',
-        stage: 'السطح (Terrace)',
-        quantity: terraceArea.toFixed(2),
-        unit: 'م²',
-        unitPrice: combinedMaterialPrice,
-        coveredArea: terraceArea,
-        totalCost: terraceArea * combinedMaterialPrice,
+        coveredArea: totalArea,
+        totalCost: totalArea * combinedMaterialPrice,
         costPerM2: combinedMaterialPrice
       });
 
+      // New Materials: الحجر (للبلوكاج), الكياس, الرمل
       const fayageQuantity = (baseBuildArea / 25).toFixed(2);
       costData.push({
         material: 'الحجر (للبلوكاج)',
@@ -1301,7 +1157,16 @@ function x1getIronQuantity(area) {
         totalCost: fayageQuantity * sacksPrice,
         costPerM2: (fayageQuantity * sacksPrice) / baseBuildArea
       });
-
+      costData.push({
+        material: 'الرمل',
+        stage: 'كامل المشروع',
+        quantity: fayageQuantity,
+        unit: 'فياج',
+        unitPrice: sandFayagePrice,
+        coveredArea: baseBuildArea,
+        totalCost: fayageQuantity * sandFayagePrice,
+        costPerM2: (fayageQuantity * sandFayagePrice) / baseBuildArea
+      });
 
       document.getElementById('costOutput').classList.remove('hidden');
       updateTables();
@@ -1348,7 +1213,7 @@ function x1getIronQuantity(area) {
           <h2 class="text-xl font-semibold">ملخص المدخلات</h2>
           <p>طول الأرض: ${document.getElementById('landLength').value || 10} م</p>
           <p>عرض الأرض: ${document.getElementById('landWidth').value || 12} م</p>
-          <p>طول المبنى: ${document.getElementById('buildLength').value || 10} م</p>
+          <p>طول المبنى: ${document.getElementById('buildLength').value || 12} م</p>
           <p>عرض المبنى: ${document.getElementById('buildWidth').value || 12} م</p>
           <p>عدد الطوابق: ${document.getElementById('numFloors').value || 1}</p>
           <p>وجود قبو: ${document.getElementById('hasBasement').checked ? 'نعم' : 'لا'}</p>
@@ -1364,16 +1229,17 @@ function x1getIronQuantity(area) {
       const summaryTable = document.getElementById('summaryTableBody');
       const wb = XLSX.utils.book_new();
       const costRows = costTable.getElementsByTagName('tr');
-      const costData = [['المادة', 'المرحلة', 'الكمية', 'التكلفة لكل وحدة (درهم مغربي)', 'التكلفة (درهم مغربي)', 'المساحة المغطاة (م²)']];
+      const costData = [['المادة', 'المرحلة', 'الكمية', 'المساحة المغطاة (م²)', 'التكلفة لكل وحدة (درهم مغربي)', 'التكلفة (درهم مغربي)', 'التكلفة لكل م² (درهم مغربي)']];
       for (let row of costRows) {
         const cells = row.getElementsByTagName('td');
         costData.push([
           cells[0].textContent,
           cells[1].textContent,
           cells[2].getElementsByTagName('input')[0].value,
-          cells[3].getElementsByTagName('input')[0].value,
-          cells[4].textContent,
-          cells[5].textContent
+          cells[3].textContent,
+          cells[4].getElementsByTagName('input')[0].value,
+          cells[5].textContent,
+          cells[6].textContent
         ]);
       }
       const costWs = XLSX.utils.aoa_to_sheet(costData);
@@ -1394,6 +1260,8 @@ function x1getIronQuantity(area) {
       XLSX.writeFile(wb, 'cost_estimation.xlsx');
     }
   </script>
+
+  
 </body>
 </html>
 
