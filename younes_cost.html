@@ -544,19 +544,27 @@
 
 
 	
-      <table class="w-full border-collapse mb-6">
-        <thead>
-          <tr class="bg-blue-600 text-white">
-            <th class="border p-2">المادة</th>
-            <th class="border p-2">المرحلة</th>
-            <th class="border p-2">الكمية</th>
-            <th class="border p-2">التكلفة لكل وحدة (درهم مغربي)</th>
-            <th class="border p-2">التكلفة (درهم مغربي)</th>
-            <th class="border p-2">المساحة المغطاة (م²)</th>
-          </tr>
-        </thead>
-        <tbody id="costTableBody"></tbody>
-      </table>
+<!-- Floating Title -->
+<h2 class="sticky top-0 bg-white text-2xl font-bold mb-4 text-center text-blue-700 shadow-md z-10">جدول تكلفة المواد</h2>
+    <h3 class="text-lg font-semibold mt-4 text-blue-800">الإجمالي: <span id="totalCostTop">0</span> درهم مغربي</h3>
+
+<!-- The Table -->
+<table class="w-full border-collapse mb-6">
+  <thead>
+    <tr class="bg-blue-600 text-white">
+      <th class="border p-2">المادة</th>
+      <th class="border p-2">المرحلة</th>
+      <th class="border p-2">الكمية</th>
+      <th class="border p-2">التكلفة لكل وحدة</th>
+      <th class="border p-2">التكلفة</th>
+      <th class="border p-2">المساحة المغطاة (م²)</th>
+    </tr>
+  </thead>
+  <tbody id="costTableBody"></tbody>
+</table>
+
+	  
+	  
       <h3 class="text-lg font-semibold mt-4 text-blue-800">الإجمالي: <span id="totalCost">0</span> درهم مغربي</h3>
 
       <!-- Summary by Product -->
@@ -645,7 +653,7 @@
           <td class="border p-2">${item.coveredArea.toFixed(2)}</td>
           <td class="border p-2"><input type="number" value="${item.unitPrice}" step="0.1" min="0" onchange="updateUnitPrice(${idx}, this.value)" class="w-full p-1 border rounded" aria-label="سعر الوحدة لـ ${item.material}"></td>
           <td class="border p-2">${item.totalCost.toFixed(2)}</td>
-          <td class="border p-2">${item.costPerM2.toFixed(2)}</td>
+		            <td class="border p-2">${item.costPerM2.toFixed(2)}</td>
         </tr>
       `).join('');
       const materials = [
@@ -685,8 +693,12 @@
           <td class="border p-2">${item.percentage}%</td>
         </tr>
       `).join('');
-      document.getElementById('totalCost').textContent = totalCost.toFixed(2);
-    }
+	 const rounded = Math.round(totalCost / 100) * 100; 
+     document.getElementById('totalCostTop').textContent = rounded.toLocaleString('fr-FR');
+	 document.getElementById('totalCost').textContent = rounded.toLocaleString('fr-FR');
+ 
+  
+ }
 
     function calculateCost() {
       const inputs = {
