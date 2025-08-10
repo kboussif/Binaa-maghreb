@@ -1343,37 +1343,38 @@ console.log(mainIronPerM2);
 	
 	
 	
-	
-	window.addEventListener('scroll', function() {
-  const table = document.querySelector('table');
-  const floatingHeader = document.getElementById('floatingTableHeader');
-
+// Assuming your table has an ID, e.g., id="costTable". Add id="costTable" to the <table> tag.
+window.addEventListener('load', function() {
+  const table = document.getElementById('costTable');
   if (!table) return;
 
-  const tableRect = table.getBoundingClientRect();
-  
-  if (tableRect.top < 0 && tableRect.bottom > 0) {
-    if (!floatingHeader.innerHTML) {
-      // Clone only the header
-      const clone = table.cloneNode(true);
-      clone.querySelector('tbody').remove();
-      
-      // Match column widths
-      const origTh = table.querySelectorAll('thead th');
-      const cloneTh = clone.querySelectorAll('thead th');
-      origTh.forEach((th, i) => {
-        cloneTh[i].style.width = th.offsetWidth + 'px';
-      });
+  // Clone the header row
+  const header = table.querySelector('thead');
+  const floatingHeader = header.cloneNode(true);
+  floatingHeader.id = 'floatingTableHeader';
+  floatingHeader.style.position = 'fixed';
+  floatingHeader.style.top = '0';
+  floatingHeader.style.width = table.offsetWidth + 'px';
+  floatingHeader.style.backgroundColor = '#f8f8f8';
+  floatingHeader.style.display = 'none';
+  document.body.appendChild(floatingHeader);
 
-      floatingHeader.innerHTML = '';
-      floatingHeader.appendChild(clone);
-      floatingHeader.classList.add('floating-header');
+  // Show/hide on scroll
+  const tableTop = table.getBoundingClientRect().top;
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > tableTop) {
+      floatingHeader.style.display = 'table';
+    } else {
+      floatingHeader.style.display = 'none';
     }
-    floatingHeader.style.display = 'block';
-  } else {
-    floatingHeader.style.display = 'none';
-  }
-});
+  });
+
+  // Handle resize to match widths
+  window.addEventListener('resize', function() {
+    floatingHeader.style.width = table.offsetWidth + 'px';
+  });
+});	
+
 
   </script>
 
