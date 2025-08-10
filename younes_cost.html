@@ -302,6 +302,31 @@
         padding: 8px;
       }
     }
+	
+	
+	
+	.table-wrapper {
+  width: 100%;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll table {
+  border-collapse: collapse;
+  min-width: 600px; /* prevent column squish on phone */
+}
+
+.table-scroll thead th {
+  position: sticky;
+  top: 0;
+  background-color: #004aad; /* match your header color */
+  color: white;
+  z-index: 5;
+}
+
   </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -565,20 +590,22 @@
 -->
 
 
-<div class="overflow-x-auto">
-  <table class="w-full border-collapse mb-6">
-    <thead class="sticky top-0 bg-blue-600 text-white z-10">
-      <tr>
-        <th class="border p-2">المادة</th>
-        <th class="border p-2">المرحلة</th>
-        <th class="border p-2">الكمية</th>
-        <th class="border p-2">التكلفة لكل وحدة</th>
-        <th class="border p-2">التكلفة</th>
-        <th class="border p-2">المساحة المغطاة (م²)</th>
-      </tr>
-    </thead>
-    <tbody id="costTableBody"></tbody>
-  </table>
+<div class="table-wrapper">
+  <div class="table-scroll">
+    <table class="w-full border-collapse mb-6">
+      <thead>
+        <tr>
+          <th class="border p-2">المادة</th>
+          <th class="border p-2">المرحلة</th>
+          <th class="border p-2">الكمية</th>
+          <th class="border p-2">التكلفة لكل وحدة</th>
+          <th class="border p-2">التكلفة</th>
+          <th class="border p-2">المساحة المغطاة (م²)</th>
+        </tr>
+      </thead>
+      <tbody id="costTableBody"></tbody>
+    </table>
+  </div>
 </div>
 
 	  
