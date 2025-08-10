@@ -327,6 +327,22 @@
   z-index: 5;
 }
 
+
+
+
+.floating-header table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.floating-header th {
+  background-color: #004aad;
+  color: white;
+  padding: 10px;
+  border: 1px solid #d4a373;
+}
+
+
+
   </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -1324,6 +1340,41 @@ console.log(mainIronPerM2);
       XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary by Product');
       XLSX.writeFile(wb, 'cost_estimation.xlsx');
     }
+	
+	
+	
+	
+	window.addEventListener('scroll', function() {
+  const table = document.querySelector('table');
+  const floatingHeader = document.getElementById('floatingTableHeader');
+
+  if (!table) return;
+
+  const tableRect = table.getBoundingClientRect();
+  
+  if (tableRect.top < 0 && tableRect.bottom > 0) {
+    if (!floatingHeader.innerHTML) {
+      // Clone only the header
+      const clone = table.cloneNode(true);
+      clone.querySelector('tbody').remove();
+      
+      // Match column widths
+      const origTh = table.querySelectorAll('thead th');
+      const cloneTh = clone.querySelectorAll('thead th');
+      origTh.forEach((th, i) => {
+        cloneTh[i].style.width = th.offsetWidth + 'px';
+      });
+
+      floatingHeader.innerHTML = '';
+      floatingHeader.appendChild(clone);
+      floatingHeader.classList.add('floating-header');
+    }
+    floatingHeader.style.display = 'block';
+  } else {
+    floatingHeader.style.display = 'none';
+  }
+});
+
   </script>
 
   
