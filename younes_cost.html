@@ -548,7 +548,7 @@
 <h2 class="sticky top-0 bg-white text-2xl font-bold mb-4 text-center text-blue-700 shadow-md z-10">جدول تكلفة المواد</h2>
     <h3 class="text-lg font-semibold mt-4 text-blue-800">الإجمالي: <span id="totalCostTop">0</span> درهم مغربي</h3>
 
-<!-- The Table -->
+<!-- The Table 
 <table class="w-full border-collapse mb-6">
   <thead>
     <tr class="bg-blue-600 text-white">
@@ -562,7 +562,23 @@
   </thead>
   <tbody id="costTableBody"></tbody>
 </table>
+-->
 
+<div class="overflow-x-auto">
+  <table class="w-full border-collapse mb-6">
+    <thead class="sticky top-0 bg-blue-600 text-white z-10">
+      <tr>
+        <th class="border p-2">المادة</th>
+        <th class="border p-2">المرحلة</th>
+        <th class="border p-2">الكمية</th>
+        <th class="border p-2">التكلفة لكل وحدة</th>
+        <th class="border p-2">التكلفة</th>
+        <th class="border p-2">المساحة المغطاة (م²)</th>
+      </tr>
+    </thead>
+    <tbody id="costTableBody"></tbody>
+  </table>
+</div>
 	  
 	  
       <h3 class="text-lg font-semibold mt-4 text-blue-800">الإجمالي: <span id="totalCost">0</span> درهم مغربي</h3>
