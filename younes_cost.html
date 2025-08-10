@@ -350,21 +350,41 @@
           <input id="numFloors" type="number" min="1" step="1" class="mt-1 p-2 w-full border rounded" value="2" placeholder="2ثال: 1" aria-label="عدد الطوابق">
         </div>
         
-		  <div>
-          <label class="block text-sm font-medium" for="hasBasement">هل يوجد قبو؟</label>
-          <input id="hasBasement" type="checkbox" class="mt-1" checked aria-label="إضافة قبو">
-        </div>
+
+		
+
+<div>
+  <label class="block text-lg font-medium" for="hasBasement" style="color: blue;">
+    هل يوجد قبو ؟ (La cave)
+  </label>
+  <input 
+    id="hasBasement" 
+    type="checkbox" 
+    style="width: 16px; height: 16px;"
+    aria-label="إضافة قبو"
+  >
+</div>
+
 
 	
-	
         <div>
-          <label class="block text-sm font-medium" for="semelleCount">عدد السملات:</label>
+          <label class="block text-sm font-medium" for="semelleCount">
+		  
+		عدد السملات (Semelle) — القاعدة
+		  
+		  </label>
           <input id="semelleCount" type="number" min="1" step="1" class="mt-1 p-2 w-full border rounded" value="16" placeholder="مثال: 16" aria-label="عدد السملات">
         </div>
       </div>
+	  
 
       <!-- Material Prices Section -->
-      <h3 class="text-lg font-semibold mt-6 mb-3 text-blue-600">أسعار المواد</h3>
+      
+	<h3 class="text-lg font-semibold mt-6 mb-3 text-blue-600">
+  أسعار مواد البناء الخاصة بالأشغال الكبرى (gros œuvre)، وفق الأسعار الحالية. يمكنكم تعديلها عند تغيّر الأسعار.
+</h3>
+
+	  
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium" for="betonPrice">سعر البيتون (درهم مغربي/م³):</label>
@@ -386,11 +406,38 @@
           <label class="block text-sm font-medium" for="excavationPrice">سعر الحفر (درهم مغربي/م³):</label>
           <input id="excavationPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="35" placeholder="مثال: 35" aria-label="سعر الحفر لكل متر مكعب">
         </div>
-        <div>
-          <label class="block text-sm font-medium" for="gravelPrice">سعر حصى الفياج (درهم مغربي/م³):</label>
-          <input id="gravelPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="200" placeholder="مثال: 200" aria-label="سعر حصى الفياج">
-        </div>
-        <div>
+		
+		
+
+        
+		
+<div class="tooltip-container">
+  <label for="gravelPrice" class="block text-sm font-medium">سعر حصى الفياج (درهم مغربي/م³):</label>
+  <input 
+    id="gravelPrice" 
+    type="number" 
+    min="0" 
+    step="0.1" 
+    value="148" 
+    placeholder="مثال: 148" 
+    aria-label="سعر حصى الفياج"
+    class="mt-1 p-2 w-full border rounded"
+  >
+  <div class="tooltip-text" style="
+    background-color: #004080;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-top: 5px;
+    font-size: 14px;
+  ">
+    التغطية (فياج) التي تساوي 25 م³ تكلف 3700 درهم، أي 148 درهم للمتر المكعب .
+  </div>
+</div>
+
+		
+		
+		<div>
           <label class="block text-sm font-medium" for="brickPrice">سعر الطوب (درهم مغربي/حبة):</label>
           <input id="brickPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="6.5" placeholder="مثال: 6.5" aria-label="سعر الطوب لكل حبة">
         </div>
@@ -416,19 +463,18 @@
 </div>
 
 
-
 		
          
 		
-		
-		
-		
-		<div>
+				<div>
           <label class="block text-sm font-medium" for="aggregatePrice">سعر الحصى (درهم مغربي/م³):</label>
           <input id="aggregatePrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="160" placeholder="مثال: 160" aria-label="سعر الحصى">
         </div>
 		
 		
+		
+		
+
         <div>
           <label class="block text-sm font-medium" for="laborPrice">سعر اليد العاملة (درهم مغربي/م²):</label>
           <input id="laborPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="240" placeholder="مثال: 240" aria-label="سعر اليد العاملة لكل متر مربع">
