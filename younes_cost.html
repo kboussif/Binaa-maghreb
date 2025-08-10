@@ -342,6 +342,51 @@
 }
 
 
+#costTable {  /* Add id="costTable" to your <table> */
+  width: 100%;
+  border-collapse: collapse;
+  display: block; /* Allows scrolling */
+  overflow-x: auto; /* Handles wide tables on mobile */
+  max-height: 400px; /* Adjust to enable vertical scroll; remove if full height needed */
+}
+
+#costTable thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+#costTable tbody {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+#costTable th {
+  position: sticky; /* Standard */
+  position: -webkit-sticky; /* For iOS Safari */
+  top: 0;
+  background-color: #f8f8f8; /* Visible background */
+  z-index: 1; /* Stays on top */
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: right; /* RTL for Arabic text */
+  white-space: nowrap; /* Prevents header wrapping on small screens */
+}
+
+#costTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: right;
+}
+
+/* Mobile-specific: Force horizontal scroll hint */
+@media (max-width: 768px) {
+  #costTable {
+    overflow-x: scroll;
+  }
+}
+
 
   </style>
 </head>
