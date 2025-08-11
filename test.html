@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Export Table to CSV Example</title>
+</head>
+<body>
+  <h2>Sample Data Table</h2>
+  <table id="dataTable" border="1" cellpadding="5" cellspacing="0">
+    <thead>
+      <tr><th>Name</th><th>Age</th><th>City</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Alice</td><td>30</td><td>New York</td></tr>
+      <tr><td>Bob</td><td>25</td><td>London</td></tr>
+      <tr><td>Charlie</td><td>35</td><td>Paris</td></tr>
+    </tbody>
+  </table>
+
+  <br />
+  <button onclick="exportTableToCSV('data.csv')">Export to CSV</button>
+
+  <script>
+    function exportTableToCSV(filename) {
+      const csv = [];
+      const rows = document.querySelectorAll("#dataTable tr");
+      
+      for (const row of rows) {
+        const cols = row.querySelectorAll("td, th");
+        const rowData = [];
+        for (const col of cols) {
+          // Escape double quotes and wrap in quotes if necessary
+          let data = col.innerText.replace(/"/g, '""');
+          if (data.includes(",") || data.includes('"') || data.includes("\n")) {
+            data = `"${data}"`;
+          }
+          rowData.push(data);
+        }
+        csv.push(rowData.join(","));
+      }
+      
+      // Create CSV file blob and trigger download
+      const csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+      const downloadLink = document.createElement("a");
+      downloadLink.download = filename;
+      downloadLink.href = window.URL.createObjectURL(csvFile);
+      downloadLink.style.display = "none";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
+  </script>
+</body>
+</html>
