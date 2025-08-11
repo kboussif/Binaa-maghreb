@@ -680,10 +680,13 @@
     <!-- Export Buttons -->
     <div class="flex justify-center gap-4 mb-6">
       <button onclick="exportToPDF()" class="bg-green-600 text-white p-2 rounded hover:bg-green-700">📄 تصدير إلى PDF</button>
-      <button onclick="exportToExcel()" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">تصدير الجداول إلى Excel</button>
+<!--      <button onclick="exportToExcel()" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">تصدير الجداول إلى Excel</button> -->
+      <button onclick="exportCostEstimation()" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">تصدير الجداول إلى Excel</button>
+
     </div>
   </div>
 
+ 
  
  
  
@@ -1502,6 +1505,76 @@ window.addEventListener('load', function() {
     floatingHeader.style.width = table.offsetWidth + 'px';
   });
 });	
+
+
+
+function exportTablesToCSV(filename) {
+  function tableBodyToArray(tableBody) {
+    const rows = tableBody.getElementsByTagName('tr');
+    const data = [];
+    for (let row of rows) {
+      const cells = row.getElementsByTagName('td');
+      const rowData = [];
+      for (let cell of cells) {
+        // If the cell has an input, get its value; otherwise get textContent
+        const input = cell.querySelector('input');
+        rowData.push(input ? input.value : cell.textContent.trim());
+      }
+      data.push(rowData);
+    }
+    return data;
+  }
+
+  const costTableBody = document.getElementById('costTableBody');
+  const summaryTableBody = document.getElementById('summaryTableBody');
+
+  // Headers for CSV
+  const costHeaders = ['المادة', 'المرحلة', 'الكمية', 'المساحة المغطاة (م²)', 'التكلفة لكل وحدة (درهم مغربي)', 'التكلفة (درهم مغربي)', 'التكلفة لكل م² (درهم مغربي)'];
+  const summaryHeaders = ['المادة', 'إجمالي الكمية', 'إجمالي التكلفة (درهم مغربي)', 'النسبة المئوية (%)'];
+
+  const costData = [costHeaders, ...tableBodyToArray(costTableBody)];
+  const summaryData = [summaryHeaders, ...tableBodyToArray(summaryTableBody)];
+
+  function arrayToCSV(data) {
+    return data.map(row =>
+      row.map(item => {
+        // Escape double quotes
+        let str = item.replace(/"/g, '""');
+        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+          str = `"${str}"`;
+        }
+        return str;
+      }).join(',')
+    ).join('\n');
+  }
+
+  // Join both tables with a separator line (optional)
+  const csvContent = arrayToCSV(costData) + '\n\n' + arrayToCSV(summaryData);
+
+  // Trigger CSV download
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+
+function isMobile() {
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+}
+
+function exportCostEstimation() {
+  if (isMobile()) {
+    exportTablesToCSV('cost_estimation.csv');
+  } else {
+    exportToExcel(); // your XLSX export function
+  }
+}
 
 
   </script>
