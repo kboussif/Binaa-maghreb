@@ -1372,7 +1372,7 @@ if (baseBuildArea < 80) {
       html2pdf().from(tempDiv).save('cost_estimation.pdf');
     }
 
-    function exportToExcel() {
+    function _OLDexportToExcel() {
       const costTable = document.getElementById('costTableBody');
       const summaryTable = document.getElementById('summaryTableBody');
       const wb = XLSX.utils.book_new();
@@ -1409,6 +1409,67 @@ if (baseBuildArea < 80) {
     }
 	
 	
+	
+	
+	function exportToExcel() {
+  const costTable = document.getElementById('costTableBody');
+  const summaryTable = document.getElementById('summaryTableBody');
+  const wb = XLSX.utils.book_new();
+
+  // Prepare cost data
+  const costRows = costTable.getElementsByTagName('tr');
+  const costData = [['المادة', 'المرحلة', 'الكمية', 'المساحة المغطاة (م²)', 'التكلفة لكل وحدة (درهم مغربي)', 'التكلفة (درهم مغربي)', 'التكلفة لكل م² (درهم مغربي)']];
+  for (let row of costRows) {
+    const cells = row.getElementsByTagName('td');
+    costData.push([
+      cells[0].textContent,
+      cells[1].textContent,
+      cells[2].getElementsByTagName('input')[0].value,
+      cells[3].textContent,
+      cells[4].getElementsByTagName('input')[0].value,
+      cells[5].textContent,
+      cells[6].textContent
+    ]);
+  }
+  const costWs = XLSX.utils.aoa_to_sheet(costData);
+  XLSX.utils.book_append_sheet(wb, costWs, 'Detailed Cost');
+
+  // Prepare summary data
+  const summaryRows = summaryTable.getElementsByTagName('tr');
+  const summaryData = [['المادة', 'إجمالي الكمية', 'إجمالي التكلفة (درهم مغربي)', 'النسبة المئوية (%)']];
+  for (let row of summaryRows) {
+    const cells = row.getElementsByTagName('td');
+    summaryData.push([
+      cells[0].textContent,
+      cells[1].textContent,
+      cells[2].textContent,
+      cells[3].textContent
+    ]);
+  }
+  const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
+  XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary by Product');
+
+  // Generate binary string
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+
+  // Create blob from array buffer
+  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+
+  // Create a download link and trigger it
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cost_estimation.xlsx';
+  document.body.appendChild(a);
+  a.click();
+
+  // Clean up
+  setTimeout(() => {
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }, 0);
+}
+
 	
 // Assuming your table has an ID, e.g., id="costTable". Add id="costTable" to the <table> tag.
 window.addEventListener('load', function() {
