@@ -392,7 +392,7 @@
         </div>
         <div>
           <label class="block text-sm font-medium" for="buildWidth">عرض المبنى (متر):</label>
-          <input id="buildWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض المبنى بالمتر">
+          <input id="buildWidth" type="number" min="0" max="15"  step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض المبنى بالمتر">
         </div>
 		
 		      <div>
@@ -688,6 +688,17 @@
 
 
  <script>
+ 
+ 
+  const buildWidthInput = document.getElementById("buildWidth");
+  buildWidthInput.addEventListener("input", function () {
+    if (parseFloat(this.value) > 14) {
+      this.value = 14;
+      showError("العرض لا يتجاوز 14م، ولزيادة المساحة يمكنك رفع الطول.");
+       return;
+    }
+  });
+  
     let costData = [];
 
     function validateInputs(inputs) {
@@ -786,6 +797,9 @@
           <td class="border p-2">${item.percentage}%</td>
         </tr>
       `).join('');
+	  
+	  
+	  
 	 const rounded = Math.round(totalCost / 100) * 100; 
      document.getElementById('totalCostTop').textContent = rounded.toLocaleString('fr-FR');
 	 document.getElementById('totalCost').textContent = rounded.toLocaleString('fr-FR');
@@ -904,7 +918,6 @@ if (baseBuildArea < 80) {
     mainIronPerM2 = 8500 / 120;
 }
 
-console.log(mainIronPerM2);
 
 
 	  
@@ -939,11 +952,12 @@ console.log(mainIronPerM2);
         });
       }
 
+
       const ironSizes = [
-        { size: '6 مم', quantityKg: 1.50 },
-        { size: '8 مم', quantityKg: 0.20 },
-        { size: '10 مم', quantityKg: 3.50 },
-        { size: '14 مم', quantityKg: 0.30 }
+        { size: '6 مم', quantityKg: 1500 },
+        { size: '8 مم', quantityKg: 200 },
+        { size: '10 مم', quantityKg: 350 },
+        { size: '14 مم', quantityKg: 300 }
       ];
       ironSizes.forEach(({ size, quantityKg }) => {
         const scaledQuantity = (quantityKg * baseBuildArea / 120).toFixed(2);
@@ -976,6 +990,8 @@ console.log(mainIronPerM2);
         totalCost: semelleBeton * betonPrice,
         costPerM2: (semelleBeton * betonPrice) / baseBuildArea
       });
+	  
+	  console.log("Total Cost Beton:", totalCost);
       costData.push({
         material: 'البيتون',
         stage: 'الأساسات (Dalle)',
