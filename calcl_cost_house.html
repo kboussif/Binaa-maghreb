@@ -1357,7 +1357,7 @@ if (baseBuildArea < 80) {
       updateTables();
     }
 
-    function exportToPDF() {
+    function OLDexportToPDF() {
       const element = document.getElementById('costOutput');
       const inputsSummary = `
         <div class="mb-4">
@@ -1374,6 +1374,65 @@ if (baseBuildArea < 80) {
       tempDiv.innerHTML = inputsSummary + element.outerHTML;
       html2pdf().from(tempDiv).save('cost_estimation.pdf');
     }
+
+
+
+
+function exportToPDF() {
+  const element = document.getElementById('costOutput');
+  const inputsSummary = `
+    <div class="mb-4" style="font-family: Arial, sans-serif; direction: rtl; text-align: right;">
+      <h2 style="font-weight: 600; font-size: 1.25rem;">ملخص المدخلات</h2>
+      <p>طول الأرض: ${document.getElementById('landLength').value || 10} م</p>
+      <p>عرض الأرض: ${document.getElementById('landWidth').value || 12} م</p>
+      <p>طول المبنى: ${document.getElementById('buildLength').value || 12} م</p>
+      <p>عرض المبنى: ${document.getElementById('buildWidth').value || 12} م</p>
+      <p>عدد الطوابق: ${document.getElementById('numFloors').value || 1}</p>
+      <p>وجود قبو: ${document.getElementById('hasBasement').checked ? 'نعم' : 'لا'}</p>
+    </div>
+  `;
+
+  const tempDiv = document.createElement('div');
+  tempDiv.style.direction = 'rtl';
+  tempDiv.style.textAlign = 'right';
+  tempDiv.style.fontFamily = 'Arial, sans-serif';
+  tempDiv.innerHTML = inputsSummary + element.outerHTML;
+
+  const options = {
+    margin: 0.3,
+    filename: 'cost_estimation.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      logging: false,
+      letterRendering: true,
+      useCORS: true,
+    },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+  };
+
+  // Try generating PDF and opening in new tab for mobile
+  html2pdf()
+    .set(options)
+    .from(tempDiv)
+    .outputPdf('blob')
+    .then(pdfBlob => {
+      // On mobile, open in new tab instead of auto download
+      if (/Mobi|Android/i.test(navigator.userAgent)) {
+        const url = URL.createObjectURL(pdfBlob);
+        window.open(url, '_blank');
+      } else {
+        // On desktop, save file directly
+        html2pdf().set(options).from(tempDiv).save();
+      }
+    })
+    .catch(err => {
+      console.error('PDF generation failed:', err);
+      alert('حدث خطأ أثناء تصدير PDF، حاول مرة أخرى.');
+    });
+}
+
+
 
     function _OLDexportToExcel() {
       const costTable = document.getElementById('costTableBody');
