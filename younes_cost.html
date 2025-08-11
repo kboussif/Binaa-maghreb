@@ -342,50 +342,27 @@
 }
 
 
-#costTable {  /* Add id="costTable" to your <table> */
-  width: 100%;
-  border-collapse: collapse;
-  display: block; /* Allows scrolling */
-  overflow-x: auto; /* Handles wide tables on mobile */
-  max-height: 400px; /* Adjust to enable vertical scroll; remove if full height needed */
+
+
+
+
+
+.table-scroll {
+  max-height: 300px; /* or whatever height fits your phone screen */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
 }
 
-#costTable thead {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
-
-#costTable tbody {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
-
-#costTable th {
-  position: sticky; /* Standard */
-  position: -webkit-sticky; /* For iOS Safari */
+.table-scroll thead th {
+  position: sticky;
   top: 0;
-  background-color: #f8f8f8; /* Visible background */
-  z-index: 1; /* Stays on top */
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: right; /* RTL for Arabic text */
-  white-space: nowrap; /* Prevents header wrapping on small screens */
+  background-color: white; /* or your table header bg color */
+  z-index: 10; /* make sure it’s above the body rows */
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4); /* optional shadow for clarity */
 }
 
-#costTable td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: right;
-}
 
-/* Mobile-specific: Force horizontal scroll hint */
-@media (max-width: 768px) {
-  #costTable {
-    overflow-x: scroll;
-  }
-}
+
 
 
   </style>
@@ -623,10 +600,10 @@
      <h3 style="color: #004aad; font-size: 20px; text-align: center;">
         وفي النهاية يمكنك رؤية السعر والملخص لكل مادة لكل المنزل بالكامل، ويمكنك أيضاً طباعة التقرير بصيغة PDF أو Excel
       </h3>
-      <h2 class="text-xl font-semibold mb-4 text-blue-700">
-        تفاصيل التكلفة
-        التكلفة ستظهر بشكل أفضل لرؤية الجدول بالكامل إذا قمت بتدوير الهاتف أفقيًا، أو يمكنك أيضاً رؤيتها من الكمبيوتر.
-      </h2>
+<h2 class="text-xl font-semibold mb-4 text-blue-700">
+  تفاصيل التكلفة  
+  باش تشوف الجدول كامل، حرك الشاشة لليسار ولا لليمين. وكيكون أحسن تقلب التيليفون أفقياً، أو تشوف من الكمبيوتر.
+</h2>
 
 
 	
@@ -1426,4 +1403,3 @@ window.addEventListener('load', function() {
   
 </body>
 </html>
-
