@@ -1579,7 +1579,6 @@ function exportCostEstimation() {
 
 
 
-
 function exportTablesToCSV(filename) {
   function tableBodyToArray(tableBody) {
     const rows = tableBody.getElementsByTagName('tr');
@@ -1588,7 +1587,6 @@ function exportTablesToCSV(filename) {
       const cells = row.getElementsByTagName('td');
       const rowData = [];
       for (let cell of cells) {
-        // If the cell has an input, get its value; otherwise get textContent
         const input = cell.querySelector('input');
         rowData.push(input ? input.value : cell.textContent.trim());
       }
@@ -1600,7 +1598,6 @@ function exportTablesToCSV(filename) {
   const costTableBody = document.getElementById('costTableBody');
   const summaryTableBody = document.getElementById('summaryTableBody');
 
-  // Headers for CSV
   const costHeaders = ['المادة', 'المرحلة', 'الكمية', 'المساحة المغطاة (م²)', 'التكلفة لكل وحدة (درهم مغربي)', 'التكلفة (درهم مغربي)', 'التكلفة لكل م² (درهم مغربي)'];
   const summaryHeaders = ['المادة', 'إجمالي الكمية', 'إجمالي التكلفة (درهم مغربي)', 'النسبة المئوية (%)'];
 
@@ -1610,33 +1607,34 @@ function exportTablesToCSV(filename) {
   function arrayToCSV(data) {
     return data.map(row =>
       row.map(item => {
-        // Escape double quotes
         let str = item.replace(/"/g, '""');
         if (str.includes(',') || str.includes('"') || str.includes('\n')) {
           str = `"${str}"`;
         }
         return str;
       }).join(',')
-    ).join('\n');
+    ).join('\r\n');  // Use Windows line endings
   }
 
-  // Join both tables with a separator line (optional)
-  const csvContent = arrayToCSV(costData) + '\n\n' + arrayToCSV(summaryData);
+  const csvContent = arrayToCSV(costData) + '\r\n\r\n' + arrayToCSV(summaryData);
 
-  // UTF-8 BOM character to fix Arabic encoding in Excel
-  const BOM = "\uFEFF";
+  // UTF-8 BOM character
+  const BOM = new Uint8Array([0xEF, 0xBB, 0xBF]);
 
-  // Trigger CSV download with BOM for Arabic support
-  const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+  // Create blob with BOM + CSV content
+  const blob = new Blob([BOM, csvContent], { type: 'text/csv;charset=utf-8;' });
+
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
+
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
 
 
   </script>
