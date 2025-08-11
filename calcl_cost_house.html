@@ -612,7 +612,9 @@
 </div>
 
 
-
+<p style="color: #004aad; font-size: 16px; text-align: center;">
+  بالنسبة للحديد، يرجى التواصل مع مكتب الدراسات للحصول على الكمية والتكوين الصحيحين.
+</p>
 
 
 
@@ -692,12 +694,29 @@
  
   const buildWidthInput = document.getElementById("buildWidth");
   buildWidthInput.addEventListener("input", function () {
-    if (parseFloat(this.value) > 14) {
-      this.value = 14;
-      showError("العرض لا يتجاوز 14م، ولزيادة المساحة يمكنك رفع الطول.");
-       return;
+    if (parseFloat(this.value) > 20) {
+      this.value = 10;
+	  
+ showError("العرض لا يتجاوز 20م، ولزيادة المساحة يمكنك رفع الطول.");
+	 
+	 return;
     }
   });
+  
+  
+    const buildLengthInput = document.getElementById("buildLength");
+  buildLengthInput.addEventListener("input", function () {
+    if (parseFloat(this.value) > 20) {
+      this.value = 12;
+	  
+showError("الطول L والعرض W يجب ألا يتجاوزا 20م.");	 
+	 return;
+    }
+  });
+  
+  
+  
+  
   
     let costData = [];
 
@@ -899,22 +918,22 @@
 
 
 if (baseBuildArea < 80) {
-    mainIronPerM2 = 5000 / 120;
+    mainIronPerM2 = 5000 / 80;
 } else if (baseBuildArea >= 80 && baseBuildArea < 90) {
-    mainIronPerM2 = 5000 / 120;
+    mainIronPerM2 = 5500 / 80;
 } else if (baseBuildArea >= 90 && baseBuildArea < 100) {
-    mainIronPerM2 = 5500 / 120;
+    mainIronPerM2 = 6000 / 90;
 } else if (baseBuildArea >= 100 && baseBuildArea < 110) {
-    mainIronPerM2 = 6000 / 120;
+    mainIronPerM2 = 6500 / 100;
 } else if (baseBuildArea >= 110 && baseBuildArea < 120) {
-    mainIronPerM2 = 6500 / 120;
+    mainIronPerM2 = 7000 / 110;
 } else if (baseBuildArea >= 120 && baseBuildArea < 130) {
-    mainIronPerM2 = 7000 / 120;
+    mainIronPerM2 = 7500 / 110;
 } else if (baseBuildArea >= 130 && baseBuildArea < 140) {
-    mainIronPerM2 = 7500 / 120;
+    mainIronPerM2 = 7700 / 120;
 } else if (baseBuildArea >= 140 && baseBuildArea < 150) {
-    mainIronPerM2 = 8000 / 120;
-} else if (baseBuildArea >= 180 && baseBuildArea <= 300) {
+    mainIronPerM2 = 8200 / 120;
+} else if (baseBuildArea >= 180 ) {
     mainIronPerM2 = 8500 / 120;
 }
 
