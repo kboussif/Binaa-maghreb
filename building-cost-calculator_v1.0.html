@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حاسبة تكلفة البناء - نسخة ديناميكية</title>
+<title>version 1.0</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+body { font-family: 'Amiri', 'Noto Sans Arabic', sans-serif; background: #f4e7d3; color: #3c2f2f; padding: 20px; }
+.container { max-width: 1200px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; }
+h1, h2, h3 { color: #004aad; }
+input, button, select { padding: 6px; margin: 4px; }
+table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+th, td { border: 1px solid #d4a373; padding: 8px; text-align: center; }
+.admin-panel { background: #ede7f6; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; }
+.toggle-admin { background: #004aad; color: white; padding: 8px; border: none; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>حاسبة تكلفة البناء - نسخة ديناميكية</h1>
+
+<!-- Project Inputs -->
+<div>
+  <label>طول المبنى (م):</label><input type="number" id="buildLength" value="10">
+  <label>عرض المبنى (م):</label><input type="number" id="buildWidth" value="12">
+  
+  <div style="display:none;">
+    <label>طول الأرض (م):</label><input type="number" id="landLength" value="10">
+    <label>عرض الأرض (م):</label><input type="number" id="landWidth" value="12">
+  </div>
+  
+   <label>عدد الطوابق:</label><input type="number" id="numFloors" value="1">
+  <label>وجود قبو:</label><input type="checkbox" id="hasBasement">
+  <button onclick="calculateCost()">احسب التكلفة</button>
+</div>
+
+
+<!-- Toggle Admin Tools -->
+<button class="toggle-admin" onclick="document.querySelector('.admin-panel').style.display =
+  document.querySelector('.admin-panel').style.display==='none' ? 'block' : 'none'">
+  ⚙️ إظهار/إخفاء أدوات الإدارة
+</button>
+
+<!-- Admin Panel -->
+<div class="admin-panel">
+  <h3>أدوات الإدارة</h3>
+  <div>
+    <input id="newSectionName" placeholder="اسم القسم الجديد">
+    <button onclick="addSection()">➕ إضافة قسم</button>
+  </div>
+  <div>
+    <select id="sectionSelect"></select>
+    <input id="renameSectionName" placeholder="اسم جديد للقسم">
+    <button onclick="renameSection()">✏️ تعديل اسم القسم</button>
+    <button onclick="deleteSection()">🗑️ حذف القسم</button>
+  </div>
+ 
+
+
+<div>
+  <select id="sectionForItem" onchange="populateItemList()"></select>
+  <select id="itemList" onchange="loadItemDetails()"></select>
+  <input id="itemName" placeholder="اسم البند">
+  <input id="itemUnit" placeholder="الوحدة">
+  <input type="number" id="itemPrice" placeholder="سعر الوحدة">
+  <input type="number" id="itemQty" placeholder="الكمية الأساسية">
+  <button onclick="addItem()">➕ إضافة بند</button>
+  <button onclick="updateItem()">✏️ تعديل</button>
+  <button onclick="deleteItem()">🗑️ حذف</button>
+</div>
+
+
+
+
+  <div>
+    <button onclick="exportModel()">💾 تصدير النموذج (JSON)</button>
+    <input type="file" id="importFile" onchange="importModel(event)">
+  </div>
+</div>
+
+<!-- Cost Output -->
+<div id="costOutput"></div>
+
+<!-- Export Buttons -->
+<div>
+  <button onclick="exportToPDF()">📄 تصدير إلى PDF</button>
+  <button onclick="exportToExcel()">📊 تصدير إلى Excel</button>
+</div>
+
+</div>
+
+<script>
+
+
+const LOG_ENABLED = true; // change to false to disable logging
+
+let baseData = [
+  { name: "Fondation", items: [
+    { item: "حفر الأساسات", unit: "100", unitPrice: 125, baseQty: 100 },
+    { item: "الحديد (6 مم)", unit: "100", unitPrice: 9.4, baseQty: 400 },
+    { item: "الحديد (10 مم)", unit: "100", unitPrice: 9.2, baseQty: 500 },
+    { item: "الحديد (12 مم)", unit: "100", unitPrice: 9.2, baseQty: 800 },
+    { item: "الحديد (14 مم)", unit: "100", unitPrice: 9.2, baseQty: 0 },
+    { item: "البيطون (B25)", unit: "100", unitPrice: 780, baseQty: 25 },
+    { item: "البيطون (B35)", unit: "100", unitPrice: 850, baseQty: 0 },
+    { item: "الأسمنت (35)", unit: "100", unitPrice: 75, baseQty: 25 },
+    { item: "الأسمنت (45)", unit: "100", unitPrice: 81, baseQty: 0 },
+    { item: "الوردي والبودر والشبكة", unit: "100", unitPrice: 85, baseQty: 0 },
+    { item: "الياجور (7)", unit: "100", unitPrice: 2.5, baseQty: 0 },
+    { item: "الياجور (15)", unit: "100", unitPrice: 5.5, baseQty: 1500 },
+    { item: "الرمل", unit: "100", unitPrice: 4, baseQty: 350 },
+    { item: "الحجر (للبلوكاج)", unit: "100", unitPrice: 3500, baseQty: 0 },
+    { item: "الكياس", unit: "100", unitPrice: 300, baseQty: 4 },
+    { item: "أنابيب PVC (200)", unit: "100", unitPrice: 20, baseQty: 60 },
+    { item: "السلك والمسامير", unit: "100", unitPrice: 16, baseQty: 40 },
+    { item: "ميكا", unit: "100", unitPrice: 20, baseQty: 65 },
+    { item: "الماء والكهرباء (مواد)", unit: "100", unitPrice: 70, baseQty: 0 },
+    { item: "الماء والكهرباء (يد عاملة)", unit: "100", unitPrice: 45, baseQty: 0 },
+    { item: "اليد العاملة", unit: "100", unitPrice: 125, baseQty: 100 }
+  ] }
+];
+
+
+
+function refreshSectionSelects() {
+  let selects = [document.getElementById('sectionSelect'), document.getElementById('sectionForItem')];
+  selects.forEach(sel => { sel.innerHTML = ''; baseData.forEach((sec, idx) => {
+    let opt = document.createElement('option'); opt.value = idx; opt.textContent = sec.name; sel.appendChild(opt);
+  }); });
+  populateItemList();
+}
+
+
+
+refreshSectionSelects();
+
+function addSection() {
+  let name = document.getElementById('newSectionName').value.trim();
+  if (name) { baseData.push({ name, items: [] }); refreshSectionSelects(); calculateCost(); }
+}
+function renameSection() {
+  let idx = document.getElementById('sectionSelect').value;
+  let name = document.getElementById('renameSectionName').value.trim();
+  if (name) { baseData[idx].name = name; refreshSectionSelects(); calculateCost(); }
+}
+function deleteSection() {
+  let idx = document.getElementById('sectionSelect').value;
+  baseData.splice(idx, 1); refreshSectionSelects(); calculateCost();
+}
+function addItem() {
+  let idx = document.getElementById('sectionForItem').value;
+  baseData[idx].items.push({
+    item: document.getElementById('itemName').value,
+    unit: document.getElementById('itemUnit').value,
+    unitPrice: parseFloat(document.getElementById('itemPrice').value) || 0,
+    baseQty: parseFloat(document.getElementById('itemQty').value) || 0
+  });
+  calculateCost();
+}
+function exportModel() {
+  let blob = new Blob([JSON.stringify(baseData, null, 2)], { type: 'application/json' });
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement('a'); a.href = url; a.download = 'model.json'; a.click();
+}
+function importModel(e) {
+  let file = e.target.files[0];
+  if (!file) return;
+  let reader = new FileReader();
+  reader.onload = ev => { baseData = JSON.parse(ev.target.result); refreshSectionSelects(); calculateCost(); };
+  reader.readAsText(file);
+}
+
+
+
+
+
+
+
+
+function calculateCost() {
+  let html = '';
+
+  // 1️⃣ Get the input values
+  let buildLength = parseFloat(document.getElementById('buildLength').value) || 0;
+  let buildWidth = parseFloat(document.getElementById('buildWidth').value) || 0;
+  let numFloors = parseFloat(document.getElementById('numFloors').value) || 1;
+  let hasBasement = document.getElementById('hasBasement').checked;
+
+  // 2️⃣ Calculate total building area
+  let buildArea = buildLength * buildWidth;
+  let totalArea = buildArea * numFloors;
+  if (hasBasement) totalArea += buildArea;
+
+  // 3️⃣ Track the grand total
+  let grandTotal = 0;
+
+  // 4️⃣ Loop through sections
+  baseData.forEach(sec => {
+    let sectionTotal = 0;
+    html += `<h3>${sec.name}</h3><table><thead><tr>
+      <th>البند</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th>
+    </tr></thead><tbody>`;
+
+    sec.items.forEach(it => {
+      // Adjust quantity based on totalArea
+      let unitSize = parseFloat(it.unit) || 1; // "100" means per 100m²
+      let adjustedQty = (totalArea / unitSize) * it.baseQty;
+
+      let itemTotal = adjustedQty * it.unitPrice;
+      sectionTotal += itemTotal;
+
+      html += `<tr>
+        <td>${it.item}</td>
+        <td>${it.unit}</td>
+        <td>${adjustedQty.toFixed(2)}</td>
+        <td>${it.unitPrice}</td>
+        <td>${itemTotal.toFixed(2)}</td>
+      </tr>`;
+
+      logRow(it.item + ' => ' + itemTotal);
+    });
+
+    grandTotal += sectionTotal;
+
+    html += `<tr><td colspan="4">المجموع الفرعي</td><td>${sectionTotal.toFixed(2)}</td></tr></tbody></table>`;
+  });
+
+  // 5️⃣ Add grand total at the top
+  let grandTotalHtml = `<h2 style="color: red;">💰 الإجمالي الكلي: ${grandTotal.toFixed(2)}</h2>`;
+  document.getElementById('costOutput').innerHTML = grandTotalHtml + html;
+}
+
+
+
+
+
+
+
+
+function exportToPDF() {
+  const element = document.getElementById('costOutput');
+  const inputsSummary = `
+    <div>
+      <h2>ملخص المدخلات</h2>
+      <p>طول الأرض: ${document.getElementById('landLength').value || 10} م</p>
+      <p>عرض الأرض: ${document.getElementById('landWidth').value || 12} م</p>
+      <p>طول المبنى: ${document.getElementById('buildLength').value || 10} م</p>
+      <p>عرض المبنى: ${document.getElementById('buildWidth').value || 12} م</p>
+      <p>عدد الطوابق: ${document.getElementById('numFloors').value || 1}</p>
+      <p>وجود قبو: ${document.getElementById('hasBasement').checked ? 'نعم' : 'لا'}</p>
+    </div>
+  `;
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = inputsSummary + element.outerHTML;
+  html2pdf().from(tempDiv).save('cost_estimation.pdf');
+}
+
+function exportToExcel() {
+  const wb = XLSX.utils.book_new();
+  let detailedData = [['المادة', 'المرحلة', 'الكمية', 'التكلفة لكل وحدة', 'التكلفة']];
+  baseData.forEach(sec => {
+    sec.items.forEach(it => {
+      detailedData.push([it.item, sec.name, it.baseQty, it.unitPrice, it.baseQty * it.unitPrice]);
+    });
+  });
+  const ws1 = XLSX.utils.aoa_to_sheet(detailedData);
+  XLSX.utils.book_append_sheet(wb, ws1, 'Detailed Cost');
+
+  let summaryMap = {};
+  baseData.forEach(sec => {
+    sec.items.forEach(it => {
+      summaryMap[it.item] = (summaryMap[it.item] || 0) + (it.baseQty * it.unitPrice);
+    });
+  });
+  let summaryData = [['المادة', 'إجمالي التكلفة']];
+  Object.entries(summaryMap).forEach(([mat, total]) => summaryData.push([mat, total]));
+  const ws2 = XLSX.utils.aoa_to_sheet(summaryData);
+  XLSX.utils.book_append_sheet(wb, ws2, 'Summary');
+
+  XLSX.writeFile(wb, 'cost_estimation.xlsx');
+}
+
+
+
+
+
+function logRow(rowHtml) {
+  if (LOG_ENABLED) {
+    console.log(rowHtml);
+  }
+}
+
+function addItem() {
+  let idx = document.getElementById('sectionForItem').value;
+  baseData[idx].items.push({
+    item: document.getElementById('itemName').value,
+    unit: document.getElementById('itemUnit').value,
+    unitPrice: parseFloat(document.getElementById('itemPrice').value) || 0,
+    baseQty: parseFloat(document.getElementById('itemQty').value) || 0
+  });
+  calculateCost();
+}
+
+
+function populateItemList() {
+  let sectionIdx = document.getElementById('sectionForItem').value;
+  let itemList = document.getElementById('itemList');
+  itemList.innerHTML = '';
+  baseData[sectionIdx].items.forEach((it, idx) => {
+    let opt = document.createElement('option');
+    opt.value = idx;
+    opt.textContent = it.item;
+    itemList.appendChild(opt);
+  });
+}
+
+function loadItemDetails() {
+  let sectionIdx = document.getElementById('sectionForItem').value;
+  let itemIdx = document.getElementById('itemList').value;
+  let item = baseData[sectionIdx].items[itemIdx];
+  if (!item) return;
+  document.getElementById('itemName').value = item.item;
+  document.getElementById('itemUnit').value = item.unit;
+  document.getElementById('itemPrice').value = item.unitPrice;
+  document.getElementById('itemQty').value = item.baseQty;
+}
+
+function updateItem() {
+  let sectionIdx = document.getElementById('sectionForItem').value;
+  let itemIdx = document.getElementById('itemList').value;
+  if (itemIdx < 0) return;
+  baseData[sectionIdx].items[itemIdx] = {
+    item: document.getElementById('itemName').value,
+    unit: document.getElementById('itemUnit').value,
+    unitPrice: parseFloat(document.getElementById('itemPrice').value) || 0,
+    baseQty: parseFloat(document.getElementById('itemQty').value) || 0
+  };
+  populateItemList();
+  calculateCost();
+}
+
+function deleteItem() {
+  let sectionIdx = document.getElementById('sectionForItem').value;
+  let itemIdx = document.getElementById('itemList').value;
+  if (itemIdx < 0) return;
+  baseData[sectionIdx].items.splice(itemIdx, 1);
+  populateItemList();
+  calculateCost();
+}
+
+
+
+
+</script>
+
+</body>
+</html>
