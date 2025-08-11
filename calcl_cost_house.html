@@ -1381,7 +1381,7 @@ if (baseBuildArea < 80) {
 function exportToPDF() {
   const element = document.getElementById('costOutput');
   const inputsSummary = `
-    <div class="mb-4" style="font-family: Arial, sans-serif; direction: rtl; text-align: right;">
+    <div style="font-family: Tahoma, Arial, sans-serif; direction: rtl; text-align: right;">
       <h2 style="font-weight: 600; font-size: 1.25rem;">ملخص المدخلات</h2>
       <p>طول الأرض: ${document.getElementById('landLength').value || 10} م</p>
       <p>عرض الأرض: ${document.getElementById('landWidth').value || 12} م</p>
@@ -1395,7 +1395,7 @@ function exportToPDF() {
   const tempDiv = document.createElement('div');
   tempDiv.style.direction = 'rtl';
   tempDiv.style.textAlign = 'right';
-  tempDiv.style.fontFamily = 'Arial, sans-serif';
+  tempDiv.style.fontFamily = "Tahoma, Arial, sans-serif";
   tempDiv.innerHTML = inputsSummary + element.outerHTML;
 
   const options = {
@@ -1411,26 +1411,30 @@ function exportToPDF() {
     jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
   };
 
-  // Try generating PDF and opening in new tab for mobile
-  html2pdf()
-    .set(options)
-    .from(tempDiv)
-    .outputPdf('blob')
-    .then(pdfBlob => {
-      // On mobile, open in new tab instead of auto download
-      if (/Mobi|Android/i.test(navigator.userAgent)) {
-        const url = URL.createObjectURL(pdfBlob);
-        window.open(url, '_blank');
-      } else {
-        // On desktop, save file directly
-        html2pdf().set(options).from(tempDiv).save();
-      }
-    })
-    .catch(err => {
-      console.error('PDF generation failed:', err);
-      alert('حدث خطأ أثناء تصدير PDF، حاول مرة أخرى.');
-    });
+  setTimeout(() => {
+    html2pdf()
+      .set(options)
+      .from(tempDiv)
+      .outputPdf('blob')
+      .then(pdfBlob => {
+        if (/Mobi|Android/i.test(navigator.userAgent)) {
+          const url = URL.createObjectURL(pdfBlob);
+          const newWindow = window.open(url, '_blank');
+          if (!newWindow) {
+            alert('يرجى السماح بفتح النوافذ المنبثقة لتصدير PDF.');
+          }
+        } else {
+          html2pdf().set(options).from(tempDiv).save();
+        }
+      })
+      .catch(err => {
+        console.error('PDF generation failed:', err);
+        alert('حدث خطأ أثناء تصدير PDF، حاول مرة أخرى.');
+      });
+  }, 500);
 }
+
+
 
 
 
