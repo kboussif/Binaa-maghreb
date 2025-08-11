@@ -342,43 +342,16 @@
 }
 
 
-#costTable {  /* Add id="costTable" to your <table> */
-  width: 100%;
-  border-collapse: collapse;
-  display: block; /* Allows scrolling */
-  overflow-x: auto; /* Handles wide tables on mobile */
-  max-height: 400px; /* Adjust to enable vertical scroll; remove if full height needed */
-}
 
-#costTable thead {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
 
-#costTable tbody {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
+  @keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0; }
+  }
+  .animate-blink {
+    animation: blink 1.5s infinite;
+  }
 
-#costTable th {
-  position: sticky; /* Standard */
-  position: -webkit-sticky; /* For iOS Safari */
-  top: 0;
-  background-color: #f8f8f8; /* Visible background */
-  z-index: 1; /* Stays on top */
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: right; /* RTL for Arabic text */
-  white-space: nowrap; /* Prevents header wrapping on small screens */
-}
-
-#costTable td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: right;
-}
 
 /* Mobile-specific: Force horizontal scroll hint */
 @media (max-width: 768px) {
@@ -613,11 +586,12 @@
   في النهاية، سترى ملخص التكلفة لكل مادة ولكامل المنزل، مع إمكانية طباعة التقرير بصيغة PDF أو Excel.
   <span style="color: red; font-weight: bold;">ملاحظة:</span>
   لرؤية الجدول بشكل أفضل، يُفضل تدوير الهاتف أفقيًا أو استخدام الكمبيوتر، ويمكنك التمرير يمينًا ويسارًا لمشاهدة المحتوى كاملاً.
-</h3
-
-	
+</h3	
 <!-- Floating Title -->
-<   <h3 class="text-lg font-semibold mt-4 text-blue-800">الإجمالي: <span id="totalCostTop">0</span> درهم مغربي</h3>
+
+<h3 id="totalCostTopContainer" class="mt-4 text-blue-800 font-bold text-center text-4xl">
+  الإجمالي: DH <span id="totalCostTop" class="animate-blink">0</span>  
+</h3>
 
 <!-- The Table 
 <table class="w-full border-collapse mb-6">
