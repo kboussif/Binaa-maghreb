@@ -123,12 +123,13 @@
   <!-- Export Buttons -->
   <div style="margin-top:8px;">
     <button onclick="exportToPDF()">📄 تصدير إلى PDF</button>
-	<button onclick="exportAllToExcel('التكلفة.xlsx')">📊 تصدير إلى Excel</button>
+	<button onclick="exportCostEstimation()">📊 تصدير إلى Excel</button>
   </div>
 </div>
 
 
 
+<
 
 <script>
 /* ---------- Config & state ---------- */
@@ -547,68 +548,126 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
-function exportAllToExcel(filename) {
+
+function isMobile() {
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+}
+
+function exportCostEstimation() {
+  if (isMobile()) {
+    exportTablesToCSV('cost_estimation.csv');
+  } else {
+    exportAllToExcel('cost_estimation.xlsx');
+  }
+}
+
+// === PC: Export to Excel ===
+function exportToExcel() {
+  const costTable = document.getElementById('costOutput');
   const wb = XLSX.utils.book_new();
 
-  // 1️⃣ تفاصيل التكاليف
-  const costTable = document.getElementById('costTable');
-  if (costTable) {
-    const ws1 = XLSX.utils.table_to_sheet(costTable);
-    const range1 = XLSX.utils.decode_range(ws1['!ref']);
-    const totalRow1 = range1.e.r + 1;
-    XLSX.utils.sheet_add_aoa(ws1, [['', '', '', '', '', 'الإجمالي', '=SUM(F2:F' + (range1.e.r + 1) + ')']], { origin: 'A' + (totalRow1 + 1) });
-    XLSX.utils.book_append_sheet(wb, ws1, 'تفاصيل التكاليف');
+  const costRows = costTable.getElementsByTagName('tr');
+  const costData = [['المرحلة', 'المادة', 'الكمية (baseQty)', 'سعر الوحدة', 'التكلفة', 'ملاحظة']];
+
+  for (let row of costRows) {
+    const cells = row.getElementsByTagName('td');
+	
+	  if (cells.length < 6) {
+    console.warn('Row does not have enough cells:', row);
+    continue; // skip this row if not enough cells
+  }
+    costData.push([
+      cells[1].textContent.trim(), // المرحلة
+      cells[0].textContent.trim(), // المادة
+      cells[2].querySelector('input')?.value || '', // الكمية
+      cells[4].querySelector('input')?.value || '', // سعر الوحدة
+      cells[5].textContent.trim(), // التكلفة (المجموع الفرعي)
+      '' // ملاحظة
+    ]);
   }
 
-  // 2️⃣ ملخص التكاليف
-  const summaryTable = document.getElementById('summaryTable');
-  if (summaryTable) {
-    const ws2 = XLSX.utils.table_to_sheet(summaryTable);
-    const range2 = XLSX.utils.decode_range(ws2['!ref']);
-    const totalRow2 = range2.e.r + 1;
-    XLSX.utils.sheet_add_aoa(ws2, [['', '', 'الإجمالي', '=SUM(C2:C' + (range2.e.r + 1) + ')']], { origin: 'A' + (totalRow2 + 1) });
-    XLSX.utils.book_append_sheet(wb, ws2, 'ملخص التكاليف');
+
+
+
+
+  const costWs = XLSX.utils.aoa_to_sheet(costData);
+  XLSX.utils.book_append_sheet(wb, costWs, 'التكلفة التفصيلية');
+
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cost_estimation.xlsx';
+  document.body.appendChild(a);
+  a.click();
+
+  setTimeout(() => {
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }, 0);
+}
+
+// === Mobile: Export to CSV ===
+function exportTablesToCSV() {
+  const costOutput = document.getElementById('costOutput');
+  if (!costOutput) {
+    alert('لا يوجد جدول لتصديره!');
+    return;
   }
 
-  // 3️⃣ Detailed Raw Data with "المجموع الفرعي"
-  if (typeof baseData !== 'undefined') {
-    const detailed = [['المرحلة', 'المادة', 'الكمية (baseQty)', 'سعر الوحدة', 'التكلفة', 'ملاحظة']];
-    let grandTotal = 0;
+  // Find all tables inside costOutput (each section has a table)
+  const tables = costOutput.querySelectorAll('table');
+  if (tables.length === 0) {
+    alert('لا توجد جداول في النتائج لتصديرها.');
+    return;
+  }
 
-    baseData.forEach(sec => {
-      let phaseTotal = 0;
-      (sec.items || []).forEach(it => {
-        const cost = it.baseQty * it.unitPrice;
-        phaseTotal += cost;
-        grandTotal += cost;
-        detailed.push([
-          sec.name,   // المرحلة
-          it.item,    // المادة
-          it.baseQty, // الكمية
-          it.unitPrice,
-          cost,
-          ''          // ملاحظة (now blank since ignoreFloors removed)
-        ]);
+  tables.forEach((table, index) => {
+    let csv = [];
+    
+    // Get section name - the <h3> before the table
+    let sectionName = 'Section_' + (index + 1);
+    const prevHeading = table.previousElementSibling;
+    if (prevHeading && prevHeading.tagName === 'H3') {
+      sectionName = prevHeading.textContent.trim().replace(/\s+/g, '_');
+    }
+
+    // Extract rows
+    const rows = table.querySelectorAll('tr');
+    rows.forEach(row => {
+      const cols = row.querySelectorAll('th, td');
+      const rowData = [];
+      cols.forEach(col => {
+        // Escape double quotes in cell text
+        let text = col.textContent.replace(/"/g, '""');
+        // Wrap text in quotes if it contains comma or newlines
+        if (text.search(/("|,|\n)/g) >= 0) text = `"${text}"`;
+        rowData.push(text);
       });
-      // Add subtotal row after each مرحلة
-      detailed.push([sec.name, '', '', '', phaseTotal, 'المجموع الفرعي']);
+      csv.push(rowData.join(','));
     });
 
-    // Add إجمالي row
-    detailed.push(['', '', '', '', grandTotal, 'الإجمالي']);
+    // Create CSV string
+    const csvString = csv.join('\n');
 
-    const ws3 = XLSX.utils.aoa_to_sheet(detailed);
-    XLSX.utils.book_append_sheet(wb, ws3, 'Detailed Raw Data');
-  }
-
-  XLSX.writeFile(wb, filename || 'cost_estimation.xlsx');
+    // Download CSV file
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${sectionName}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
 }
 
 
 
-
-
-function OLDexportAllToExcel(filename) {
+function exportAllToExcel(filename) {
   const wb = XLSX.utils.book_new();
 
   // 1️⃣ تفاصيل التكاليف (from costTable) with إجمالي
@@ -658,6 +717,9 @@ function OLDexportAllToExcel(filename) {
   // Export the workbook
   XLSX.writeFile(wb, filename || 'cost_estimation.xlsx');
 }
+
+
+
 
 </script>
 </body>
