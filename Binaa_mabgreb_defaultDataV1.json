@@ -2,787 +2,154 @@
   {
     "name": "الأساسات",
     "items": [
-      {
-        "item": "حفر الأساسات",
-        "unit": "100",
-        "unitPrice": 125,
-        "baseQty": 100
-      },
-      {
-        "item": "الحديد (6 مم)",
-        "unit": "100",
-        "unitPrice": 9.4,
-        "baseQty": 400
-      },
-      {
-        "item": "الحديد (10 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 500
-      },
-      {
-        "item": "الحديد (12 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 800
-      },
-      {
-        "item": "الحديد (14 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 0
-      },
-      {
-        "item": "البيطون (B25)",
-        "unit": "100",
-        "unitPrice": 780,
-        "baseQty": 25
-      },
-      {
-        "item": "البيطون (B35)",
-        "unit": "100",
-        "unitPrice": 850,
-        "baseQty": 0
-      },
-      {
-        "item": "الأسمنت (35)",
-        "unit": "100",
-        "unitPrice": 75,
-        "baseQty": 25
-      },
-      {
-        "item": "الأسمنت (45)",
-        "unit": "100",
-        "unitPrice": 81,
-        "baseQty": 0
-      },
-      {
-        "item": "الوردي والبودر والشبكة",
-        "unit": "100",
-        "unitPrice": 85,
-        "baseQty": 0
-      },
-      {
-        "item": "الياجور (7)",
-        "unit": "100",
-        "unitPrice": 2.5,
-        "baseQty": 0
-      },
-      {
-        "item": "الياجور (15)",
-        "unit": "100",
-        "unitPrice": 5.5,
-        "baseQty": 1500
-      },
-      {
-        "item": "الرمل",
-        "unit": "100",
-        "unitPrice": 4,
-        "baseQty": 350
-      },
-      {
-        "item": "الحجر (للبلوكاج)",
-        "unit": "100",
-        "unitPrice": 3500,
-        "baseQty": 0
-      },
-      {
-        "item": "الكياس",
-        "unit": "100",
-        "unitPrice": 300,
-        "baseQty": 4
-      },
-      {
-        "item": "أنابيب PVC (200)",
-        "unit": "100",
-        "unitPrice": 20,
-        "baseQty": 60
-      },
-      {
-        "item": "السلك والمسامير",
-        "unit": "100",
-        "unitPrice": 16,
-        "baseQty": 40
-      },
-      {
-        "item": "ميكا",
-        "unit": "100",
-        "unitPrice": 20,
-        "baseQty": 65
-      },
-      {
-        "item": "الماء والكهرباء (مواد)",
-        "unit": "100",
-        "unitPrice": 70,
-        "baseQty": 0
-      },
-      {
-        "item": "الماء والكهرباء (يد عاملة)",
-        "unit": "100",
-        "unitPrice": 45,
-        "baseQty": 0
-      },
-      {
-        "item": "اليد العاملة",
-        "unit": "100",
-        "unitPrice": 125,
-        "baseQty": 100
-      }
+      {"item":"حفر الأساسات","unit":"100","unitPrice":30,"baseQty":100},
+      {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
+      {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
+      {"item":"الحديد (12 مم)","unit":"100","unitPrice":9.2,"baseQty":800},
+      {"item":"الحديد (14 مم)","unit":"100","unitPrice":9.2,"baseQty":0},
+      {"item":"البيطون (B25)","unit":"100","unitPrice":780,"baseQty":25},
+      {"item":"الأسمنت (35)","unit":"100","unitPrice":75,"baseQty":25},
+      {"item":"الوردي والبودر والشبكة","unit":"100","unitPrice":85,"baseQty":0},
+      {"item":"الياجور (15)","unit":"100","unitPrice":5.5,"baseQty":1500},
+      {"item":"الرمل","unit":"100","unitPrice":4,"baseQty":350},
+      {"item":"الحجر (للبلوكاج)","unit":"100","unitPrice":3500,"baseQty":0},
+      {"item":"الكياس","unit":"100","unitPrice":300,"baseQty":4},
+      {"item":"أنابيب PVC (200)","unit":"100","unitPrice":20,"baseQty":60},
+      {"item":"السلك والمسامير","unit":"100","unitPrice":16,"baseQty":40},
+      {"item":"ميكا","unit":"100","unitPrice":20,"baseQty":65},
+      {"item":"الماء والكهرباء (مواد)","unit":"100","unitPrice":70,"baseQty":0},
+      {"item":"الماء والكهرباء (يد عاملة)","unit":"100","unitPrice":45,"baseQty":0},
+      {"item":"اليد العاملة","unit":"100","unitPrice":125,"baseQty":100}
     ]
   },
   {
     "name": "الطابق الأرضي RDC",
     "items": [
-      {
-        "item": "حفر الأساسات",
-        "unit": "100",
-        "unitPrice": 125,
-        "baseQty": 100
-      },
-      {
-        "item": "الحديد (6 مم)",
-        "unit": "100",
-        "unitPrice": 9.4,
-        "baseQty": 400
-      },
-      {
-        "item": "الحديد (10 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 500
-      },
-      {
-        "item": "الحديد (12 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 800
-      },
-      {
-        "item": "الحديد (14 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 0
-      },
-      {
-        "item": "البيطون (B25)",
-        "unit": "100",
-        "unitPrice": 780,
-        "baseQty": 25
-      },
-      {
-        "item": "البيطون (B35)",
-        "unit": "100",
-        "unitPrice": 850,
-        "baseQty": 0
-      },
-      {
-        "item": "الأسمنت (35)",
-        "unit": "100",
-        "unitPrice": 75,
-        "baseQty": 25
-      },
-      {
-        "item": "الأسمنت (45)",
-        "unit": "100",
-        "unitPrice": 81,
-        "baseQty": 0
-      },
-      {
-        "item": "الوردي والبودر والشبكة",
-        "unit": "100",
-        "unitPrice": 85,
-        "baseQty": 0
-      },
-      {
-        "item": "الياجور (7)",
-        "unit": "100",
-        "unitPrice": 2.5,
-        "baseQty": 0
-      },
-      {
-        "item": "الياجور (15)",
-        "unit": "100",
-        "unitPrice": 5.5,
-        "baseQty": 1500
-      },
-      {
-        "item": "الرمل",
-        "unit": "100",
-        "unitPrice": 4,
-        "baseQty": 350
-      },
-      {
-        "item": "الحجر (للبلوكاج)",
-        "unit": "100",
-        "unitPrice": 3500,
-        "baseQty": 0
-      },
-      {
-        "item": "الكياس",
-        "unit": "100",
-        "unitPrice": 300,
-        "baseQty": 4
-      },
-      {
-        "item": "أنابيب PVC (200)",
-        "unit": "100",
-        "unitPrice": 20,
-        "baseQty": 60
-      },
-      {
-        "item": "السلك والمسامير",
-        "unit": "100",
-        "unitPrice": 16,
-        "baseQty": 40
-      },
-      {
-        "item": "ميكا",
-        "unit": "100",
-        "unitPrice": 20,
-        "baseQty": 65
-      },
-      {
-        "item": "الماء والكهرباء (مواد)",
-        "unit": "100",
-        "unitPrice": 70,
-        "baseQty": 0
-      },
-      {
-        "item": "الماء والكهرباء (يد عاملة)",
-        "unit": "100",
-        "unitPrice": 45,
-        "baseQty": 0
-      },
-      {
-        "item": "اليد العاملة",
-        "unit": "100",
-        "unitPrice": 125,
-        "baseQty": 100
-      }
+      {"item":"حفر الأساسات","unit":"100","unitPrice":125,"baseQty":100},
+      {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
+      {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
+      {"item":"الحديد (12 مم)","unit":"100","unitPrice":9.2,"baseQty":800},
+      {"item":"الحديد (14 مم)","unit":"100","unitPrice":9.2,"baseQty":0},
+      {"item":"البيطون (B25)","unit":"100","unitPrice":780,"baseQty":25},
+      {"item":"البيطون (B35)","unit":"100","unitPrice":850,"baseQty":0},
+      {"item":"الأسمنت (35)","unit":"100","unitPrice":75,"baseQty":25},
+      {"item":"الأسمنت (45)","unit":"100","unitPrice":81,"baseQty":0},
+      {"item":"الوردي والبودر والشبكة","unit":"100","unitPrice":85,"baseQty":0},
+      {"item":"الياجور (7)","unit":"100","unitPrice":2.5,"baseQty":0},
+      {"item":"الياجور (15)","unit":"100","unitPrice":5.5,"baseQty":1500},
+      {"item":"الرمل","unit":"100","unitPrice":4,"baseQty":350},
+      {"item":"الحجر (للبلوكاج)","unit":"100","unitPrice":3500,"baseQty":0},
+      {"item":"الكياس","unit":"100","unitPrice":300,"baseQty":4},
+      {"item":"أنابيب PVC (200)","unit":"100","unitPrice":20,"baseQty":60},
+      {"item":"السلك والمسامير","unit":"100","unitPrice":16,"baseQty":40},
+      {"item":"ميكا","unit":"100","unitPrice":20,"baseQty":65},
+      {"item":"الماء والكهرباء (مواد)","unit":"100","unitPrice":70,"baseQty":0},
+      {"item":"الماء والكهرباء (يد عاملة)","unit":"100","unitPrice":45,"baseQty":0},
+      {"item":"اليد العاملة","unit":"100","unitPrice":125,"baseQty":100}
     ]
   },
   {
     "name": "R+1 الطابق الأول",
     "items": [
-      {
-        "item": "حفر الأساسات",
-        "unit": "100",
-        "unitPrice": 125,
-        "baseQty": 100
-      },
-      {
-        "item": "الحديد (6 مم)",
-        "unit": "100",
-        "unitPrice": 9.4,
-        "baseQty": 400
-      },
-      {
-        "item": "الحديد (10 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 500
-      },
-      {
-        "item": "الحديد (12 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 800
-      },
-      {
-        "item": "الحديد (14 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 0
-      },
-      {
-        "item": "البيطون (B25)",
-        "unit": "100",
-        "unitPrice": 780,
-        "baseQty": 25
-      },
-      {
-        "item": "البيطون (B35)",
-        "unit": "100",
-        "unitPrice": 850,
-        "baseQty": 0
-      },
-      {
-        "item": "الأسمنت (35)",
-        "unit": "100",
-        "unitPrice": 75,
-        "baseQty": 25
-      },
-      {
-        "item": "الأسمنت (45)",
-        "unit": "100",
-        "unitPrice": 81,
-        "baseQty": 0
-      },
-      {
-        "item": "الوردي والبودر والشبكة",
-        "unit": "100",
-        "unitPrice": 85,
-        "baseQty": 0
-      },
-      {
-        "item": "الياجور (7)",
-        "unit": "100",
-        "unitPrice": 2.5,
-        "baseQty": 0
-      },
-      {
-        "item": "الياجور (15)",
-        "unit": "100",
-        "unitPrice": 5.5,
-        "baseQty": 1500
-      },
-      {
-        "item": "الرمل",
-        "unit": "100",
-        "unitPrice": 4,
-        "baseQty": 350
-      },
-      {
-        "item": "الحجر (للبلوكاج)",
-        "unit": "100",
-        "unitPrice": 3500,
-        "baseQty": 0
-      },
-      {
-        "item": "الكياس",
-        "unit": "100",
-        "unitPrice": 300,
-        "baseQty": 4
-      },
-      {
-        "item": "أنابيب PVC (200)",
-        "unit": "100",
-        "unitPrice": 20,
-        "baseQty": 60
-      },
-      {
-        "item": "السلك والمسامير",
-        "unit": "100",
-        "unitPrice": 16,
-        "baseQty": 40
-      },
-      {
-        "item": "ميكا",
-        "unit": "100",
-        "unitPrice": 20,
-        "baseQty": 65
-      },
-      {
-        "item": "الماء والكهرباء (مواد)",
-        "unit": "100",
-        "unitPrice": 70,
-        "baseQty": 0
-      },
-      {
-        "item": "الماء والكهرباء (يد عاملة)",
-        "unit": "100",
-        "unitPrice": 45,
-        "baseQty": 0
-      },
-      {
-        "item": "اليد العاملة",
-        "unit": "100",
-        "unitPrice": 125,
-        "baseQty": 100
-      }
+      {"item":"حفر الأساسات","unit":"100","unitPrice":125,"baseQty":100},
+      {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
+      {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
+      {"item":"الحديد (12 مم)","unit":"100","unitPrice":9.2,"baseQty":800},
+      {"item":"الحديد (14 مم)","unit":"100","unitPrice":9.2,"baseQty":0},
+      {"item":"البيطون (B25)","unit":"100","unitPrice":780,"baseQty":25},
+      {"item":"البيطون (B35)","unit":"100","unitPrice":850,"baseQty":0},
+      {"item":"الأسمنت (35)","unit":"100","unitPrice":75,"baseQty":25},
+      {"item":"الأسمنت (45)","unit":"100","unitPrice":81,"baseQty":0},
+      {"item":"الوردي والبودر والشبكة","unit":"100","unitPrice":85,"baseQty":0},
+      {"item":"الياجور (7)","unit":"100","unitPrice":2.5,"baseQty":0},
+      {"item":"الياجور (15)","unit":"100","unitPrice":5.5,"baseQty":1500},
+      {"item":"الرمل","unit":"100","unitPrice":4,"baseQty":350},
+      {"item":"الحجر (للبلوكاج)","unit":"100","unitPrice":3500,"baseQty":0},
+      {"item":"الكياس","unit":"100","unitPrice":300,"baseQty":4},
+      {"item":"أنابيب PVC (200)","unit":"100","unitPrice":20,"baseQty":60},
+      {"item":"السلك والمسامير","unit":"100","unitPrice":16,"baseQty":40},
+      {"item":"ميكا","unit":"100","unitPrice":20,"baseQty":65},
+      {"item":"الماء والكهرباء (مواد)","unit":"100","unitPrice":70,"baseQty":0},
+      {"item":"الماء والكهرباء (يد عاملة)","unit":"100","unitPrice":45,"baseQty":0},
+      {"item":"اليد العاملة","unit":"100","unitPrice":125,"baseQty":100}
     ]
   },
   {
     "name": "R+2 الطابق الثاني",
     "items": [
-      {
-        "item": "حفر الأساسات",
-        "unit": "100",
-        "unitPrice": 125,
-        "baseQty": 100
-      },
-      {
-        "item": "الحديد (6 مم)",
-        "unit": "100",
-        "unitPrice": 9.4,
-        "baseQty": 400
-      },
-      {
-        "item": "الحديد (10 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 500
-      },
-      {
-        "item": "الحديد (12 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 800
-      },
-      {
-        "item": "الحديد (14 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 0
-      },
-      {
-        "item": "البيطون (B25)",
-        "unit": "100",
-        "unitPrice": 780,
-        "baseQty": 25
-      },
-      {
-        "item": "البيطون (B35)",
-        "unit": "100",
-        "unitPrice": 850,
-        "baseQty": 0
-      },
-      {
-        "item": "الأسمنت (35)",
-        "unit": "100",
-        "unitPrice": 75,
-        "baseQty": 25
-      },
-      {
-        "item": "الأسمنت (45)",
-        "unit": "100",
-        "unitPrice": 81,
-        "baseQty": 0
-      },
-      {
-        "item": "الوردي والبودر والشبكة",
-        "unit": "100",
-        "unitPrice": 85,
-        "baseQty": 0
-      },
-      {
-        "item": "الياجور (7)",
-        "unit": "100",
-        "unitPrice": 2.5,
-        "baseQty": 0
-      },
-      {
-        "item": "الياجور (15)",
-        "unit": "100",
-        "unitPrice": 5.5,
-        "baseQty": 1500
-      },
-      {
-        "item": "الرمل",
-        "unit": "100",
-        "unitPrice": 4,
-        "baseQty": 350
-      },
-      {
-        "item": "الحجر (للبلوكاج)",
-        "unit": "100",
-        "unitPrice": 3500,
-        "baseQty": 0
-      },
-      {
-        "item": "الكياس",
-        "unit": "100",
-        "unitPrice": 300,
-        "baseQty": 4
-      },
-      {
-        "item": "أنابيب PVC (200)",
-        "unit": "100",
-        "unitPrice": 20,
-        "baseQty": 60
-      },
-      {
-        "item": "السلك والمسامير",
-        "unit": "100",
-        "unitPrice": 16,
-        "baseQty": 40
-      },
-      {
-        "item": "ميكا",
-        "unit": "100",
-        "unitPrice": 20,
-        "baseQty": 65
-      },
-      {
-        "item": "الماء والكهرباء (مواد)",
-        "unit": "100",
-        "unitPrice": 70,
-        "baseQty": 0
-      },
-      {
-        "item": "الماء والكهرباء (يد عاملة)",
-        "unit": "100",
-        "unitPrice": 45,
-        "baseQty": 0
-      },
-      {
-        "item": "اليد العاملة",
-        "unit": "100",
-        "unitPrice": 125,
-        "baseQty": 100
-      }
+      {"item":"حفر الأساسات","unit":"100","unitPrice":125,"baseQty":100},
+      {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
+      {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
+      {"item":"الحديد (12 مم)","unit":"100","unitPrice":9.2,"baseQty":800},
+      {"item":"الحديد (14 مم)","unit":"100","unitPrice":9.2,"baseQty":0},
+      {"item":"البيطون (B25)","unit":"100","unitPrice":780,"baseQty":25},
+      {"item":"البيطون (B35)","unit":"100","unitPrice":850,"baseQty":0},
+      {"item":"الأسمنت (35)","unit":"100","unitPrice":75,"baseQty":25},
+      {"item":"الأسمنت (45)","unit":"100","unitPrice":81,"baseQty":0},
+      {"item":"الوردي والبودر والشبكة","unit":"100","unitPrice":85,"baseQty":0},
+      {"item":"الياجور (7)","unit":"100","unitPrice":2.5,"baseQty":0},
+      {"item":"الياجور (15)","unit":"100","unitPrice":5.5,"baseQty":1500},
+      {"item":"الرمل","unit":"100","unitPrice":4,"baseQty":350},
+      {"item":"الحجر (للبلوكاج)","unit":"100","unitPrice":3500,"baseQty":0},
+      {"item":"الكياس","unit":"100","unitPrice":300,"baseQty":4},
+      {"item":"أنابيب PVC (200)","unit":"100","unitPrice":20,"baseQty":60},
+      {"item":"السلك والمسامير","unit":"100","unitPrice":16,"baseQty":40},
+      {"item":"ميكا","unit":"100","unitPrice":20,"baseQty":65},
+      {"item":"الماء والكهرباء (مواد)","unit":"100","unitPrice":70,"baseQty":0},
+      {"item":"الماء والكهرباء (يد عاملة)","unit":"100","unitPrice":45,"baseQty":0},
+      {"item":"اليد العاملة","unit":"100","unitPrice":125,"baseQty":100}
     ]
   },
   {
     "name": "R+3 الطابق الثالث",
     "items": [
-      {
-        "item": "حفر الأساسات",
-        "unit": "100",
-        "unitPrice": 125,
-        "baseQty": 100
-      },
-      {
-        "item": "الحديد (6 مم)",
-        "unit": "100",
-        "unitPrice": 9.4,
-        "baseQty": 400
-      },
-      {
-        "item": "الحديد (10 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 500
-      },
-      {
-        "item": "الحديد (12 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 800
-      },
-      {
-        "item": "الحديد (14 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 0
-      },
-      {
-        "item": "البيطون (B25)",
-        "unit": "100",
-        "unitPrice": 780,
-        "baseQty": 25
-      },
-      {
-        "item": "البيطون (B35)",
-        "unit": "100",
-        "unitPrice": 850,
-        "baseQty": 0
-      },
-      {
-        "item": "الأسمنت (35)",
-        "unit": "100",
-        "unitPrice": 75,
-        "baseQty": 25
-      },
-      {
-        "item": "الأسمنت (45)",
-        "unit": "100",
-        "unitPrice": 81,
-        "baseQty": 0
-      },
-      {
-        "item": "الوردي والبودر والشبكة",
-        "unit": "100",
-        "unitPrice": 85,
-        "baseQty": 0
-      },
-      {
-        "item": "الياجور (7)",
-        "unit": "100",
-        "unitPrice": 2.5,
-        "baseQty": 0
-      },
-      {
-        "item": "الياجور (15)",
-        "unit": "100",
-        "unitPrice": 5.5,
-        "baseQty": 1500
-      },
-      {
-        "item": "الرمل",
-        "unit": "100",
-        "unitPrice": 4,
-        "baseQty": 350
-      },
-      {
-        "item": "الحجر (للبلوكاج)",
-        "unit": "100",
-        "unitPrice": 3500,
-        "baseQty": 0
-      },
-      {
-        "item": "الكياس",
-        "unit": "100",
-        "unitPrice": 300,
-        "baseQty": 4
-      },
-      {
-        "item": "أنابيب PVC (200)",
-        "unit": "100",
-        "unitPrice": 20,
-        "baseQty": 60
-      },
-      {
-        "item": "السلك والمسامير",
-        "unit": "100",
-        "unitPrice": 16,
-        "baseQty": 40
-      },
-      {
-        "item": "ميكا",
-        "unit": "100",
-        "unitPrice": 20,
-        "baseQty": 65
-      },
-      {
-        "item": "الماء والكهرباء (مواد)",
-        "unit": "100",
-        "unitPrice": 70,
-        "baseQty": 0
-      },
-      {
-        "item": "الماء والكهرباء (يد عاملة)",
-        "unit": "100",
-        "unitPrice": 45,
-        "baseQty": 0
-      },
-      {
-        "item": "اليد العاملة",
-        "unit": "100",
-        "unitPrice": 125,
-        "baseQty": 100
-      }
+      {"item":"حفر الأساسات","unit":"100","unitPrice":125,"baseQty":100},
+      {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
+      {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
+      {"item":"الحديد (12 مم)","unit":"100","unitPrice":9.2,"baseQty":800},
+      {"item":"الحديد (14 مم)","unit":"100","unitPrice":9.2,"baseQty":0},
+      {"item":"البيطون (B25)","unit":"100","unitPrice":780,"baseQty":25},
+      {"item":"البيطون (B35)","unit":"100","unitPrice":850,"baseQty":0},
+      {"item":"الأسمنت (35)","unit":"100","unitPrice":75,"baseQty":25},
+      {"item":"الأسمنت (45)","unit":"100","unitPrice":81,"baseQty":0},
+      {"item":"الوردي والبودر والشبكة","unit":"100","unitPrice":85,"baseQty":0},
+      {"item":"الياجور (7)","unit":"100","unitPrice":2.5,"baseQty":0},
+      {"item":"الياجور (15)","unit":"100","unitPrice":5.5,"baseQty":1500},
+      {"item":"الرمل","unit":"100","unitPrice":4,"baseQty":350},
+      {"item":"الحجر (للبلوكاج)","unit":"100","unitPrice":3500,"baseQty":0},
+      {"item":"الكياس","unit":"100","unitPrice":300,"baseQty":4},
+      {"item":"أنابيب PVC (200)","unit":"100","unitPrice":20,"baseQty":60},
+      {"item":"السلك والمسامير","unit":"100","unitPrice":16,"baseQty":40},
+      {"item":"ميكا","unit":"100","unitPrice":20,"baseQty":65},
+      {"item":"الماء والكهرباء (مواد)","unit":"100","unitPrice":70,"baseQty":0},
+      {"item":"الماء والكهرباء (يد عاملة)","unit":"100","unitPrice":45,"baseQty":0},
+      {"item":"اليد العاملة","unit":"100","unitPrice":125,"baseQty":100}
     ]
   },
   {
     "name": "R+T السطح",
     "items": [
-      {
-        "item": "حفر الأساسات",
-        "unit": "100",
-        "unitPrice": 125,
-        "baseQty": 100
-      },
-      {
-        "item": "الحديد (6 مم)",
-        "unit": "100",
-        "unitPrice": 9.4,
-        "baseQty": 400
-      },
-      {
-        "item": "الحديد (10 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 500
-      },
-      {
-        "item": "الحديد (12 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 800
-      },
-      {
-        "item": "الحديد (14 مم)",
-        "unit": "100",
-        "unitPrice": 9.2,
-        "baseQty": 0
-      },
-      {
-        "item": "البيطون (B25)",
-        "unit": "100",
-        "unitPrice": 780,
-        "baseQty": 25
-      },
-      {
-        "item": "البيطون (B35)",
-        "unit": "100",
-        "unitPrice": 850,
-        "baseQty": 0
-      },
-      {
-        "item": "الأسمنت (35)",
-        "unit": "100",
-        "unitPrice": 75,
-        "baseQty": 25
-      },
-      {
-        "item": "الأسمنت (45)",
-        "unit": "100",
-        "unitPrice": 81,
-        "baseQty": 0
-      },
-      {
-        "item": "الوردي والبودر والشبكة",
-        "unit": "100",
-        "unitPrice": 85,
-        "baseQty": 0
-      },
-      {
-        "item": "الياجور (7)",
-        "unit": "100",
-        "unitPrice": 2.5,
-        "baseQty": 0
-      },
-      {
-        "item": "الياجور (15)",
-        "unit": "100",
-        "unitPrice": 5.5,
-        "baseQty": 1500
-      },
-      {
-        "item": "الرمل",
-        "unit": "100",
-        "unitPrice": 4,
-        "baseQty": 350
-      },
-      {
-        "item": "الحجر (للبلوكاج)",
-        "unit": "100",
-        "unitPrice": 3500,
-        "baseQty": 0
-      },
-      {
-        "item": "الكياس",
-        "unit": "100",
-        "unitPrice": 300,
-        "baseQty": 4
-      },
-      {
-        "item": "أنابيب PVC (200)",
-        "unit": "100",
-        "unitPrice": 20,
-        "baseQty": 60
-      },
-      {
-        "item": "السلك والمسامير",
-        "unit": "100",
-        "unitPrice": 16,
-        "baseQty": 40
-      },
-      {
-        "item": "ميكا",
-        "unit": "100",
-        "unitPrice": 20,
-        "baseQty": 65
-      },
-      {
-        "item": "الماء والكهرباء (مواد)",
-        "unit": "100",
-        "unitPrice": 70,
-        "baseQty": 0
-      },
-      {
-        "item": "الماء والكهرباء (يد عاملة)",
-        "unit": "100",
-        "unitPrice": 45,
-        "baseQty": 0
-      },
-      {
-        "item": "اليد العاملة",
-        "unit": "100",
-        "unitPrice": 125,
-        "baseQty": 100
-      }
+      {"item":"حفر الأساسات","unit":"100","unitPrice":125,"baseQty":100},
+      {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
+      {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
+      {"item":"الحديد (12 مم)","unit":"100","unitPrice":9.2,"baseQty":800},
+      {"item":"الحديد (14 مم)","unit":"100","unitPrice":9.2,"baseQty":0},
+      {"item":"البيطون (B25)","unit":"100","unitPrice":780,"baseQty":25},
+      {"item":"البيطون (B35)","unit":"100","unitPrice":850,"baseQty":0},
+      {"item":"الأسمنت (35)","unit":"100","unitPrice":75,"baseQty":25},
+      {"item":"الأسمنت (45)","unit":"100","unitPrice":81,"baseQty":0},
+      {"item":"الوردي والبودر والشبكة","unit":"100","unitPrice":85,"baseQty":0},
+      {"item":"الياجور (7)","unit":"100","unitPrice":2.5,"baseQty":0},
+      {"item":"الياجور (15)","unit":"100","unitPrice":5.5,"baseQty":1500},
+      {"item":"الرمل","unit":"100","unitPrice":4,"baseQty":350},
+      {"item":"الحجر (للبلوكاج)","unit":"100","unitPrice":3500,"baseQty":0},
+      {"item":"الكياس","unit":"100","unitPrice":300,"baseQty":4},
+      {"item":"أنابيب PVC (200)","unit":"100","unitPrice":20,"baseQty":60},
+      {"item":"السلك والمسامير","unit":"100","unitPrice":16,"baseQty":40},
+      {"item":"ميكا","unit":"100","unitPrice":20,"baseQty":65},
+      {"item":"الماء والكهرباء (مواد)","unit":"100","unitPrice":70,"baseQty":0},
+      {"item":"الماء والكهرباء (يد عاملة)","unit":"100","unitPrice":45,"baseQty":0},
+      {"item":"اليد العاملة","unit":"100","unitPrice":125,"baseQty":100}
     ]
   }
 ]
