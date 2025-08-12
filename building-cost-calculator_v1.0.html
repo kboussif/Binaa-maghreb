@@ -561,56 +561,68 @@ function exportCostEstimation() {
   }
 }
 
-// === PC: Export to Excel ===
-function exportToExcel() {
-  const costTable = document.getElementById('costOutput');
-  const wb = XLSX.utils.book_new();
-
-  const costRows = costTable.getElementsByTagName('tr');
-  const costData = [['المرحلة', 'المادة', 'الكمية (baseQty)', 'سعر الوحدة', 'التكلفة', 'ملاحظة']];
-
-  for (let row of costRows) {
-    const cells = row.getElementsByTagName('td');
-	
-	  if (cells.length < 6) {
-    console.warn('Row does not have enough cells:', row);
-    continue; // skip this row if not enough cells
-  }
-    costData.push([
-      cells[1].textContent.trim(), // المرحلة
-      cells[0].textContent.trim(), // المادة
-      cells[2].querySelector('input')?.value || '', // الكمية
-      cells[4].querySelector('input')?.value || '', // سعر الوحدة
-      cells[5].textContent.trim(), // التكلفة (المجموع الفرعي)
-      '' // ملاحظة
-    ]);
-  }
 
 
 
 
 
-  const costWs = XLSX.utils.aoa_to_sheet(costData);
-  XLSX.utils.book_append_sheet(wb, costWs, 'التكلفة التفصيلية');
 
-  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([wbout], { type: 'application/octet-stream' });
 
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'cost_estimation.xlsx';
-  document.body.appendChild(a);
-  a.click();
-
-  setTimeout(() => {
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  }, 0);
-}
 
 // === Mobile: Export to CSV ===
 function exportTablesToCSV() {
+  const costOutput = document.getElementById('costOutput');
+  if (!costOutput) {
+    alert('لا يوجد جدول لتصديره!');
+    return;
+  }
+
+  const tables = costOutput.querySelectorAll('table');
+  if (tables.length === 0) {
+    alert('لا توجد جداول في النتائج لتصديرها.');
+    return;
+  }
+
+  tables.forEach((table, index) => {
+    let csv = [];
+    
+    let sectionName = 'Section_' + (index + 1);
+    const prevHeading = table.previousElementSibling;
+    if (prevHeading && prevHeading.tagName === 'H3') {
+      sectionName = prevHeading.textContent.trim().replace(/\s+/g, '_');
+    }
+
+    const rows = table.querySelectorAll('tr');
+    rows.forEach(row => {
+      const cols = row.querySelectorAll('th, td');
+      const rowData = [];
+      cols.forEach(col => {
+        let text = col.textContent.replace(/"/g, '""');
+        if (text.search(/("|,|\n)/g) >= 0) text = `"${text}"`;
+        rowData.push(text);
+      });
+      csv.push(rowData.join(','));
+    });
+
+    const csvString = csv.join('\n');
+    const bom = "\uFEFF";  // UTF-8 BOM
+
+    const blob = new Blob([bom + csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${sectionName}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+}
+
+
+
+// ==== delete it
+function OLDexportTablesToCSV() {
   const costOutput = document.getElementById('costOutput');
   if (!costOutput) {
     alert('لا يوجد جدول لتصديره!');
@@ -653,6 +665,8 @@ function exportTablesToCSV() {
     const csvString = csv.join('\n');
 
     // Download CSV file
+	
+	
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -665,7 +679,8 @@ function exportTablesToCSV() {
   });
 }
 
-
+// === PC: Export to Excel ===
+ 
 
 function exportAllToExcel(filename) {
   const wb = XLSX.utils.book_new();
