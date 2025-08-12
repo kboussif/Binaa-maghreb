@@ -2,7 +2,7 @@
   {
     "name": "الأساسات",
     "items": [
-      { "item": "حفر الأساسات", "unit": "100", "unitPrice": 125.0, "baseQty": 100.0 },
+      { "item": "حفر الأساسات", "unit": "100", "unitPrice": 30, "baseQty": 100.0 },
       { "item": "الحديد (6 مم)", "unit": "100", "unitPrice": 9.4, "baseQty": 400.0 },
       { "item": "الحديد (10 مم)", "unit": "100", "unitPrice": 9.2, "baseQty": 500.0 },
       { "item": "الحديد (12 مم)", "unit": "100", "unitPrice": 9.2, "baseQty": 800.0 },
