@@ -34,7 +34,7 @@
     ]
   },
   {
-    "name": "R+1 الطابق الأول",
+    "name": "الطابق الأول R+1 ",
     "items": [
       {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
       {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
@@ -51,7 +51,7 @@
     ]
   },
   {
-    "name": "R+2 الطابق الثاني",
+    "name": "الطابق الثاني R+2 ",
     "items": [
       {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
       {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
@@ -68,7 +68,7 @@
     ]
   },
   {
-    "name": "R+3 الطابق الثالث",
+    "name": "الطابق الثالث R+3",
     "items": [
       {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
       {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
@@ -85,7 +85,7 @@
     ]
   },
   {
-    "name": "R+T السطح",
+    "name": "السطح Terrace",
     "items": [
       {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
       {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
