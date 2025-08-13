@@ -1,6 +1,6 @@
 [
   {
-    "name": "الأساسات K1",
+    "name": "الأساسات K31",
     "items": [
       {"item":"حفر الأساسات","unit":"100","unitPrice":30,"baseQty":100},
       {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
@@ -19,7 +19,7 @@
     ]
   },
   {
-    "name": "الطابق الأرضي RDC K1",
+    "name": "الطابق الأرضي RDC K31",
     "items": [
       {"item":"حفر الأساسات","unit":"100","unitPrice":125,"baseQty":100},
       {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
@@ -45,7 +45,7 @@
     ]
   },
   {
-    "name": "R+1 الطابق الأول K",
+    "name": "R+1 الطابق الأول K31",
     "items": [
       {"item":"حفر الأساسات","unit":"100","unitPrice":125,"baseQty":100},
       {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
@@ -71,7 +71,7 @@
     ]
   },
   {
-    "name": "R+2 الطابق الثاني K1",
+    "name": "R+2 الطابق الثاني K31",
     "items": [
       {"item":"حفر الأساسات","unit":"100","unitPrice":125,"baseQty":100},
       {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
@@ -97,7 +97,7 @@
     ]
   },
   {
-    "name": "R+3 الطابق الثالث K1",
+    "name": "R+3 الطابق الثالث K31",
     "items": [
       {"item":"حفر الأساسات","unit":"100","unitPrice":125,"baseQty":100},
       {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
@@ -123,7 +123,7 @@
     ]
   },
   {
-    "name": "R+T السطح K1",
+    "name": "R+T السطح K31",
     "items": [
       {"item":"حفر الأساسات","unit":"100","unitPrice":125,"baseQty":100},
       {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
