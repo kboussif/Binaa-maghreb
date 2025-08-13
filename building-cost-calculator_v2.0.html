@@ -25,8 +25,8 @@
 </head>
 <body>
   <div class="container">
-    <h1> حاسبة تكلفة البناء - نسخة ديناميكية  v2.02 date 13-aug-25 7AM</h1>
-
+    <h1> حاسبة تكلفة البناء - نسخة ديناميكية </h1>
+<p style="font-size:14px; text-align:right; margin:0;">  v2.02 — 13-Aug-25 11am</p>
 
 
 
@@ -490,13 +490,26 @@ const baseData = await response.json();
     });
 
     grandTotal += sectionTotal;
+	
+html += `<tr>
+  <td colspan="4"><strong>المجموع الفرعي</strong></td>
+  <td><strong>${Math.round(sectionTotal).toLocaleString('fr-FR')} MAD</strong></td>
+</tr></tbody></table>`;
 
-    html += `<tr><td colspan="4"><strong>المجموع الفرعي</strong></td><td><strong>${sectionTotal.toFixed(2)}</strong></td></tr></tbody></table>`;
+
+
+  
   });
 
   // 5️⃣ Display grand total
-  let grandTotalHtml = `<h2 style="color: red;">💰 الإجمالي الكلي: ${grandTotal.toFixed(2)}</h2>`;
-  document.getElementById('costOutput').innerHTML = grandTotalHtml + html;
+  //let grandTotalHtml = `<h2 style="color: red;">💰 الإجمالي الكلي: ${grandTotal.toFixed(2)}</h2>`;
+//  let grandTotalHtml = `<h2 style="color: red;">💰 الإجمالي الكلي: ${Math.round(grandTotal).toLocaleString('fr-FR')} MAD</h2>`;
+//document.getElementById('costOutput').innerHTML = grandTotalHtml + html;
+
+  let grandTotalHtml = `<h2 style="color: red;">💰 الإجمالي الكلي: ${Math.round(grandTotal).toLocaleString('fr-FR')} MAD</h2>`;
+let houseInfoHtml = getHouseInfo();
+document.getElementById('costOutput').innerHTML = houseInfoHtml + grandTotalHtml + html;
+
   document.getElementById('costOutput').style.display = 'block'; // make sure it's visible
 }
 
@@ -563,71 +576,24 @@ function v2_calculateCost() {
   }
 
   // 7️⃣ Display grand total
-  let grandTotalHtml = `<h2 style="color: red;">💰 الإجمالي الكلي: ${grandTotal.toFixed(2)}</h2>`;
-  document.getElementById('costOutput').innerHTML = grandTotalHtml + html;
-  document.getElementById('costOutput').style.display = 'block';
+  
+  
+  
+//  let grandTotalHtml = `<h2 style="color: red;">💰 الإجمالي الكلي: ${grandTotal.toFixed(2)}</h2>`;
+//  document.getElementById('costOutput').innerHTML = grandTotalHtml + html;
+//  document.getElementById('costOutput').style.display = 'block';
+  
+  let grandTotalHtml = `<h2 style="color: red;">💰 الإجمالي الكلي: ${Math.round(grandTotal).toLocaleString('fr-FR')} MAD</h2>`;
+let houseInfoHtml = getHouseInfo();
+document.getElementById('costOutput').innerHTML = houseInfoHtml + grandTotalHtml + html;
+
+  
 
   // Log generated HTML for debugging
   logRow('Generated HTML:', grandTotalHtml + html);
 }
 
 
-
-function old_calculateCost() {
-  let html = '';
-
-  // 1️⃣ Get the input values
-  let buildLength = parseFloat(document.getElementById('buildLength').value) || 0;
-  let buildWidth = parseFloat(document.getElementById('buildWidth').value) || 0;
-  let numFloors = parseFloat(document.getElementById('numFloors').value) || 1;
-  let hasBasement = document.getElementById('hasBasement').checked;
-
-  // 2️⃣ Calculate total building area (floors + basement if any)
-  let buildArea = buildLength * buildWidth;
-  let totalArea = buildLength * buildWidth
-//  let totalArea = buildArea * numFloors;
-// if (hasBasement) totalArea += buildArea;
-
-  // 3️⃣ Track the grand total
-  let grandTotal = 0;
-
-  // 4️⃣ Loop through each section
-  baseData.forEach(section => {
-    let sectionTotal = 0;
-    html += `<h3>${section.name}</h3><table><thead><tr>
-      <th>البند</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th>
-    </tr></thead><tbody>`;
-
-    section.items.forEach(item => {
-      // Convert unit string to number (e.g., "100" means base area of 100m2)
-      let baseUnitArea = parseFloat(item.unit) || 1;
-
-      // Scale baseQty by ratio of actual totalArea to baseUnitArea
-      let adjustedQty = (totalArea / baseUnitArea) * item.baseQty;
-
-      // Calculate item total cost
-      let itemTotal = adjustedQty * item.unitPrice;
-      sectionTotal += itemTotal;
-
-      html += `<tr>
-        <td>${item.item}</td>
-        <td>${item.unit}</td>
-        <td>${adjustedQty.toFixed(2)}</td>
-        <td>${item.unitPrice.toFixed(2)}</td>
-        <td>${itemTotal.toFixed(2)}</td>
-      </tr>`;
-    });
-
-    grandTotal += sectionTotal;
-
-    html += `<tr><td colspan="4"><strong>المجموع الفرعي</strong></td><td><strong>${sectionTotal.toFixed(2)}</strong></td></tr></tbody></table>`;
-  });
-
-  // 5️⃣ Display grand total
-  let grandTotalHtml = `<h2 style="color: red;">💰 الإجمالي الكلي: ${grandTotal.toFixed(2)}</h2>`;
-  document.getElementById('costOutput').innerHTML = grandTotalHtml + html;
-  document.getElementById('costOutput').style.display = 'block'; // make sure it's visible
-}
 
 
 
@@ -797,6 +763,24 @@ function getJsonUrl(numFloors = 1, hasBasement = false, facadeNumber = 1) {
   // Return full GitHub raw URL
   return `https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/model/${fileName}`;
 }
+
+// Function to generate house info header
+
+
+// ✅ Function to get house info and display it at the top
+function getHouseInfo() {
+  const buildLength = parseFloat(document.getElementById('buildLength').value) || 10;
+  const buildWidth = parseFloat(document.getElementById('buildWidth').value) || 10;
+  const numFloors = parseInt(document.getElementById('numFloors').value) || 1;
+  const hasBasement = document.getElementById('hasBasement').checked ? 'مع قبو' : 'بدون قبو';
+  const facadeNumber = parseInt(document.getElementById('facadeNumber').value) || 1;
+
+  const area = Math.round(buildLength * buildWidth);
+
+  return `<p style="margin:0; text-align:right;">🏠 ${area} م² | واجهات: ${facadeNumber} | ${hasBasement}</p>`;
+}
+
+
 
 	
   </script>
