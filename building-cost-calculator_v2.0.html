@@ -25,7 +25,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>حاسبة تكلفة البناء - نسخة ديناميكية</h1>
+    <h1> حاسبة تكلفة البناء - نسخة ديناميكية  v2.01 date 13-aug-25 7AM</h1>
     <!-- Project Inputs -->
     <div>
       <label>طول المبنى (م):</label><input type="number" id="buildLength" value="10">
@@ -149,64 +149,43 @@
       }
     ];
 
-    /* ---------- Load default model ---------- */
-    async function loadDefaultData() {
-      try {
-	  
-	   const url = `https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/khalid.json`;
-	   
-//   const url = `https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/Binaa_mabgreb_defaultDataV1.json?v=${Date.now()}`;
- //      const res = await fetch(url, { cache: "no-store" });
+
+/* ---------- Load default model   ---------- */
+async function loadDefaultData() {
+  try {
+//    const url = 'https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/model/R+3_1Facade';
 
 
-//        const url = 'https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/Binaa_mabgreb_defaultDataV1.json';
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Failed to fetch remote JSON, using fallback');
-        baseData = await res.json();
-        if (!Array.isArray(baseData) || baseData.length < 5) throw new Error('Invalid JSON, using fallback');
-        console.log('Loaded model from GitHub:', baseData);
-      if (!confirm('we were able to get date model from GETHIB khalid  ')) return;
+    const url = 'https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/Binaa_mabgreb_defaultDataV1.json';
+	
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Failed to fetch remote JSON, using fallback');
+    baseData = await res.json();
+    if (!Array.isArray(baseData) || baseData.length === 0) throw new Error('Invalid JSON, using fallback');
+    console.log('Loaded model from GitHub');
+  } catch (err) {
+    console.warn(err);
+    baseData = JSON.parse(JSON.stringify(fallbackModel)); // deep copy
+    console.log('Using fallback model');
+  }
 
-      } catch (err) {
-        console.warn(err);
-		if (!confirm('Do you want to use the default table ')) return;
-        baseData = JSON.parse(JSON.stringify(fallbackModel)); // Deep copy
-        console.log('Using fallback model:', baseData);
-      }
+  refreshSectionSelects();
+//  initialize selection defaults
+  const secSel = document.getElementById('sectionForItem');
+  if (secSel.options.length > 0) secSel.selectedIndex = 0;
 
-      // Validate and normalize baseData
-      if (!baseData || !Array.isArray(baseData) || baseData.length < 5) {
-        alert('خطأ: فشل تحميل البيانات الأساسية');
-        document.getElementById('costOutput').innerHTML = '<p style="color: red;">خطأ: البيانات الأساسية غير متوفرة</p>';
-        return;
-      }
+   populateItemList();
 
-      // Normalize sections and items
-      baseData.forEach((section, index) => {
-        if (!section || !section.name || !Array.isArray(section.items)) {
-          console.warn(`Invalid section at index ${index}:`, section);
-          section = { name: `قسم ${index + 1}`, items: [] };
-          baseData[index] = section;
-        }
-        section.items = section.items.map(item => ({
-          item: item.item || 'Unknown Item',
-          unit: item.unit || '1',
-          unitPrice: item.unitPrice !== undefined ? Number(item.unitPrice) : 0,
-          baseQty: item.baseQty !== undefined ? Number(item.baseQty) : 0
-        }));
-      });
+  // set last selection
+  lastSectionIdx = secSel.value || null;
+  const itSel = document.getElementById('itemList');
+  if (itSel.options.length > 0) itSel.selectedIndex = 0;
+  lastItemIdx = itSel.value || null;
+  loadItemDetails(); // fill form with first item
+   calculateCost();
+ 
+}
 
-      refreshSectionSelects();
-      const secSel = document.getElementById('sectionForItem');
-      if (secSel.options.length > 0) secSel.selectedIndex = 0;
-      populateItemList();
-      const itSel = document.getElementById('itemList');
-      if (itSel.options.length > 0) itSel.selectedIndex = 0;
-      lastSectionIdx = secSel.value || null;
-      lastItemIdx = itSel.value || null;
-      loadItemDetails();
-      calculateCost();
-    }
 
     /* ---------- UI population ---------- */
     function refreshSectionSelects() {
@@ -442,9 +421,65 @@
 
 //****  calculateCost 
 
+function calculateCost() {
+  let html = '';
+
+  // 1️⃣ Get the input values
+  let buildLength = parseFloat(document.getElementById('buildLength').value) || 0;
+  let buildWidth = parseFloat(document.getElementById('buildWidth').value) || 0;
+  let numFloors = parseFloat(document.getElementById('numFloors').value) || 1;
+  let hasBasement = document.getElementById('hasBasement').checked;
+
+  // 2️⃣ Calculate total building area (floors + basement if any)
+  let buildArea = buildLength * buildWidth;
+  let totalArea = buildLength * buildWidth
+//  let totalArea = buildArea * numFloors;
+// if (hasBasement) totalArea += buildArea;
+
+  // 3️⃣ Track the grand total
+  let grandTotal = 0;
+
+  // 4️⃣ Loop through each section
+  baseData.forEach(section => {
+    let sectionTotal = 0;
+    html += `<h3>${section.name}</h3><table><thead><tr>
+      <th>البند</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th>
+    </tr></thead><tbody>`;
+
+    section.items.forEach(item => {
+      // Convert unit string to number (e.g., "100" means base area of 100m2)
+      let baseUnitArea = parseFloat(item.unit) || 1;
+
+      // Scale baseQty by ratio of actual totalArea to baseUnitArea
+      let adjustedQty = (totalArea / baseUnitArea) * item.baseQty;
+
+      // Calculate item total cost
+      let itemTotal = adjustedQty * item.unitPrice;
+      sectionTotal += itemTotal;
+
+      html += `<tr>
+        <td>${item.item}</td>
+        <td>${item.unit}</td>
+        <td>${adjustedQty.toFixed(2)}</td>
+        <td>${item.unitPrice.toFixed(2)}</td>
+        <td>${itemTotal.toFixed(2)}</td>
+      </tr>`;
+    });
+
+    grandTotal += sectionTotal;
+
+    html += `<tr><td colspan="4"><strong>المجموع الفرعي</strong></td><td><strong>${sectionTotal.toFixed(2)}</strong></td></tr></tbody></table>`;
+  });
+
+  // 5️⃣ Display grand total
+  let grandTotalHtml = `<h2 style="color: red;">💰 الإجمالي الكلي: ${grandTotal.toFixed(2)}</h2>`;
+  document.getElementById('costOutput').innerHTML = grandTotalHtml + html;
+  document.getElementById('costOutput').style.display = 'block'; // make sure it's visible
+}
+
 
 /* ---------- Calculation ---------- */
-function calculateCost() {
+function v2_calculateCost() {
   let html = '';
   let grandTotal = 0;
 
@@ -460,6 +495,8 @@ function calculateCost() {
   // 3️⃣ Select sections based on user input
   const selectedSections = [];
   if (hasBasement && baseData[0]) selectedSections.push(baseData[0]); // Foundation
+  if ( baseData[0]) selectedSections.push(baseData[0]); // Foundation
+
   if (baseData[1]) selectedSections.push(baseData[1]); // Ground Floor
   if (numFloors >= 1 && baseData[2]) selectedSections.push(baseData[2]); // First Floor
   if (numFloors >= 2 && baseData[3]) selectedSections.push(baseData[3]); // Second Floor
