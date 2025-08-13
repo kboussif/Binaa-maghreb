@@ -26,6 +26,10 @@
 <body>
   <div class="container">
     <h1> حاسبة تكلفة البناء - نسخة ديناميكية  v2.02 date 13-aug-25 7AM</h1>
+
+
+
+
     <!-- Project Inputs -->
     <div>
       <label>طول المبنى (م):</label><input type="number" id="buildLength" value="10">
@@ -34,7 +38,10 @@
         <label>طول الأرض (م):</label><input type="number" id="landLength" value="10">
         <label>عرض الأرض (م):</label><input type="number" id="landWidth" value="10">
       </div>
-      <label>عدد الطوابق:</label><input type="number" id="numFloors" value="3" min="1">
+      <label>عدد الطوابق:</label><input type="number" id="numFloors" value="1" min="1">
+
+<label>رقم الواجهة:</label> <input type="number" id="facadeNumber" value="1" min="1" max="3">	  
+	  
       <label>وجود قبو:</label><input type="checkbox" id="hasBasement">
       <button onclick="calculateCost()">احسب التكلفة</button>
     </div>
@@ -43,7 +50,9 @@
         document.querySelector('.admin-panel').style.display==='none' ? 'block' : 'none'">
       ⚙️ إظهار/إخفاء أدوات الإدارة
     </button>
-    <!-- Admin Panel -->
+  
+
+  <!-- Admin Panel -->
     <div class="admin-panel">
       <h3>أدوات الإدارة</h3>
       <!-- Add Section -->
@@ -421,8 +430,22 @@ async function loadDefaultData() {
 
 //****  calculateCost 
 
-function calculateCost() {
+async   function calculateCost() {
   let html = '';
+
+  // Fetch JSON Model and continue calculation...
+
+const numFloors1 = parseInt(document.getElementById('numFloors').value) || 3;
+const hasBasement1 = document.getElementById('hasBasement').checked || false;
+const facadeNumber1 = parseInt(document.getElementById('facadeNumber').value) || 1;
+
+const url = getJsonUrl(numFloors1, hasBasement1, facadeNumber1);
+
+console.log("Fetching from URL:", url);
+const response = await fetch(url);
+const baseData = await response.json();
+// const baseData = await response.json();
+
 
   // 1️⃣ Get the input values
   let buildLength = parseFloat(document.getElementById('buildLength').value) || 0;
@@ -751,6 +774,32 @@ function old_calculateCost() {
     window.addEventListener('DOMContentLoaded', () => {
       loadDefaultData();
     });
+	
+	
+// pickJsonUrl.js
+
+/**
+ * Get JSON URL based on floor, cave, and facade number
+ * @param {number} floor - Floor number (1, 2, 3)
+ * @param {boolean} cave - Whether basement exists
+ * @param {number} facade - Facade number (1, 2, 3)
+ * @returns {string} - URL of the JSON file
+ */
+function getJsonUrl(numFloors = 1, hasBasement = false, facadeNumber = 1) {
+  // Ensure valid ranges
+  const floor = Math.min(Math.max(numFloors, 1), 3); // 1-3
+  const facade = Math.min(Math.max(facadeNumber, 1), 3); // 1-3
+  const caveSuffix = hasBasement ? "_cave" : "";
+
+  // Build file name
+  const fileName = `R+${floor}_${facade}facade${caveSuffix}.json`;
+
+  // Return full GitHub raw URL
+  return `https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/model/${fileName}`;
+}
+
+	
   </script>
+  
 </body>
 </html>
