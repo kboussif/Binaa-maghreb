@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>حاسبة تكلفة البناء - نسخة ديناميكية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    body { font-family: 'Amiri', 'Noto Sans Arabic', sans-serif; background: #f4e7d3; color: #3c2f2f; padding: 20px; }
+    .container { max-width: 1200px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; }
+    h1, h2, h3 { color: #004aad; }
+    input, button, select { padding: 6px; margin: 4px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #d4a373; padding: 8px; text-align: center; }
+    .admin-panel { background: #ede7f6; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: none; }
+    .toggle-admin { background: #004aad; color: white; padding: 8px; border: none; cursor: pointer; margin:8px 0; }
+    .admin-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .admin-row input, .admin-row select { min-width:140px; }
+    .admin-block { margin-bottom:10px; }
+    .small { width:120px; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>حاسبة تكلفة البناء - نسخة ديناميكية</h1>
+    <!-- Project Inputs -->
+    <div>
+      <label>طول المبنى (م):</label><input type="number" id="buildLength" value="10">
+      <label>عرض المبنى (م):</label><input type="number" id="buildWidth" value="10">
+      <div style="display:none;">
+        <label>طول الأرض (م):</label><input type="number" id="landLength" value="10">
+        <label>عرض الأرض (م):</label><input type="number" id="landWidth" value="10">
+      </div>
+      <label>عدد الطوابق:</label><input type="number" id="numFloors" value="3" min="1">
+      <label>وجود قبو:</label><input type="checkbox" id="hasBasement">
+      <button onclick="calculateCost()">احسب التكلفة</button>
+    </div>
+    <!-- Toggle Admin Tools -->
+    <button class="toggle-admin" onclick="document.querySelector('.admin-panel').style.display =
+        document.querySelector('.admin-panel').style.display==='none' ? 'block' : 'none'">
+      ⚙️ إظهار/إخفاء أدوات الإدارة
+    </button>
+    <!-- Admin Panel -->
+    <div class="admin-panel">
+      <h3>أدوات الإدارة</h3>
+      <!-- Add Section -->
+      <div class="admin-block admin-row">
+        <label for="newSectionName" style="margin-left:8px;">اسم القسم الجديد:</label>
+        <input id="newSectionName" placeholder="اسم القسم الجديد">
+        <button onclick="addSection()">➕ إضافة قسم</button>
+      </div>
+      <!-- Rename / Delete Section -->
+      <div class="admin-block admin-row">
+        <label for="sectionSelect" style="margin-left:8px;">اختر القسم:</label>
+        <select id="sectionSelect" class="small"></select>
+        <label for="renameSectionName" style="margin-left:8px;">اسم جديد للقسم:</label>
+        <input id="renameSectionName" placeholder="اسم جديد للقسم">
+        <button onclick="renameSection()">✏️ تعديل اسم القسم</button>
+        <button onclick="deleteSection()">🗑️ حذف القسم</button>
+      </div>
+      <!-- Items Management -->
+      <div class="admin-block">
+        <div class="admin-row">
+          <label for="sectionForItem" style="margin-left:8px;">القسم:</label>
+          <select id="sectionForItem" class="small"></select>
+          <label for="itemList" style="margin-left:8px;">البند:</label>
+          <select id="itemList" class="small"></select>
+        </div>
+        <div class="admin-row" style="margin-top:8px;">
+          <label for="itemName" style="margin-left:8px;">اسم البند:</label>
+          <input id="itemName" placeholder="اسم البند" style="flex:1;">
+          <label for="itemUnit" style="margin-left:8px;">الوحدة:</label>
+          <input id="itemUnit" placeholder="الوحدة (مثال: 1 أو 100)" class="small">
+          <label for="itemPrice" style="margin-left:8px;">سعر الوحدة:</label>
+          <input type="number" id="itemPrice" placeholder="سعر الوحدة" class="small">
+          <label for="itemQty" style="margin-left:8px;">الكمية الأساسية:</label>
+          <input type="number" id="itemQty" placeholder="الكمية الأساسية" class="small">
+        </div>
+        <div class="admin-row" style="margin-top:8px;">
+          <button onclick="addItem()">➕ إضافة بند</button>
+          <button onclick="updateItem()">✏️ تعديل</button>
+          <button onclick="deleteItem()">🗑️ حذف</button>
+        </div>
+      </div>
+      <!-- Export / Import -->
+      <div class="admin-block admin-row">
+        <button onclick="exportModel()">💾 تصدير النموذج (JSON)</button>
+        <input type="file" id="importFile" onchange="importModel(event)">
+      </div>
+    </div>
+    <!-- Cost Output -->
+    <div id="costOutput"></div>
+    <!-- Export Buttons -->
+    <div style="margin-top:8px;">
+      <button onclick="exportToPDF()">📄 تصدير إلى PDF</button>
+      <button onclick="exportAllToExcel('التكلفة.xlsx')">📊 تصدير إلى Excel</button>
+    </div>
+  </div>
+  <script>
+    /* ---------- Config & state ---------- */
+    const LOG_ENABLED = true;
+    let baseData = [];
+    let lastSectionIdx = null;
+    let lastItemIdx = null;
+
+    /* ---------- Default model for 3 floors + basement ---------- */
+    const fallbackModel = [
+      {
+        "name": "الأساسات",
+        "items": [
+          { "item": "حفر الأساسات", "unit": "100", "unitPrice": 30, "baseQty": 100 }
+         ]
+      },
+      {
+        "name": "الطابق الأرضي RDC",
+        "items": [
+         { "item": "حفر الأساسات", "unit": "100", "unitPrice": 125, "baseQty": 100 },
+          { "item": "اليد العاملة", "unit": "100", "unitPrice": 125, "baseQty": 100 }
+        ]
+      },
+      {
+        "name": "R+1 الطابق الأول",
+        "items": [
+          { "item": "حفر الأساسات", "unit": "100", "unitPrice": 125, "baseQty": 100 },
+          { "item": "اليد العاملة", "unit": "100", "unitPrice": 125, "baseQty": 100 }
+        ]
+      },
+      {
+        "name": "R+2 الطابق الثاني",
+        "items": [
+          { "item": "حفر الأساسات", "unit": "100", "unitPrice": 125, "baseQty": 100 },
+          { "item": "اليد العاملة", "unit": "100", "unitPrice": 125, "baseQty": 100 }
+        ]
+      },
+      {
+        "name": "R+T السطح",
+        "items": [
+          { "item": "حفر الأساسات", "unit": "100", "unitPrice": 125, "baseQty": 100 },
+          { "item": "الحديد (6 مم)", "unit": "100", "unitPrice": 9.4, "baseQty": 400 },
+          { "item": "الحديد (10 مم)", "unit": "100", "unitPrice": 9.2, "baseQty": 500 },
+            { "item": "ميكا", "unit": "100", "unitPrice": 20, "baseQty": 65 },
+          { "item": "الماء والكهرباء (مواد)", "unit": "100", "unitPrice": 70, "baseQty": 0 },
+          { "item": "الماء والكهرباء (يد عاملة)", "unit": "100", "unitPrice": 45, "baseQty": 0 },
+          { "item": "اليد العاملة", "unit": "100", "unitPrice": 125, "baseQty": 100 }
+        ]
+      }
+    ];
+
+    /* ---------- Load default model ---------- */
+    async function loadDefaultData() {
+      try {
+	  
+	   const url = `https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/khalid.json`;
+	   
+//   const url = `https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/Binaa_mabgreb_defaultDataV1.json?v=${Date.now()}`;
+ //      const res = await fetch(url, { cache: "no-store" });
+
+
+//        const url = 'https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/Binaa_mabgreb_defaultDataV1.json';
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Failed to fetch remote JSON, using fallback');
+        baseData = await res.json();
+        if (!Array.isArray(baseData) || baseData.length < 5) throw new Error('Invalid JSON, using fallback');
+        console.log('Loaded model from GitHub:', baseData);
+      if (!confirm('we were able to get date model from GETHIB khalid  ')) return;
+
+      } catch (err) {
+        console.warn(err);
+		if (!confirm('Do you want to use the default table ')) return;
+        baseData = JSON.parse(JSON.stringify(fallbackModel)); // Deep copy
+        console.log('Using fallback model:', baseData);
+      }
+
+      // Validate and normalize baseData
+      if (!baseData || !Array.isArray(baseData) || baseData.length < 5) {
+        alert('خطأ: فشل تحميل البيانات الأساسية');
+        document.getElementById('costOutput').innerHTML = '<p style="color: red;">خطأ: البيانات الأساسية غير متوفرة</p>';
+        return;
+      }
+
+      // Normalize sections and items
+      baseData.forEach((section, index) => {
+        if (!section || !section.name || !Array.isArray(section.items)) {
+          console.warn(`Invalid section at index ${index}:`, section);
+          section = { name: `قسم ${index + 1}`, items: [] };
+          baseData[index] = section;
+        }
+        section.items = section.items.map(item => ({
+          item: item.item || 'Unknown Item',
+          unit: item.unit || '1',
+          unitPrice: item.unitPrice !== undefined ? Number(item.unitPrice) : 0,
+          baseQty: item.baseQty !== undefined ? Number(item.baseQty) : 0
+        }));
+      });
+
+      refreshSectionSelects();
+      const secSel = document.getElementById('sectionForItem');
+      if (secSel.options.length > 0) secSel.selectedIndex = 0;
+      populateItemList();
+      const itSel = document.getElementById('itemList');
+      if (itSel.options.length > 0) itSel.selectedIndex = 0;
+      lastSectionIdx = secSel.value || null;
+      lastItemIdx = itSel.value || null;
+      loadItemDetails();
+      calculateCost();
+    }
+
+    /* ---------- UI population ---------- */
+    function refreshSectionSelects() {
+      const selects = [document.getElementById('sectionSelect'), document.getElementById('sectionForItem')];
+      selects.forEach(sel => {
+        sel.innerHTML = '';
+        baseData.forEach((sec, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.textContent = sec.name || `قسم ${idx + 1}`;
+          sel.appendChild(opt);
+        });
+      });
+    }
+
+    function populateItemList() {
+      const sectionIdx = Number(document.getElementById('sectionForItem').value) || 0;
+      const itemList = document.getElementById('itemList');
+      itemList.innerHTML = '';
+      if (!baseData[sectionIdx] || !Array.isArray(baseData[sectionIdx].items)) {
+        console.warn('No items found for section ' + sectionIdx);
+        return;
+      }
+      baseData[sectionIdx].items.forEach((it, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = it.item || `بند ${idx + 1}`;
+        itemList.appendChild(opt);
+      });
+      if (itemList.options.length > 0) {
+        itemList.selectedIndex = 0;
+        lastItemIdx = itemList.value;
+      } else {
+        lastItemIdx = null;
+      }
+    }
+
+    /* ---------- Helpers to autosave pending edits ---------- */
+    function getCurrentFormValues() {
+      return {
+        item: document.getElementById('itemName').value.trim() || '',
+        unit: document.getElementById('itemUnit').value.trim() || '1',
+        unitPrice: parseFloat(document.getElementById('itemPrice').value) || 0,
+        baseQty: parseFloat(document.getElementById('itemQty').value) || 0
+      };
+    }
+
+    function savePendingEditsIfAny(oldSecIdx, oldItIdx) {
+      if (oldSecIdx == null || oldItIdx == null) return;
+      oldSecIdx = Number(oldSecIdx);
+      oldItIdx = Number(oldItIdx);
+      if (!baseData[oldSecIdx] || !baseData[oldSecIdx].items[oldItIdx]) return;
+
+      const current = baseData[oldSecIdx].items[oldItIdx];
+      const form = getCurrentFormValues();
+
+      const changed = current.item !== form.item ||
+                     current.unit !== form.unit ||
+                     Number(current.unitPrice) !== Number(form.unitPrice) ||
+                     Number(current.baseQty) !== Number(form.baseQty);
+
+      if (changed) {
+        baseData[oldSecIdx].items[oldItIdx] = {
+          item: form.item,
+          unit: form.unit,
+          unitPrice: form.unitPrice,
+          baseQty: form.baseQty
+        };
+        logRow(`Auto-saved edits for section ${oldSecIdx}, item ${oldItIdx}`);
+        populateItemList();
+        document.getElementById('itemList').value = String(oldItIdx);
+        calculateCost();
+      }
+    }
+
+    function loadItemDetails() {
+      const sectionIdx = Number(document.getElementById('sectionForItem').value) || 0;
+      const itemIdx = Number(document.getElementById('itemList').value) || 0;
+
+      if (lastSectionIdx !== null || lastItemIdx !== null) {
+        if (String(sectionIdx) !== String(lastSectionIdx) || String(itemIdx) !== String(lastItemIdx)) {
+          savePendingEditsIfAny(lastSectionIdx, lastItemIdx);
+        }
+      }
+
+      lastSectionIdx = sectionIdx;
+      lastItemIdx = itemIdx;
+
+      if (!baseData[sectionIdx] || !baseData[sectionIdx].items[itemIdx]) {
+        document.getElementById('itemName').value = '';
+        document.getElementById('itemUnit').value = '';
+        document.getElementById('itemPrice').value = '';
+        document.getElementById('itemQty').value = '';
+        return;
+      }
+
+      const it = baseData[sectionIdx].items[itemIdx];
+      document.getElementById('itemName').value = it.item || '';
+      document.getElementById('itemUnit').value = it.unit || '';
+      document.getElementById('itemPrice').value = it.unitPrice != null ? it.unitPrice : '';
+      document.getElementById('itemQty').value = it.baseQty != null ? it.baseQty : '';
+    }
+
+    /* ---------- CRUD operations ---------- */
+    function addSection() {
+      const name = document.getElementById('newSectionName').value.trim();
+      if (!name) {
+        alert('أدخل اسم القسم');
+        return;
+      }
+      baseData.push({ name, items: [] });
+      refreshSectionSelects();
+      const secSel = document.getElementById('sectionForItem');
+      secSel.value = String(baseData.length - 1);
+      populateItemList();
+      lastSectionIdx = secSel.value;
+      lastItemIdx = null;
+      calculateCost();
+    }
+
+    function renameSection() {
+      const idx = Number(document.getElementById('sectionSelect').value);
+      const name = document.getElementById('renameSectionName').value.trim();
+      if (isNaN(idx) || !baseData[idx]) {
+        alert('اختر قسمًا صالحًا');
+        return;
+      }
+      if (!name) {
+        alert('أدخل اسم جديد');
+        return;
+      }
+      baseData[idx].name = name;
+      refreshSectionSelects();
+      populateItemList();
+      calculateCost();
+    }
+
+    function deleteSection() {
+      const idx = Number(document.getElementById('sectionSelect').value);
+      if (isNaN(idx) || !baseData[idx]) {
+        alert('اختر قسمًا صالحًا');
+        return;
+      }
+      if (!confirm('هل تريد حذف هذا القسم؟')) return;
+      baseData.splice(idx, 1);
+      refreshSectionSelects();
+      populateItemList();
+      calculateCost();
+    }
+
+    function addItem() {
+      const secIdx = Number(document.getElementById('sectionForItem').value);
+      if (isNaN(secIdx) || !baseData[secIdx]) {
+        alert('اختر القسم أولاً');
+        return;
+      }
+      const newItem = getCurrentFormValues();
+      if (!newItem.item) {
+        alert('أدخل اسم البند');
+        return;
+      }
+      baseData[secIdx].items.push(newItem);
+      populateItemList();
+      document.getElementById('itemList').value = String(baseData[secIdx].items.length - 1);
+      lastSectionIdx = secIdx;
+      lastItemIdx = document.getElementById('itemList').value;
+      calculateCost();
+    }
+
+    function updateItem() {
+      const sectionIdx = Number(document.getElementById('sectionForItem').value);
+      const itemIdx = Number(document.getElementById('itemList').value);
+
+      // Validate inputs
+      if (isNaN(sectionIdx) || isNaN(itemIdx)) {
+        alert('الرجاء اختيار قسم وبند صالحين');
+        return;
+      }
+      if (!baseData[sectionIdx] || !baseData[sectionIdx].items[itemIdx]) {
+        alert('القسم أو البند غير موجود');
+        return;
+      }
+
+      // Get form values
+      const newItem = getCurrentFormValues();
+      if (!newItem.item) {
+        alert('الرجاء إدخال اسم البند');
+        return;
+      }
+
+      // Update the item in baseData
+      baseData[sectionIdx].items[itemIdx] = {
+        item: newItem.item,
+        unit: newItem.unit,
+        unitPrice: newItem.unitPrice,
+        baseQty: newItem.baseQty
+      };
+
+      // Log for debugging
+      logRow(`Updated item in section ${sectionIdx}, item ${itemIdx}: ${JSON.stringify(baseData[sectionIdx].items[itemIdx])}`);
+    if (!confirm('we were to refresh ')) return;
+
+      // Update UI
+      populateItemList();
+//      document.getElementById('itemList').value = String(itemIdx);
+    document.getElementById('itemList').value = itemIdx;
+      loadItemDetails();
+      calculateCost();
+    }
+
+
+
+
+    function deleteItem() {
+      const secIdx = Number(document.getElementById('sectionForItem').value);
+      const itIdx = Number(document.getElementById('itemList').value);
+      if (isNaN(secIdx) || isNaN(itIdx) || !baseData[secIdx] || !baseData[secIdx].items[itIdx]) {
+        alert('اختر قسمًا وبندًا صالحين');
+        return;
+      }
+      if (!confirm('هل تريد حذف هذا البند؟')) return;
+      baseData[secIdx].items.splice(itIdx, 1);
+      populateItemList();
+      const itemList = document.getElementById('itemList');
+      if (itemList.options.length) itemList.selectedIndex = 0;
+      lastItemIdx = itemList.value || null;
+      loadItemDetails();
+      calculateCost();
+    }
+
+
+
+
+//****  calculateCost 
+
+
+/* ---------- Calculation ---------- */
+function calculateCost() {
+  let html = '';
+  let grandTotal = 0;
+
+  // 1️⃣ Get input values
+  let buildLength = parseFloat(document.getElementById('buildLength').value) || 0;
+  let buildWidth = parseFloat(document.getElementById('buildWidth').value) || 0;
+  let numFloors = parseInt(document.getElementById('numFloors').value) || 1;
+  let hasBasement = document.getElementById('hasBasement').checked;
+
+  // 2️⃣ Calculate building area per floor
+  let buildArea = buildLength * buildWidth;
+
+  // 3️⃣ Select sections based on user input
+  const selectedSections = [];
+  if (hasBasement && baseData[0]) selectedSections.push(baseData[0]); // Foundation
+  if (baseData[1]) selectedSections.push(baseData[1]); // Ground Floor
+  if (numFloors >= 1 && baseData[2]) selectedSections.push(baseData[2]); // First Floor
+  if (numFloors >= 2 && baseData[3]) selectedSections.push(baseData[3]); // Second Floor
+  if (baseData[4]) selectedSections.push(baseData[4]); // Roof
+
+  // 4️⃣ Log inputs for debugging
+  logRow(`Inputs: buildLength=${buildLength}, buildWidth=${buildWidth}, numFloors=${numFloors}, hasBasement=${hasBasement}, buildArea=${buildArea}`);
+  logRow('Selected sections:', selectedSections.map(s => s ? s.name : 'undefined'));
+
+  // 5️⃣ Process each selected section
+  selectedSections.forEach(section => {
+    let sectionTotal = 0;
+    html += `<h3>${escapeHtml(section.name)}</h3><table><thead><tr>
+      <th>البند</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th>
+    </tr></thead><tbody>`;
+
+    section.items.forEach(item => {
+      let baseUnitArea = parseFloat(item.unit) || 1;
+      let adjustedQty = (buildArea / baseUnitArea) * item.baseQty;
+      let itemTotal = adjustedQty * item.unitPrice;
+      sectionTotal += itemTotal;
+
+      html += `<tr>
+        <td>${escapeHtml(item.item)}</td>
+        <td>${escapeHtml(item.unit)}</td>
+        <td>${adjustedQty.toFixed(2)}</td>
+        <td>${item.unitPrice.toFixed(2)}</td>
+        <td>${itemTotal.toFixed(2)}</td>
+      </tr>`;
+    });
+
+    grandTotal += sectionTotal;
+    html += `<tr><td colspan="4"><strong>المجموع الفرعي</strong></td><td><strong>${sectionTotal.toFixed(2)}</strong></td></tr></tbody></table>`;
+  });
+
+  // 6️⃣ Check if table is empty
+  if (!html) {
+    document.getElementById('costOutput').innerHTML = '<p style="color: red;">خطأ: لا توجد بيانات صالحة لعرض الجدول</p>';
+    logRow('Error: No valid items to display in table');
+    return;
+  }
+
+  // 7️⃣ Display grand total
+  let grandTotalHtml = `<h2 style="color: red;">💰 الإجمالي الكلي: ${grandTotal.toFixed(2)}</h2>`;
+  document.getElementById('costOutput').innerHTML = grandTotalHtml + html;
+  document.getElementById('costOutput').style.display = 'block';
+
+  // Log generated HTML for debugging
+  logRow('Generated HTML:', grandTotalHtml + html);
+}
+
+
+
+function old_calculateCost() {
+  let html = '';
+
+  // 1️⃣ Get the input values
+  let buildLength = parseFloat(document.getElementById('buildLength').value) || 0;
+  let buildWidth = parseFloat(document.getElementById('buildWidth').value) || 0;
+  let numFloors = parseFloat(document.getElementById('numFloors').value) || 1;
+  let hasBasement = document.getElementById('hasBasement').checked;
+
+  // 2️⃣ Calculate total building area (floors + basement if any)
+  let buildArea = buildLength * buildWidth;
+  let totalArea = buildLength * buildWidth
+//  let totalArea = buildArea * numFloors;
+// if (hasBasement) totalArea += buildArea;
+
+  // 3️⃣ Track the grand total
+  let grandTotal = 0;
+
+  // 4️⃣ Loop through each section
+  baseData.forEach(section => {
+    let sectionTotal = 0;
+    html += `<h3>${section.name}</h3><table><thead><tr>
+      <th>البند</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th>
+    </tr></thead><tbody>`;
+
+    section.items.forEach(item => {
+      // Convert unit string to number (e.g., "100" means base area of 100m2)
+      let baseUnitArea = parseFloat(item.unit) || 1;
+
+      // Scale baseQty by ratio of actual totalArea to baseUnitArea
+      let adjustedQty = (totalArea / baseUnitArea) * item.baseQty;
+
+      // Calculate item total cost
+      let itemTotal = adjustedQty * item.unitPrice;
+      sectionTotal += itemTotal;
+
+      html += `<tr>
+        <td>${item.item}</td>
+        <td>${item.unit}</td>
+        <td>${adjustedQty.toFixed(2)}</td>
+        <td>${item.unitPrice.toFixed(2)}</td>
+        <td>${itemTotal.toFixed(2)}</td>
+      </tr>`;
+    });
+
+    grandTotal += sectionTotal;
+
+    html += `<tr><td colspan="4"><strong>المجموع الفرعي</strong></td><td><strong>${sectionTotal.toFixed(2)}</strong></td></tr></tbody></table>`;
+  });
+
+  // 5️⃣ Display grand total
+  let grandTotalHtml = `<h2 style="color: red;">💰 الإجمالي الكلي: ${grandTotal.toFixed(2)}</h2>`;
+  document.getElementById('costOutput').innerHTML = grandTotalHtml + html;
+  document.getElementById('costOutput').style.display = 'block'; // make sure it's visible
+}
+
+
+
+
+    /* ---------- Export / Import ---------- */
+    function customStringify(data) {
+      const lines = ['['];
+      data.forEach((sec, si) => {
+        lines.push('  {');
+        lines.push(`    "name": ${JSON.stringify(sec.name)},`);
+        lines.push('    "items": [');
+        (sec.items || []).forEach((it, ii) => {
+          const itemObj = {
+            item: it.item,
+            unit: it.unit,
+            unitPrice: it.unitPrice,
+            baseQty: it.baseQty
+          };
+          let itemStr = JSON.stringify(itemObj);
+          if (ii < (sec.items || []).length - 1) itemStr += ',';
+          lines.push('      ' + itemStr);
+        });
+        lines.push('    ]');
+        lines.push(si < data.length - 1 ? '  },' : '  }');
+      });
+      lines.push(']');
+      return lines.join('\n');
+    }
+
+    function exportModel() {
+      const blob = new Blob([customStringify(baseData)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'binaa_maghreb_model.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importModel(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (!Array.isArray(parsed)) throw new Error('Invalid model file');
+          baseData = parsed;
+          // Normalize imported data
+          baseData.forEach((section, index) => {
+            if (!section || !section.name || !Array.isArray(section.items)) {
+              console.warn(`Invalid section at index ${index}:`, section);
+              section = { name: `قسم ${index + 1}`, items: [] };
+              baseData[index] = section;
+            }
+            section.items = section.items.map(item => ({
+              item: item.item || 'Unknown Item',
+              unit: item.unit || '1',
+              unitPrice: item.unitPrice !== undefined ? Number(item.unitPrice) : 0,
+              baseQty: item.baseQty !== undefined ? Number(item.baseQty) : 0
+            }));
+          });
+          refreshSectionSelects();
+          populateItemList();
+          loadItemDetails();
+          calculateCost();
+        } catch (err) {
+          alert('ملف غير صالح: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* ---------- PDF / Excel export ---------- */
+    function exportToPDF() {
+      const element = document.getElementById('costOutput');
+      const inputsSummary = `
+        <div>
+          <h2>ملخص المدخلات</h2>
+          <p>طول المبنى: ${document.getElementById('buildLength').value || 0} م</p>
+          <p>عرض المبنى: ${document.getElementById('buildWidth').value || 0} م</p>
+          <p>عدد الطوابق: ${document.getElementById('numFloors').value || 0}</p>
+          <p>وجود قبو: ${document.getElementById('hasBasement').checked ? 'نعم' : 'لا'}</p>
+        </div>
+      `;
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = inputsSummary + element.outerHTML;
+      html2pdf().from(tempDiv).save('cost_estimation.pdf');
+    }
+
+    function exportAllToExcel(filename) {
+      const wb = XLSX.utils.book_new();
+      const detailed = [['المرحلة', 'المادة', 'الكمية (baseQty)', 'سعر الوحدة', 'التكلفة']];
+      let grandTotal = 0;
+
+      const numFloors = parseInt(document.getElementById('numFloors').value) || 1;
+      const hasBasement = document.getElementById('hasBasement').checked;
+      const selectedSections = [];
+      if (hasBasement && baseData[0]) selectedSections.push(baseData[0]);
+      if (baseData[1]) selectedSections.push(baseData[1]);
+      if (numFloors >= 1 && baseData[2]) selectedSections.push(baseData[2]);
+      if (numFloors >= 2 && baseData[3]) selectedSections.push(baseData[3]);
+      if (baseData[4]) selectedSections.push(baseData[4]);
+
+      let floorArea = parseFloat(document.getElementById('buildLength').value || 0) * parseFloat(document.getElementById('buildWidth').value || 0);
+
+      selectedSections.forEach(sec => {
+        let phaseTotal = 0;
+        (sec.items || []).forEach(it => {
+          if (!it || it.unitPrice === undefined || it.baseQty === undefined) return;
+          let baseUnitArea = parseFloat(it.unit) || 1;
+          let adjustedQty = (floorArea / baseUnitArea) * it.baseQty;
+          const cost = adjustedQty * it.unitPrice;
+          phaseTotal += cost;
+          grandTotal += cost;
+          detailed.push([sec.name, it.item, adjustedQty.toFixed(2), it.unitPrice, cost.toFixed(2)]);
+        });
+        detailed.push([sec.name, '', '', '', phaseTotal.toFixed(2), 'المجموع الفرعي']);
+      });
+      detailed.push(['', '', '', '', grandTotal.toFixed(2), 'الإجمالي']);
+
+      const ws = XLSX.utils.aoa_to_sheet(detailed);
+      XLSX.utils.book_append_sheet(wb, ws, 'تفاصيل التكاليف');
+      XLSX.writeFile(wb, filename || 'cost_estimation.xlsx');
+    }
+
+    /* ---------- Utilities ---------- */
+    function logRow(msg) { if (LOG_ENABLED) console.log(msg); }
+    function escapeHtml(s) { if (!s && s !== 0) return ''; return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]); }
+
+    /* ---------- Event wiring ---------- */
+    document.getElementById('sectionForItem').addEventListener('change', () => {
+      populateItemList();
+      const itSel = document.getElementById('itemList');
+      if (itSel.options.length) itSel.selectedIndex = 0;
+      loadItemDetails();
+    });
+    document.getElementById('itemList').addEventListener('change', loadItemDetails);
+    ['buildLength', 'buildWidth', 'numFloors', 'hasBasement'].forEach(id => {
+      document.getElementById(id).addEventListener('change', calculateCost);
+    });
+
+    /* ---------- Init on load ---------- */
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDefaultData();
+    });
+  </script>
+</body>
+</html>
