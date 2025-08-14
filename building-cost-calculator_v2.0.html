@@ -60,18 +60,12 @@
           <input type="number" id="numFloors" value="1" min="1" max="3" style="width:60px; padding:4px; font-size:16px;">
           <label style="font-size:18px; white-space:nowrap; width:120px;">رقم الواجهة:</label>
           <input type="number" id="facadeNumber" value="1" min="1" max="3" style="width:60px; padding:4px; font-size:16px;">
- 
-		</div>
-		<div>
-		<button 
-  onclick="calculateCost()" 
-  style="padding:8px 16px; font-size:16px; border:none; border-radius:6px; background:#007bff; color:white; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2); transition:all 0.2s;">
-  احسب التكلفة
-</button>
-		          <label style="font-size:18px; white-space:nowrap; width:80px;">وجود قبو:</label>
+          <label style="font-size:18px; white-space:nowrap; width:80px;">وجود قبو:</label>
           <input type="checkbox" id="hasBasement">
-
-		
+        </div>
+        <div class="admin-row">
+          <button onclick="calculateCost()">احسب التكلفة</button>
+        </div>
       </div>
       <div id="costOutput"></div>
       <div style="margin-top:8px;">
@@ -151,6 +145,9 @@
       <div class="admin-row" style="margin-top:8px;">
         <button onclick="calculateCost()">احسب التكلفة</button>
       </div>
+	  <!-- Table of all materials for bulk price updates -->
+      <div id="allMaterialsTable" style="margin-top:15px; overflow-x:auto;"></div>
+	  
     </div>
 
     <!-- Report Output -->
@@ -164,86 +161,110 @@
   </div>
 
   <script>
-    /* ---------- Config & state ---------- */
-    const LOG_ENABLED = true;
-    let baseData = [];
-    let lastSectionIdx = null;
-    let lastItemIdx = null;
+  
 
-    /* ---------- Default model ---------- */
-    const fallbackModel = [
-  {
-    "name": "الأساسات Fondation Sample",
-    "items": [
-      {"item":"حفر الأساسات","unit":"100","unitPrice":30,"baseQty":100},
-      {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
-      {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
-      {"item":"الحديد (12 مم)","unit":"100","unitPrice":9.2,"baseQty":800},
-      {"item":"البيطون (B25)","unit":"100","unitPrice":780,"baseQty":25},
-      {"item":"الأسمنت (35)","unit":"100","unitPrice":75,"baseQty":25},
-      {"item":"الياجور (15)","unit":"100","unitPrice":5.5,"baseQty":1500},
-      {"item":"الرمل","unit":"100","unitPrice":4,"baseQty":350},
-      {"item":"الحجر (للبلوكاج)","unit":"100","unitPrice":3500,"baseQty":0},
-      {"item":"أنابيب PVC (200)","unit":"100","unitPrice":20,"baseQty":60},
-      {"item":"السلك والمسامير","unit":"100","unitPrice":16,"baseQty":40},
-      {"item":"ميكا","unit":"100","unitPrice":20,"baseQty":65},
-      {"item":"اليد العاملة","unit":"100","unitPrice":125,"baseQty":100}
-    ]
-  },
-  {
-    "name": "الطابق الأرضي RDC Sample",
-    "items": [
-      {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
-      {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
-      {"item":"الحديد (12 مم)","unit":"100","unitPrice":9.2,"baseQty":800},
-      {"item":"الحديد (14 مم)","unit":"100","unitPrice":9.2,"baseQty":0},
-      {"item":"البيطون (B35)","unit":"100","unitPrice":850,"baseQty":0},
-      {"item":"الأسمنت (45)","unit":"100","unitPrice":81,"baseQty":0},
-      {"item":"الوردي والبودر والشبكة","unit":"100","unitPrice":85,"baseQty":0},
-      {"item":"الياجور (7)","unit":"100","unitPrice":2.5,"baseQty":0},
-      {"item":"الياجور (15)","unit":"100","unitPrice":5.5,"baseQty":1500},
-      {"item":"الرمل","unit":"100","unitPrice":4,"baseQty":350},
-      {"item":"اليد العاملة","unit":"100","unitPrice":250,"baseQty":100}
-    ]
-  },
-  {
-    "name": "الطابق الأول R+1 Sample",
-    "items": [
-      {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
-      {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
-      {"item":"الحديد (12 مم)","unit":"100","unitPrice":9.2,"baseQty":800},
-      {"item":"الحديد (14 مم)","unit":"100","unitPrice":9.2,"baseQty":0},
-      {"item":"البيطون (B35)","unit":"100","unitPrice":850,"baseQty":0},
-      {"item":"الأسمنت (35)","unit":"100","unitPrice":75,"baseQty":25},
-      {"item":"الأسمنت (45)","unit":"100","unitPrice":81,"baseQty":0},
-      {"item":"الوردي والبودر والشبكة","unit":"100","unitPrice":85,"baseQty":0},
-      {"item":"الياجور (7)","unit":"100","unitPrice":2.5,"baseQty":0},
-      {"item":"الياجور (15)","unit":"100","unitPrice":5.5,"baseQty":1500},
-      {"item":"الرمل","unit":"100","unitPrice":4,"baseQty":350},
-      {"item":"اليد العاملة","unit":"100","unitPrice":250,"baseQty":100}
-    ]
-  },
-  {
-    "name": "السطح Terrace",
-    "items": [
-      {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
-      {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
-      {"item":"الحديد (12 مم)","unit":"100","unitPrice":9.2,"baseQty":800},
-      {"item":"الحديد (14 مم)","unit":"100","unitPrice":9.2,"baseQty":0},
-      {"item":"الأسمنت (35)","unit":"100","unitPrice":75,"baseQty":25},
-      {"item":"الأسمنت (45)","unit":"100","unitPrice":81,"baseQty":0},
-      {"item":"الياجور (7)","unit":"100","unitPrice":2.5,"baseQty":0},
-      {"item":"الياجور (15)","unit":"100","unitPrice":5.5,"baseQty":1500},
-      {"item":"اليد العاملة","unit":"100","unitPrice":250,"baseQty":100}
-    ]
-  }
-]
-;
+//``javascript
+/* ---------- Config & state ---------- */
+const LOG_ENABLED = true;
+let baseData = [];
+let lastSectionIdx = null;
+let lastItemIdx = null;
 
-    /* ---------- Load default model ---------- */
-    async function loadDefaultData() {
-      console.log('Loading default data...');
-      try {
+// Static price table (in-memory for the session)
+let priceTable = {
+    'الرمل': { name: 'الرمل', unit: '100', price: 4 },
+    'الأسمنت (35)': { name: 'الأسمنت (35)', unit: '100', price: 75 },
+    'الأسمنت (45)': { name: 'الأسمنت (45)', unit: '100', price: 81 },
+    'الحديد (6 مم)': { name: 'الحديد (6 مم)', unit: '100', price: 9.4 },
+    'الحديد (10 مم)': { name: 'الحديد (10 مم)', unit: '100', price: 9.2 },
+    'الحديد (12 مم)': { name: 'الحديد (12 مم)', unit: '100', price: 9.2 },
+    'الحديد (14 مم)': { name: 'الحديد (14 مم)', unit: '100', price: 9.2 },
+    'البيطون (B25)': { name: 'البيطون (B25)', unit: '100', price: 780 },
+    'البيطون (B35)': { name: 'البيطون (B35)', unit: '100', price: 850 },
+    'الياجور (7)': { name: 'الياجور (7)', unit: '100', price: 2.5 },
+    'الياجور (15)': { name: 'الياجور (15)', unit: '100', price: 5.5 },
+    'حفر الأساسات': { name: 'حفر الأساسات', unit: '100', price: 30 },
+    'الحجر (للبلوكاج)': { name: 'الحجر (للبلوكاج)', unit: '100', price: 3500 },
+    'أنابيب PVC (200)': { name: 'أنابيب PVC (200)', unit: '100', price: 20 },
+    'السلك والمسامير': { name: 'السلك والمسامير', unit: '100', price: 16 },
+    'ميكا': { name: 'ميكا', unit: '100', price: 20 },
+    'الوردي والبودر والشبكة': { name: 'الوردي والبودر والشبكة', unit: '100', price: 85 },
+    'اليد العاملة': { name: 'اليد العاملة', unit: '100', price: 250 }
+};
+
+/* ---------- Default model ---------- */
+const fallbackModel = [
+    {
+        name: 'الأساسات Fondation Sample',
+        items: [
+            { item: 'حفر الأساسات', unit: '100', unitPrice: 30, baseQty: 100 },
+            { item: 'الحديد (6 مم)', unit: '100', unitPrice: 9.4, baseQty: 400 },
+            { item: 'الحديد (10 مم)', unit: '100', unitPrice: 9.2, baseQty: 500 },
+            { item: 'الحديد (12 مم)', unit: '100', unitPrice: 9.2, baseQty: 800 },
+            { item: 'البيطون (B25)', unit: '100', unitPrice: 780, baseQty: 25 },
+            { item: 'الأسمنت (35)', unit: '100', unitPrice: 75, baseQty: 25 },
+            { item: 'الياجور (15)', unit: '100', unitPrice: 5.5, baseQty: 1500 },
+            { item: 'الرمل', unit: '100', unitPrice: 4, baseQty: 350 },
+            { item: 'الحجر (للبلوكاج)', unit: '100', unitPrice: 3500, baseQty: 0 },
+            { item: 'أنابيب PVC (200)', unit: '100', unitPrice: 20, baseQty: 60 },
+            { item: 'السلك والمسامير', unit: '100', unitPrice: 16, baseQty: 40 },
+            { item: 'ميكا', unit: '100', unitPrice: 20, baseQty: 65 },
+            { item: 'اليد العاملة', unit: '100', unitPrice: 125, baseQty: 100 }
+        ]
+    },
+    {
+        name: 'الطابق الأرضي RDC Sample',
+        items: [
+            { item: 'الحديد (6 مم)', unit: '100', unitPrice: 9.4, baseQty: 400 },
+            { item: 'الحديد (10 مم)', unit: '100', unitPrice: 9.2, baseQty: 500 },
+            { item: 'الحديد (12 مم)', unit: '100', unitPrice: 9.2, baseQty: 800 },
+            { item: 'الحديد (14 مم)', unit: '100', unitPrice: 9.2, baseQty: 0 },
+            { item: 'البيطون (B35)', unit: '100', unitPrice: 850, baseQty: 0 },
+            { item: 'الأسمنت (45)', unit: '100', unitPrice: 81, baseQty: 0 },
+            { item: 'الوردي والبودر والشبكة', unit: '100', unitPrice: 85, baseQty: 0 },
+            { item: 'الياجور (7)', unit: '100', unitPrice: 2.5, baseQty: 0 },
+            { item: 'الياجور (15)', unit: '100', unitPrice: 5.5, baseQty: 1500 },
+            { item: 'الرمل', unit: '100', unitPrice: 4, baseQty: 350 },
+            { item: 'اليد العاملة', unit: '100', unitPrice: 250, baseQty: 100 }
+        ]
+    },
+    {
+        name: 'الطابق الأول R+1 Sample',
+        items: [
+            { item: 'الحديد (6 مم)', unit: '100', unitPrice: 9.4, baseQty: 400 },
+            { item: 'الحديد (10 مم)', unit: '100', unitPrice: 9.2, baseQty: 500 },
+            { item: 'الحديد (12 مم)', unit: '100', unitPrice: 9.2, baseQty: 800 },
+            { item: 'الحديد (14 مم)', unit: '100', unitPrice: 9.2, baseQty: 0 },
+            { item: 'البيطون (B35)', unit: '100', unitPrice: 850, baseQty: 0 },
+            { item: 'الأسمنت (35)', unit: '100', unitPrice: 75, baseQty: 25 },
+            { item: 'الأسمنت (45)', unit: '100', unitPrice: 81, baseQty: 0 },
+            { item: 'الوردي والبودر والشبكة', unit: '100', unitPrice: 85, baseQty: 0 },
+            { item: 'الياجور (7)', unit: '100', unitPrice: 2.5, baseQty: 0 },
+            { item: 'الياجور (15)', unit: '100', unitPrice: 5.5, baseQty: 1500 },
+            { item: 'الرمل', unit: '100', unitPrice: 4, baseQty: 350 },
+            { item: 'اليد العاملة', unit: '100', unitPrice: 250, baseQty: 100 }
+        ]
+    },
+    {
+        name: 'السطح Terrace Sample',
+        items: [
+            { item: 'الحديد (6 مم)', unit: '100', unitPrice: 9.4, baseQty: 400 },
+            { item: 'الحديد (10 مم)', unit: '100', unitPrice: 9.2, baseQty: 500 },
+            { item: 'الحديد (12 مم)', unit: '100', unitPrice: 9.2, baseQty: 800 },
+            { item: 'الحديد (14 مم)', unit: '100', unitPrice: 9.2, baseQty: 0 },
+            { item: 'الأسمنت (35)', unit: '100', unitPrice: 75, baseQty: 25 },
+            { item: 'الأسمنت (45)', unit: '100', unitPrice: 81, baseQty: 0 },
+            { item: 'الياجور (7)', unit: '100', unitPrice: 2.5, baseQty: 0 },
+            { item: 'الياجور (15)', unit: '100', unitPrice: 5.5, baseQty: 1500 },
+            { item: 'اليد العاملة', unit: '100', unitPrice: 250, baseQty: 100 }
+        ]
+    }
+];
+
+/* ---------- Load default model ---------- */
+async function loadDefaultData() {
+    console.log('Loading default data...');
+    try {
         const url = 'https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/Binaa_mabgreb_defaultDataV1.json';
         console.log(`Fetching data from source: ${url}`);
         const res = await fetch(url);
@@ -251,499 +272,591 @@
         baseData = await res.json();
         if (!Array.isArray(baseData) || baseData.length === 0) throw new Error('Invalid JSON, using fallback');
         console.log('Loaded model from GitHub:', url);
-      } catch (err) {
+    } catch (err) {
         console.warn('Error fetching default data:', err);
         console.log('Using fallback model');
         baseData = JSON.parse(JSON.stringify(fallbackModel));
-      }
-      refreshSectionSelects();
-      populateItemList();
-      populateMaterialSelect();
-      calculateCost();
     }
+    // Apply priceTable prices to baseData
+    applyPriceTable();
+    refreshSectionSelects();
+    populateItemList();
+    populateMaterialSelect();
+    populateAllMaterialsTable();
+    calculateCost();
+}
 
-    /* ---------- UI population ---------- */
-    function refreshSectionSelects() {
-      console.log('Refreshing section selects...');
-      const selects = [document.getElementById('sectionSelect'), document.getElementById('sectionForItem')];
-      selects.forEach(sel => {
+/* ---------- UI population ---------- */
+function refreshSectionSelects() {
+    console.log('Refreshing section selects...');
+    const selects = [document.getElementById('sectionSelect'), document.getElementById('sectionForItem')];
+    selects.forEach(sel => {
         sel.innerHTML = '';
         baseData.forEach((sec, idx) => {
-          const opt = document.createElement('option');
-          opt.value = idx;
-          opt.textContent = sec.name || `قسم ${idx + 1}`;
-          sel.appendChild(opt);
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = sec.name || `قسم ${idx + 1}`;
+            sel.appendChild(opt);
         });
-      });
-    }
+    });
+}
 
-    function populateItemList() {
-      console.log('Populating item list...');
-      const sectionIdx = Number(document.getElementById('sectionForItem').value) || 0;
-      const itemList = document.getElementById('itemList');
-      itemList.innerHTML = '';
-      if (!baseData[sectionIdx] || !Array.isArray(baseData[sectionIdx].items)) {
+function populateItemList() {
+    console.log('Populating item list...');
+    const sectionIdx = Number(document.getElementById('sectionForItem').value) || 0;
+    const itemList = document.getElementById('itemList');
+    itemList.innerHTML = '';
+    if (!baseData[sectionIdx] || !Array.isArray(baseData[sectionIdx].items)) {
         console.warn('No items found for section ' + sectionIdx);
         return;
-      }
-      baseData[sectionIdx].items.forEach((it, idx) => {
+    }
+    baseData[sectionIdx].items.forEach((it, idx) => {
         const opt = document.createElement('option');
         opt.value = idx;
         opt.textContent = it.item || `بند ${idx + 1}`;
         itemList.appendChild(opt);
-      });
-      if (itemList.options.length > 0) {
+    });
+    if (itemList.options.length > 0) {
         itemList.selectedIndex = 0;
         lastItemIdx = itemList.value;
-      } else {
+    } else {
         lastItemIdx = null;
-      }
-      loadItemDetails();
     }
+    loadItemDetails();
+}
 
-    function populateMaterialSelect() {
-      console.log('Populating material select...');
-      const materialSelect = document.getElementById('materialSelect');
-      materialSelect.innerHTML = '';
-      baseData.forEach((section, secIdx) => {
+function populateMaterialSelect() {
+    console.log('Populating material select...');
+    const materialSelect = document.getElementById('materialSelect');
+    materialSelect.innerHTML = '<option value="">اختر المادة</option>';
+    const seen = new Set();
+    baseData.forEach((section, secIdx) => {
         section.items.forEach((item, itemIdx) => {
-          const opt = document.createElement('option');
-          opt.value = `${secIdx}-${itemIdx}`;
-          opt.textContent = item.item;
-          materialSelect.appendChild(opt);
+            if (!seen.has(item.item)) {
+                seen.add(item.item);
+                const opt = document.createElement('option');
+                opt.value = item.item; // Use item name as value
+                opt.textContent = `${item.item} (${item.unit})`;
+                materialSelect.appendChild(opt);
+            }
         });
-      });
-      if (materialSelect.options.length > 0) {
+    });
+    if (materialSelect.options.length > 0) {
         materialSelect.selectedIndex = 0;
         loadMaterialPrice();
-      }
     }
+}
 
-    function loadMaterialPrice() {
-      console.log('Loading material price...');
-      const [secIdx, itemIdx] = document.getElementById('materialSelect').value.split('-').map(Number);
-      if (baseData[secIdx] && baseData[secIdx].items[itemIdx]) {
-        document.getElementById('materialPrice').value = baseData[secIdx].items[itemIdx].unitPrice || '';
-      }
-    }
+function populateAllMaterialsTable() {
+    console.log('Populating all materials table...');
+    const tableDiv = document.getElementById('allMaterialsTable');
+    let html = '<table><thead><tr><th>المادة</th><th>سعر الوحدة</th></tr></thead><tbody>';
+    Object.entries(priceTable).forEach(([name, material], idx) => {
+        html += `
+            <tr>
+                <td>${escapeHtml(name)}</td>
+                <td>
+                    <input type="number" 
+                           id="matPrice_${idx}" 
+                           value="${material.price}" 
+                           style="width:100px;" 
+                           onblur="updateMaterialByName('${name.replace(/'/g,"\\'")}', ${idx})">
+                </td>
+            </tr>
+        `;
+    });
+    html += '</tbody></table>';
+    tableDiv.innerHTML = html;
+}
 
-    function togglePanel(panelId) {
-      console.log(`Toggling panel: ${panelId}`);
-      const panels = ['user-panel', 'admin-panel', 'price-update-panel', 'reportOutput'];
-      panels.forEach(id => {
+function loadMaterialPrice() {
+    console.log('Loading material price...');
+    const materialName = document.getElementById('materialSelect').value;
+    document.getElementById('materialPrice').value = priceTable[materialName] ? priceTable[materialName].price : '';
+}
+
+function togglePanel(panelId) {
+    console.log(`Toggling panel: ${panelId}`);
+    const panels = ['user-panel', 'admin-panel', 'price-update-panel', 'reportOutput'];
+    panels.forEach(id => {
         const panel = document.getElementById(id);
         if (panel) panel.style.display = id === panelId ? 'block' : 'none';
-      });
-      if (panelId === 'reportOutput') showReport();
-    }
+    });
+    if (panelId === 'reportOutput') showReport();
+    if (panelId === 'price-update-panel') populateAllMaterialsTable();
+}
 
-    /* ---------- CRUD operations ---------- */
-    function addSection() {
-      console.log('Adding section...');
-      const name = document.getElementById('newSectionName').value.trim();
-      if (!name) {
+/* ---------- CRUD operations ---------- */
+function addSection() {
+    console.log('Adding section...');
+    const name = document.getElementById('newSectionName').value.trim();
+    if (!name) {
         alert('أدخل اسم القسم');
         return;
-      }
-      baseData.push({ name, items: [] });
-      refreshSectionSelects();
-      populateItemList();
-      populateMaterialSelect();
-      calculateCost();
     }
+    baseData.push({ name, items: [] });
+    refreshSectionSelects();
+    populateItemList();
+    populateMaterialSelect();
+    calculateCost();
+}
 
-    function renameSection() {
-      console.log('Renaming section...');
-      const idx = Number(document.getElementById('sectionSelect').value);
-      const name = document.getElementById('renameSectionName').value.trim();
-      if (isNaN(idx) || !baseData[idx]) {
+function renameSection() {
+    console.log('Renaming section...');
+    const idx = Number(document.getElementById('sectionSelect').value);
+    const name = document.getElementById('renameSectionName').value.trim();
+    if (isNaN(idx) || !baseData[idx]) {
         alert('اختر قسمًا صالحًا');
         return;
-      }
-      if (!name) {
+    }
+    if (!name) {
         alert('أدخل اسم جديد');
         return;
-      }
-      baseData[idx].name = name;
-      refreshSectionSelects();
-      populateItemList();
-      populateMaterialSelect();
-      calculateCost();
     }
+    baseData[idx].name = name;
+    refreshSectionSelects();
+    populateItemList();
+    populateMaterialSelect();
+    calculateCost();
+}
 
-    function deleteSection() {
-      console.log('Deleting section...');
-      const idx = Number(document.getElementById('sectionSelect').value);
-      if (isNaN(idx) || !baseData[idx]) {
+function deleteSection() {
+    console.log('Deleting section...');
+    const idx = Number(document.getElementById('sectionSelect').value);
+    if (isNaN(idx) || !baseData[idx]) {
         alert('اختر قسمًا صالحًا');
         return;
-      }
-      if (!confirm('هل تريد حذف هذا القسم؟')) return;
-      baseData.splice(idx, 1);
-      refreshSectionSelects();
-      populateItemList();
-      populateMaterialSelect();
-      calculateCost();
     }
+    if (!confirm('هل تريد حذف هذا القسم؟')) return;
+    baseData.splice(idx, 1);
+    refreshSectionSelects();
+    populateItemList();
+    populateMaterialSelect();
+    calculateCost();
+}
 
-    function addItem() {
-      console.log('Adding item...');
-      const secIdx = Number(document.getElementById('sectionForItem').value);
-      if (isNaN(secIdx) || !baseData[secIdx]) {
+function addItem() {
+    console.log('Adding item...');
+    const secIdx = Number(document.getElementById('sectionForItem').value);
+    if (isNaN(secIdx) || !baseData[secIdx]) {
         alert('اختر القسم أولاً');
         return;
-      }
-      const newItem = getCurrentFormValues();
-      if (!newItem.item) {
+    }
+    const newItem = getCurrentFormValues();
+    if (!newItem.item) {
         alert('أدخل اسم البند');
         return;
-      }
-      baseData[secIdx].items.push(newItem);
-      populateItemList();
-      populateMaterialSelect();
-      calculateCost();
     }
+    // Update priceTable with new item
+    if (!priceTable[newItem.item]) {
+        priceTable[newItem.item] = { name: newItem.item, unit: newItem.unit, price: newItem.unitPrice };
+    }
+    baseData[secIdx].items.push(newItem);
+    populateItemList();
+    populateMaterialSelect();
+    populateAllMaterialsTable();
+    calculateCost();
+}
 
-    function updateItem() {
-      console.log('Updating item...');
-      const sectionIdx = Number(document.getElementById('sectionForItem').value);
-      const itemIdx = Number(document.getElementById('itemList').value);
-      if (isNaN(sectionIdx) || isNaN(itemIdx) || !baseData[sectionIdx] || !baseData[sectionIdx].items[itemIdx]) {
+function updateItem() {
+    console.log('Updating item...');
+    const sectionIdx = Number(document.getElementById('sectionForItem').value);
+    const itemIdx = Number(document.getElementById('itemList').value);
+    if (isNaN(sectionIdx) || isNaN(itemIdx) || !baseData[sectionIdx] || !baseData[sectionIdx].items[itemIdx]) {
         alert('اختر قسمًا وبندًا صالحين');
         return;
-      }
-      const newItem = getCurrentFormValues();
-      if (!newItem.item) {
+    }
+    const newItem = getCurrentFormValues();
+    if (!newItem.item) {
         alert('أدخل اسم البند');
         return;
-      }
-      baseData[sectionIdx].items[itemIdx] = newItem;
-      populateItemList();
-      populateMaterialSelect();
-      loadItemDetails();
-      calculateCost();
     }
+    // Update priceTable if item name changes
+    const oldItemName = baseData[sectionIdx].items[itemIdx].item;
+    if (oldItemName !== newItem.item && priceTable[oldItemName]) {
+        priceTable[newItem.item] = { name: newItem.item, unit: newItem.unit, price: newItem.unitPrice };
+        delete priceTable[oldItemName];
+        // Update all items with old name to new name
+        baseData.forEach(section => {
+            section.items.forEach(item => {
+                if (item.item === oldItemName) {
+                    item.item = newItem.item;
+                    item.unit = newItem.unit;
+                    item.unitPrice = newItem.unitPrice;
+                }
+            });
+        });
+    } else {
+        priceTable[newItem.item] = { name: newItem.item, unit: newItem.unit, price: newItem.unitPrice };
+    }
+    baseData[sectionIdx].items[itemIdx] = newItem;
+    populateItemList();
+    populateMaterialSelect();
+    populateAllMaterialsTable();
+    loadItemDetails();
+    calculateCost();
+}
 
-    function deleteItem() {
-      console.log('Deleting item...');
-      const secIdx = Number(document.getElementById('sectionForItem').value);
-      const itIdx = Number(document.getElementById('itemList').value);
-      if (isNaN(secIdx) || isNaN(itIdx) || !baseData[secIdx] || !baseData[secIdx].items[itIdx]) {
+function deleteItem() {
+    console.log('Deleting item...');
+    const secIdx = Number(document.getElementById('sectionForItem').value);
+    const itIdx = Number(document.getElementById('itemList').value);
+    if (isNaN(secIdx) || isNaN(itIdx) || !baseData[secIdx] || !baseData[secIdx].items[itIdx]) {
         alert('اختر قسمًا وبندًا صالحين');
         return;
-      }
-      if (!confirm('هل تريد حذف هذا البند؟')) return;
-      baseData[secIdx].items.splice(itIdx, 1);
-      populateItemList();
-      populateMaterialSelect();
-      loadItemDetails();
-      calculateCost();
     }
+    if (!confirm('هل تريد حذف هذا البند؟')) return;
+    baseData[secIdx].items.splice(itIdx, 1);
+    populateItemList();
+    populateMaterialSelect();
+    populateAllMaterialsTable();
+    loadItemDetails();
+    calculateCost();
+}
 
-    function updateMaterialPrice() {
-      console.log('Updating material price...');
-      const [secIdx, itemIdx] = document.getElementById('materialSelect').value.split('-').map(Number);
-      const newPrice = parseFloat(document.getElementById('materialPrice').value) || 0;
-      if (isNaN(secIdx) || isNaN(itemIdx) || !baseData[secIdx] || !baseData[secIdx].items[itemIdx]) {
+function updateMaterialPrice() {
+    console.log('Updating material price for all matching items...');
+    const materialName = document.getElementById('materialSelect').value;
+    const newPrice = parseFloat(document.getElementById('materialPrice').value) || 0;
+
+    if (!materialName) {
         alert('اختر مادة صالحة');
         return;
-      }
-      baseData[secIdx].items[itemIdx].unitPrice = newPrice;
-      populateMaterialSelect();
-      calculateCost();
     }
-
-    function getCurrentFormValues() {
-      console.log('Getting current form values...');
-      return {
-        item: document.getElementById('itemName').value.trim() || '',
-        unit: document.getElementById('itemUnit').value.trim() || '1',
-        unitPrice: parseFloat(document.getElementById('itemPrice').value) || 0,
-        baseQty: parseFloat(document.getElementById('itemQty').value) || 0
-      };
-    }
-
-    function loadItemDetails() {
-      console.log('Loading item details...');
-      const sectionIdx = Number(document.getElementById('sectionForItem').value) || 0;
-      const itemIdx = Number(document.getElementById('itemList').value) || 0;
-      if (!baseData[sectionIdx] || !baseData[sectionIdx].items[itemIdx]) {
-        document.getElementById('itemName').value = '';
-        document.getElementById('itemUnit').value = '';
-        document.getElementById('itemPrice').value = '';
-        document.getElementById('itemQty').value = '';
+    if (isNaN(newPrice) || newPrice < 0) {
+        alert('أدخل سعرًا صالحًا');
         return;
-      }
-      const it = baseData[sectionIdx].items[itemIdx];
-      document.getElementById('itemName').value = it.item || '';
-      document.getElementById('itemUnit').value = it.unit || '';
-      document.getElementById('itemPrice').value = it.unitPrice != null ? it.unitPrice : '';
-      document.getElementById('itemQty').value = it.baseQty != null ? it.baseQty : '';
     }
 
-    /* ---------- Calculation ---------- */
-    async function calculateCost() {
-      console.log('Starting cost calculation...');
-      let html = '';
-      let grandTotal = 0;
-      const landLength = parseFloat(document.getElementById('landLength').value) || 0;
-      const landWidth = parseFloat(document.getElementById('landWidth').value) || 0;
-      const numFloors = parseInt(document.getElementById('numFloors').value) || 1;
-      const hasBasement = document.getElementById('hasBasement').checked;
-      const facadeNumber = parseInt(document.getElementById('facadeNumber').value) || 1;
-      const landArea = landLength * landWidth;
-      console.log(`Inputs: landArea=${landArea}, numFloors=${numFloors}, hasBasement=${hasBasement}, facadeNumber=${facadeNumber}`);
+    // Update priceTable
+    if (priceTable[materialName]) {
+        priceTable[materialName].price = newPrice;
+    } else {
+        alert('المادة غير موجودة في جدول الأسعار');
+        return;
+    }
 
-      const url = getJsonUrl(numFloors, hasBasement, facadeNumber);
-      console.log(`Fetching model from: ${url}`);
-      try {
+    // Update all matching items in baseData
+    baseData.forEach(section => {
+        section.items.forEach(item => {
+            if (item.item === materialName) {
+                item.unitPrice = newPrice;
+            }
+        });
+    });
+
+    alert(`تم تحديث سعر ${materialName} إلى ${newPrice} ${priceTable[materialName].unit} بنجاح`);
+    populateMaterialSelect();
+    populateAllMaterialsTable();
+    calculateCost();
+    saveData();
+}
+
+function updateMaterialByName(name, idx) {
+    console.log(`Updating material price for "${name}"...`);
+    const newPrice = parseFloat(document.getElementById(`matPrice_${idx}`).value) || 0;
+    if (isNaN(newPrice) || newPrice < 0) {
+        alert('أدخل سعرًا صالحًا');
+        return;
+    }
+
+    // Update priceTable
+    if (priceTable[name]) {
+        priceTable[name].price = newPrice;
+    } else {
+        alert('المادة غير موجودة في جدول الأسعار');
+        return;
+    }
+
+    // Update all matching items in baseData
+    baseData.forEach(section => {
+        section.items.forEach(item => {
+            if (item.item === name) {
+                item.unitPrice = newPrice;
+            }
+        });
+    });
+
+    alert(`تم تحديث سعر ${name} إلى ${newPrice} ${priceTable[name].unit} بنجاح`);
+    populateMaterialSelect();
+    populateAllMaterialsTable();
+    calculateCost();
+    saveData();
+}
+
+/* ---------- Data persistence ---------- */
+function saveData() {
+    try {
+        localStorage.setItem('priceTable', JSON.stringify(priceTable));
+        localStorage.setItem('baseData', JSON.stringify(baseData));
+        console.log('Data saved successfully');
+    } catch (e) {
+        console.error('Error saving data:', e);
+    }
+}
+
+function applyPriceTable() {
+    baseData.forEach(section => {
+        section.items.forEach(item => {
+            if (priceTable[item.item]) {
+                item.unitPrice = priceTable[item.item].price;
+            }
+        });
+    });
+}
+
+/* ---------- Import/Export ---------- */
+function exportModel() {
+    console.log('Exporting model...');
+    const blob = new Blob([JSON.stringify(baseData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'binaa_maghreb_model.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importModel(e) {
+    console.log('Importing model...');
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        try {
+            const parsed = JSON.parse(ev.target.result);
+            if (!Array.isArray(parsed)) throw new Error('Invalid model file: not an array');
+            parsed.forEach((section, index) => {
+                if (!section || typeof section.name !== 'string' || !Array.isArray(section.items)) {
+                    throw new Error(`Invalid section at index ${index}: missing name or items array`);
+                }
+                section.items = section.items.map(item => {
+                    if (!item || typeof item.item !== 'string' || typeof item.unit !== 'string' || typeof item.unitPrice !== 'number' || typeof item.baseQty !== 'number') {
+                        throw new Error(`Invalid item in section ${section.name}: missing or invalid fields`);
+                    }
+                    return {
+                        item: item.item,
+                        unit: item.unit,
+                        unitPrice: priceTable[item.item] ? priceTable[item.item].price : item.unitPrice,
+                        baseQty: item.baseQty
+                    };
+                });
+            });
+            baseData = parsed;
+            applyPriceTable();
+            console.log('Imported model successfully');
+            alert('تم استيراد النموذج بنجاح');
+            refreshSectionSelects();
+            populateItemList();
+            populateMaterialSelect();
+            populateAllMaterialsTable();
+            loadItemDetails();
+            calculateCost();
+            saveData();
+            togglePanel('admin-panel');
+        } catch (err) {
+            console.error('Import error:', err);
+            alert(`ملف غير صالح: ${err.message}`);
+        }
+    };
+    reader.readAsText(file);
+}
+
+/* ---------- Calculation ---------- */
+async function calculateCost() {
+    console.log('Starting cost calculation...');
+    let html = '';
+    let grandTotal = 0;
+    const landLength = parseFloat(document.getElementById('landLength').value) || 0;
+    const landWidth = parseFloat(document.getElementById('landWidth').value) || 0;
+    const numFloors = parseInt(document.getElementById('numFloors').value) || 1;
+    const hasBasement = document.getElementById('hasBasement').checked;
+    const facadeNumber = parseInt(document.getElementById('facadeNumber').value) || 1;
+    const landArea = landLength * landWidth;
+    console.log(`Inputs: landArea=${landArea}, numFloors=${numFloors}, hasBasement=${hasBasement}, facadeNumber=${facadeNumber}`);
+
+    const url = getJsonUrl(numFloors, hasBasement, facadeNumber);
+    console.log(`Fetching model from: ${url}`);
+    try {
         const res = await fetch(url);
         if (!res.ok) throw new Error('Failed to fetch JSON');
         baseData = await res.json();
+        applyPriceTable();
         console.log('Model loaded from URL:', url);
-      } catch (err) {
+    } catch (err) {
         console.warn('Using fallback model due to fetch error:', err);
         baseData = JSON.parse(JSON.stringify(fallbackModel));
-      }
+        applyPriceTable();
+    }
 
-      const selectedSections = [];
-      if (hasBasement && baseData[0]) selectedSections.push(baseData[0]);
-      if (baseData[1]) selectedSections.push(baseData[1]);
-      if (numFloors >= 1 && baseData[2]) selectedSections.push(baseData[2]);
-      if (numFloors >= 2 && baseData[3]) selectedSections.push(baseData[3]);
-      if (baseData[4]) selectedSections.push(baseData[4]);
-      console.log('Selected sections:', selectedSections.map(s => s.name));
+    const selectedSections = baseData.filter(Boolean);
+    console.log('Selected sections:', selectedSections.map(s => s.name));
 
-      selectedSections.forEach(section => {
+    selectedSections.forEach(section => {
         let sectionTotal = 0;
         html += `<h3 class="section-title">${escapeHtml(section.name)}</h3><table><thead><tr>
-          <th>البند</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th>
+            <th>البند</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th>
         </tr></thead><tbody>`;
         section.items.forEach(item => {
-          let baseUnitArea = parseFloat(item.unit) || 1;
-          let adjustedQty = (landArea / baseUnitArea) * item.baseQty;
-          let itemTotal = adjustedQty * item.unitPrice;
-          console.log(`Calculating item "${item.item}" in section "${section.name}": baseUnitArea=${baseUnitArea}, baseQty=${item.baseQty}, adjustedQty=${adjustedQty.toFixed(2)}, unitPrice=${item.unitPrice}, itemTotal=${itemTotal.toFixed(2)}`);
-          sectionTotal += itemTotal;
-          html += `<tr>
-            <td>${escapeHtml(item.item)}</td>
-            <td>${escapeHtml(item.unit)}</td>
-            <td>${adjustedQty.toFixed(2)}</td>
-            <td>${item.unitPrice.toFixed(2)}</td>
-            <td>${itemTotal.toFixed(2)}</td>
-          </tr>`;
+            let baseUnitArea = parseFloat(item.unit) || 1;
+            let adjustedQty = (landArea / baseUnitArea) * item.baseQty;
+            let itemTotal = adjustedQty * item.unitPrice;
+            console.log(`Calculating item "${item.item}" in section "${section.name}": baseUnitArea=${baseUnitArea}, baseQty=${item.baseQty}, adjustedQty=${adjustedQty.toFixed(2)}, unitPrice=${item.unitPrice}, itemTotal=${itemTotal.toFixed(2)}`);
+            sectionTotal += itemTotal;
+            html += `<tr>
+                <td>${escapeHtml(item.item)}</td>
+                <td>${escapeHtml(item.unit)}</td>
+                <td>${adjustedQty.toFixed(2)}</td>
+                <td>${item.unitPrice.toFixed(2)}</td>
+                <td>${itemTotal.toFixed(2)}</td>
+            </tr>`;
         });
         grandTotal += sectionTotal;
         html += `<tr><td colspan="4"><strong>المجموع الفرعي</strong></td><td><strong>${Math.round(sectionTotal).toLocaleString('fr-FR')} MAD</strong></td></tr></tbody></table>`;
         console.log(`Section "${section.name}" total: ${sectionTotal.toFixed(2)}`);
-      });
-      console.log(`Grand total: ${grandTotal.toFixed(2)}`);
+    });
+    console.log(`Grand total: ${grandTotal.toFixed(2)}`);
 
-      const houseInfoHtml = getHouseInfo();
-      const grandTotalHtml = `<div class="final-total">💰 الإجمالي الكلي: ${Math.round(grandTotal).toLocaleString('fr-FR')} MAD</div>`;
-      document.getElementById('costOutput').innerHTML = houseInfoHtml + grandTotalHtml + html;
-      document.getElementById('costOutput').style.display = 'block';
-      togglePanel('user-panel'); // Ensure user panel is shown to display results
-    }
+    const houseInfoHtml = getHouseInfo();
+    const grandTotalHtml = `<div class="final-total">💰 الإجمالي الكلي: ${Math.round(grandTotal).toLocaleString('fr-FR')} MAD</div>`;
+    document.getElementById('costOutput').innerHTML = houseInfoHtml + grandTotalHtml + html;
+    document.getElementById('costOutput').style.display = 'block';
+    togglePanel('user-panel');
+}
 
-    /* ---------- Report Generation ---------- */
-    function showReport() {
-      console.log('Generating report...');
-      const landLength = parseFloat(document.getElementById('landLength').value) || 0;
-      const landWidth = parseFloat(document.getElementById('landWidth').value) || 0;
-      const landArea = landLength * landWidth;
-      let grandTotal = 0;
-      const materialCosts = {};
-      const sectionCosts = {};
+/* ---------- Report Generation ---------- */
+function showReport() {
+    console.log('Generating report...');
+    const landLength = parseFloat(document.getElementById('landLength').value) || 0;
+    const landWidth = parseFloat(document.getElementById('landWidth').value) || 0;
+    const landArea = landLength * landWidth;
+    let grandTotal = 0;
+    const materialCosts = {};
+    const sectionCosts = {};
 
-      const selectedSections = [];
-      const numFloors = parseInt(document.getElementById('numFloors').value) || 1;
-      const hasBasement = document.getElementById('hasBasement').checked;
-      if (hasBasement && baseData[0]) selectedSections.push(baseData[0]);
-      if (baseData[1]) selectedSections.push(baseData[1]);
-      if (numFloors >= 1 && baseData[2]) selectedSections.push(baseData[2]);
-      if (numFloors >= 2 && baseData[3]) selectedSections.push(baseData[3]);
-      if (baseData[4]) selectedSections.push(baseData[4]);
-
-      selectedSections.forEach(section => {
+    const selectedSections = baseData.filter(Boolean);
+    selectedSections.forEach(section => {
         let sectionTotal = 0;
         section.items.forEach(item => {
-          let baseUnitArea = parseFloat(item.unit) || 1;
-          let adjustedQty = (landArea / baseUnitArea) * item.baseQty;
-          let itemTotal = adjustedQty * item.unitPrice;
-          sectionTotal += itemTotal;
-          materialCosts[item.item] = (materialCosts[item.item] || 0) + itemTotal;
-          grandTotal += itemTotal;
+            let baseUnitArea = parseFloat(item.unit) || 1;
+            let adjustedQty = (landArea / baseUnitArea) * item.baseQty;
+            let itemTotal = adjustedQty * item.unitPrice;
+            sectionTotal += itemTotal;
+            materialCosts[item.item] = (materialCosts[item.item] || 0) + itemTotal;
+            grandTotal += itemTotal;
         });
         sectionCosts[section.name] = sectionTotal;
-      });
+    });
 
-      let html = '<h2>تقرير التكاليف</h2>';
-      html += getHouseInfo();
-      html += '<h3>تكلفة المواد ونسبها</h3><table><thead><tr><th>المادة</th><th>التكلفة (MAD)</th><th>النسبة (%)</th></tr></thead><tbody>';
-      Object.entries(materialCosts).forEach(([material, cost]) => {
+    let html = '<h2>تقرير التكاليف</h2>';
+    html += getHouseInfo();
+    html += '<h3>تكلفة المواد ونسبها</h3><table><thead><tr><th>المادة</th><th>التكلفة (MAD)</th><th>النسبة (%)</th></tr></thead><tbody>';
+    Object.entries(materialCosts).forEach(([material, cost]) => {
         const percentage = grandTotal ? (cost / grandTotal * 100).toFixed(2) : 0;
         html += `<tr><td>${escapeHtml(material)}</td><td>${Math.round(cost).toLocaleString('fr-FR')}</td><td>${percentage}</td></tr>`;
-      });
-      html += '</tbody></table>';
+    });
+    html += '</tbody></table>';
 
-      html += '<h3>تكلفة الأقسام (درهم/م²)</h3><table><thead><tr><th>القسم</th><th>التكلفة (MAD)</th><th>درهم/م²</th></tr></thead><tbody>';
-      Object.entries(sectionCosts).forEach(([section, cost]) => {
+    html += '<h3>تكلفة الأقسام (درهم/م²)</h3><table><thead><tr><th>القسم</th><th>التكلفة (MAD)</th><th>درهم/م²</th></tr></thead><tbody>';
+    Object.entries(sectionCosts).forEach(([section, cost]) => {
         const costPerM2 = landArea ? (cost / landArea).toFixed(2) : 0;
         html += `<tr><td>${escapeHtml(section)}</td><td>${Math.round(cost).toLocaleString('fr-FR')}</td><td>${costPerM2}</td></tr>`;
-      });
-      html += '</tbody></table>';
+    });
+    html += '</tbody></table>';
 
-      html += `<div class="final-total">💰 الإجمالي الكلي: ${Math.round(grandTotal).toLocaleString('fr-FR')} MAD</div>`;
-      document.getElementById('reportOutput').innerHTML = html;
-      document.getElementById('reportOutput').style.display = 'block';
-    }
+    html += `<div class="final-total">💰 الإجمالي الكلي: ${Math.round(grandTotal).toLocaleString('fr-FR')} MAD</div>`;
+    document.getElementById('reportOutput').innerHTML = html;
+    document.getElementById('reportOutput').style.display = 'block';
+}
 
-    /* ---------- Export / Import ---------- */
-    function exportModel() {
-      console.log('Exporting model...');
-      const blob = new Blob([JSON.stringify(baseData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'binaa_maghreb_model.json';
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function importModel(e) {
-      console.log('Importing model...');
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        try {
-          const parsed = JSON.parse(ev.target.result);
-          if (!Array.isArray(parsed)) throw new Error('Invalid model file: not an array');
-          parsed.forEach((section, index) => {
-            if (!section || typeof section.name !== 'string' || !Array.isArray(section.items)) {
-              throw new Error(`Invalid section at index ${index}: missing name or items array`);
-            }
-            section.items = section.items.map(item => {
-              if (!item || typeof item.item !== 'string' || typeof item.unit !== 'string' || typeof item.unitPrice !== 'number' || typeof item.baseQty !== 'number') {
-                throw new Error(`Invalid item in section ${section.name}: missing or invalid fields`);
-              }
-              return {
-                item: item.item,
-                unit: item.unit,
-                unitPrice: item.unitPrice,
-                baseQty: item.baseQty
-              };
-            });
-          });
-          baseData = parsed;
-          console.log('Imported model successfully');
-          alert('تم استيراد النموذج بنجاح');
-          refreshSectionSelects();
-          populateItemList();
-          populateMaterialSelect();
-          loadItemDetails();
-          calculateCost();
-          togglePanel('admin-panel'); // Stay in admin panel after import
-        } catch (err) {
-          console.error('Import error:', err);
-          alert(`ملف غير صالح: ${err.message}`);
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    /* ---------- PDF / Excel export ---------- */
-    function exportToPDF() {
-      console.log('Exporting to PDF...');
-      const element = document.getElementById('costOutput');
-      const inputsSummary = `
+/* ---------- PDF / Excel export ---------- */
+function exportToPDF() {
+    console.log('Exporting to PDF...');
+    const element = document.getElementById('costOutput');
+    const inputsSummary = `
         <div>
-          <h2>ملخص المدخلات</h2>
-          <p>طول الأرض: ${document.getElementById('landLength').value || 0} م</p>
-          <p>عرض الأرض: ${document.getElementById('landWidth').value || 0} م</p>
-          <p>عدد الطوابق: ${document.getElementById('numFloors').value || 0}</p>
-          <p>وجود قبو: ${document.getElementById('hasBasement').checked ? 'نعم' : 'لا'}</p>
-          <p>رقم الواجهة: ${document.getElementById('facadeNumber').value || 0}</p>
+            <h2>ملخص المدخلات</h2>
+            <p>طول الأرض: ${document.getElementById('landLength').value || 0} م</p>
+            <p>عرض الأرض: ${document.getElementById('landWidth').value || 0} م</p>
+            <p>عدد الطوابق: ${document.getElementById('numFloors').value || 0}</p>
+            <p>وجود قبو: ${document.getElementById('hasBasement').checked ? 'نعم' : 'لا'}</p>
+            <p>رقم الواجهة: ${document.getElementById('facadeNumber').value || 0}</p>
         </div>
-      `;
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = inputsSummary + element.outerHTML;
-      html2pdf().from(tempDiv).save('cost_estimation.pdf');
-    }
+    `;
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = inputsSummary + element.outerHTML;
+    html2pdf().from(tempDiv).save('cost_estimation.pdf');
+}
 
-    function exportAllToExcel(filename) {
-      console.log('Exporting to Excel...');
-      const wb = XLSX.utils.book_new();
-      const detailed = [['المرحلة', 'المادة', 'الكمية', 'سعر الوحدة', 'التكلفة']];
-      let grandTotal = 0;
+function exportAllToExcel(filename) {
+    console.log('Exporting to Excel...');
+    const wb = XLSX.utils.book_new();
+    const detailed = [['المرحلة', 'المادة', 'الكمية', 'سعر الوحدة', 'التكلفة']];
+    let grandTotal = 0;
 
-      const landLength = parseFloat(document.getElementById('landLength').value) || 0;
-      const landWidth = parseFloat(document.getElementById('landWidth').value) || 0;
-      const landArea = landLength * landWidth;
-      const numFloors = parseInt(document.getElementById('numFloors').value) || 1;
-      const hasBasement = document.getElementById('hasBasement').checked;
+    const landLength = parseFloat(document.getElementById('landLength').value) || 0;
+    const landWidth = parseFloat(document.getElementById('landWidth').value) || 0;
+    const landArea = landLength * landWidth;
+    const numFloors = parseInt(document.getElementById('numFloors').value) || 1;
+    const hasBasement = document.getElementById('hasBasement').checked;
 
-      const selectedSections = [];
-      if (hasBasement && baseData[0]) selectedSections.push(baseData[0]);
-      if (baseData[1]) selectedSections.push(baseData[1]);
-      if (numFloors >= 1 && baseData[2]) selectedSections.push(baseData[2]);
-      if (numFloors >= 2 && baseData[3]) selectedSections.push(baseData[3]);
-      if (baseData[4]) selectedSections.push(baseData[4]);
-
-      selectedSections.forEach(sec => {
+    const selectedSections = baseData.filter(Boolean);
+    selectedSections.forEach(sec => {
         let phaseTotal = 0;
         (sec.items || []).forEach(it => {
-          if (!it || it.unitPrice === undefined || it.baseQty === undefined) return;
-          let baseUnitArea = parseFloat(it.unit) || 1;
-          let adjustedQty = (landArea / baseUnitArea) * it.baseQty;
-          const cost = adjustedQty * it.unitPrice;
-          phaseTotal += cost;
-          grandTotal += cost;
-          detailed.push([sec.name, it.item, adjustedQty.toFixed(2), it.unitPrice, cost.toFixed(2)]);
+            if (!it || it.unitPrice === undefined || it.baseQty === undefined) return;
+            let baseUnitArea = parseFloat(it.unit) || 1;
+            let adjustedQty = (landArea / baseUnitArea) * it.baseQty;
+            const cost = adjustedQty * it.unitPrice;
+            phaseTotal += cost;
+            grandTotal += cost;
+            detailed.push([sec.name, it.item, adjustedQty.toFixed(2), it.unitPrice, cost.toFixed(2)]);
         });
         detailed.push([sec.name, '', '', '', phaseTotal.toFixed(2), 'المجموع الفرعي']);
-      });
-      detailed.push(['', '', '', '', grandTotal.toFixed(2), 'الإجمالي']);
-
-      const ws = XLSX.utils.aoa_to_sheet(detailed);
-      XLSX.utils.book_append_sheet(wb, ws, 'تفاصيل التكاليف');
-      XLSX.writeFile(wb, filename || 'cost_estimation.xlsx');
-    }
-
-    /* ---------- Utilities ---------- */
-    function logRow(msg) { if (LOG_ENABLED) console.log(msg); }
-    function escapeHtml(s) { if (!s && s !== 0) return ''; return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]); }
-
-    function getJsonUrl(numFloors = 1, hasBasement = false, facadeNumber = 1) {
-      const floor = Math.min(Math.max(numFloors, 1), 3);
-      const facade = Math.min(Math.max(facadeNumber, 1), 3);
-      const caveSuffix = hasBasement ? "_cave" : "";
-      const fileName = `R+${floor}_${facade}facade${caveSuffix}.json`;
-      return `https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/model/${fileName}`;
-    }
-
-    function getHouseInfo() {
-      const landLength = parseFloat(document.getElementById('landLength').value) || 10;
-      const landWidth = parseFloat(document.getElementById('landWidth').value) || 10;
-      const numFloors = parseInt(document.getElementById('numFloors').value) || 1;
-      const hasBasement = document.getElementById('hasBasement').checked ? 'مع قبو' : 'بدون قبو';
-      const facadeNumber = parseInt(document.getElementById('facadeNumber').value) || 1;
-      const area = Math.round(landLength * landWidth);
-      return `<p style="margin:0; text-align:right;">🏠 ${area} م² | واجهات: ${facadeNumber} | ${hasBasement}</p>`;
-    }
-
-    /* ---------- Event wiring ---------- */
-    document.getElementById('sectionForItem').addEventListener('change', populateItemList);
-    document.getElementById('itemList').addEventListener('change', loadItemDetails);
-    document.getElementById('materialSelect').addEventListener('change', loadMaterialPrice);
-    ['landLength', 'landWidth', 'numFloors', 'hasBasement', 'facadeNumber'].forEach(id => {
-      document.getElementById(id).addEventListener('change', calculateCost);
     });
+    detailed.push(['', '', '', '', grandTotal.toFixed(2), 'الإجمالي']);
 
-    window.addEventListener('DOMContentLoaded', () => {
-      loadDefaultData();
-    });
+    const ws = XLSX.utils.aoa_to_sheet(detailed);
+    XLSX.utils.book_append_sheet(wb, ws, 'تفاصيل التكاليف');
+    XLSX.writeFile(wb, filename || 'cost_estimation.xlsx');
+}
+
+/* ---------- Utilities ---------- */
+function logRow(msg) { if (LOG_ENABLED) console.log(msg); }
+function escapeHtml(s) { if (!s && s !== 0) return ''; return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]); }
+
+function getJsonUrl(numFloors = 1, hasBasement = false, facadeNumber = 1) {
+    const floor = Math.min(Math.max(numFloors, 1), 3);
+    const facade = Math.min(Math.max(facadeNumber, 1), 3);
+    const caveSuffix = hasBasement ? "_cave" : "";
+    const fileName = `R+${floor}_${facade}facade${caveSuffix}.json`;
+    return `https://raw.githubusercontent.com/kboussif/Binaa-maghreb/main/model/${fileName}`;
+}
+
+function getHouseInfo() {
+    const landLength = parseFloat(document.getElementById('landLength').value) || 10;
+    const landWidth = parseFloat(document.getElementById('landWidth').value) || 10;
+    const numFloors = parseInt(document.getElementById('numFloors').value) || 1;
+    const hasBasement = document.getElementById('hasBasement').checked ? 'مع قبو' : 'بدون قبو';
+    const facadeNumber = parseInt(document.getElementById('facadeNumber').value) || 1;
+    const area = Math.round(landLength * landWidth);
+    return `<p style="margin:0; text-align:right;">🏠 ${area} م² | واجهات: ${facadeNumber} | ${hasBasement}</p>`;
+}
+
+/* ---------- Event wiring ---------- */
+document.getElementById('sectionForItem').addEventListener('change', populateItemList);
+document.getElementById('itemList').addEventListener('change', loadItemDetails);
+document.getElementById('materialSelect').addEventListener('change', loadMaterialPrice);
+['landLength', 'landWidth', 'numFloors', 'hasBasement', 'facadeNumber'].forEach(id => {
+    document.getElementById(id).addEventListener('change', calculateCost);
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadDefaultData();
+});
+
   </script>
+  
+
 </body>
 </html>
