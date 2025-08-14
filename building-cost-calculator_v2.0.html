@@ -31,9 +31,11 @@
     .final-total { background: #ffebee; font-weight: bold; font-size: 20px; color: #c62828; padding: 15px; margin-top: 25px; border-radius: 12px; text-align: center; border: 2px solid #d4a373; }
     .nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
     @media (max-width: 600px) { body { padding: 5px; } .container { padding: 10px; } h2, h3 { font-size: 16px; } table { font-size: 13px; } th, td { padding: 6px; } }
+	
   </style>
 </head>
 <body>
+
   <div class="container">
     <h1>حاسبة تكلفة البناء - نسخة ديناميكية v3.4</h1>
 
@@ -45,34 +47,77 @@
       <button class="toggle-report" onclick="togglePanel('reportOutput')">📈 عرض التقرير</button>
     </div>
 
-    <!-- User Interface: Cost Calculation -->
-    <div id="user-panel">
-      <h2>حساب تكلفة البناء</h2>
-      <div style="display:flex; flex-direction:column; gap:10px; max-width:500px;">
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:nowrap;">
-          <label style="font-size:18px; white-space:nowrap; width:120px;">طول الأرض (م):</label>
-          <input type="number" id="landLength" value="10" style="width:80px; padding:4px; font-size:16px;">
-          <label style="font-size:18px; white-space:nowrap; width:120px;">عرض الأرض (م):</label>
-          <input type="number" id="landWidth" value="10" style="width:80px; padding:4px; font-size:16px;">
-        </div>
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:nowrap;">
-          <label style="font-size:18px; white-space:nowrap; width:120px;">عدد الطوابق:</label>
-          <input type="number" id="numFloors" value="1" min="1" max="3" style="width:60px; padding:4px; font-size:16px;">
-          <label style="font-size:18px; white-space:nowrap; width:120px;">رقم الواجهة:</label>
-          <input type="number" id="facadeNumber" value="1" min="1" max="3" style="width:60px; padding:4px; font-size:16px;">
-          <label style="font-size:18px; white-space:nowrap; width:80px;">وجود قبو:</label>
-          <input type="checkbox" id="hasBasement">
-        </div>
-        <div class="admin-row">
-          <button onclick="calculateCost()">احسب التكلفة</button>
-        </div>
-      </div>
-      <div id="costOutput"></div>
-      <div style="margin-top:8px;">
-        <button onclick="exportToPDF()">📄 تصدير إلى PDF</button>
-        <button onclick="exportAllToExcel('التكلفة.xlsx')">📊 تصدير إلى Excel</button>
-      </div>
+
+
+
+
+
+
+
+
+
+
+<!-- User Interface: Cost Calculation -->
+<div id="user-panel">
+  <h2>حساب تكلفة البناء</h2>
+  <div style="display:flex; flex-direction:column; gap:10px; max-width:500px;">
+
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:nowrap;">
+      <label style="font-size:18px; white-space:nowrap; width:120px;">طول الأرض (م):</label>
+      <input type="number" id="landLength" value="10" style="width:80px; padding:4px; font-size:16px;">
     </div>
+
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:nowrap;">
+      <label style="font-size:18px; white-space:nowrap; width:120px;">عرض الأرض (م):</label>
+      <input type="number" id="landWidth" value="10" style="width:80px; padding:4px; font-size:16px;">
+    </div>
+
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:nowrap;">
+      <label style="font-size:18px; white-space:nowrap; width:120px;">عدد الطوابق:</label>
+      <input type="number" id="numFloors" value="1" min="1" max="3" style="width:60px; padding:4px; font-size:16px;">
+    </div>
+
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:nowrap;">
+      <label style="font-size:18px; white-space:nowrap; width:120px;">رقم الواجهة:</label>
+      <input type="number" id="facadeNumber" value="1" min="1" max="3" style="width:60px; padding:4px; font-size:16px;">
+    </div>
+
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:nowrap;">
+      <label style="font-size:18px; white-space:nowrap; width:80px;">وجود قبو:</label>
+      <input type="checkbox" id="hasBasement">
+    </div>
+<!--  -->
+
+<div class="admin-row">
+  <button onclick="calculateCost()" style="width:100%; padding:15px; font-size:20px; background-color:#0056b3; color:white; border:none; border-radius:5px; cursor:pointer;">
+    احسب التكلفة
+  </button>
+</div>
+  </div>
+
+  <div id="costOutput"></div>
+
+  <div style="margin-top:8px;">
+    <button onclick="exportToPDF()">📄 تصدير إلى PDF</button>
+    <button onclick="exportAllToExcel('التكلفة.xlsx')">📊 تصدير إلى Excel</button>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <!-- Admin Interface: Manage Sections and Items -->
     <div class="admin-panel" id="admin-panel">
