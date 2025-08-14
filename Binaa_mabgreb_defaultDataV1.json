@@ -14,7 +14,7 @@
       {"item":"أنابيب PVC (200)","unit":"100","unitPrice":20,"baseQty":60},
       {"item":"السلك والمسامير","unit":"100","unitPrice":16,"baseQty":40},
       {"item":"ميكا","unit":"100","unitPrice":20,"baseQty":65},
-      {"item":"اليد العاملة","unit":"100","unitPrice":125,"baseQty":100}
+      {"item":"اليد العاملة","unit":"50","unitPrice":250,"baseQty":100}
     ]
   },
   {
