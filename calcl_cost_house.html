@@ -1,1708 +1,420 @@
- <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حساب كمية الحديد للأساس ديال الدار | Calculateur de l'acier pour les fondations de maison</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            direction: rtl;
+            line-height: 1.5;
+        }
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>حاسبة تكلفة بناء منزل مع أسعار المواد الحالية</title>
- <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #f0f8ff;
+            border: 2px solid #4a90e2;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
 
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
 
+        h1 span, p span {
+            display: block;
+            margin: 5px 0;
+        }
 
+        .tip {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 15px;
+        }
 
+        .tip span {
+            display: block;
+        }
 
-  <style>
-    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    
-	
-	.tooltip-container {
-  position: relative;
-  display: inline-block; /* أو block حسب الحاجة */
-  width: 100%; /* أو حجم مناسب */
-}
-.tooltip-text {
-  visibility: hidden;
-  max-width: 300px;
-  background-color: #004080;
-  color: #fff;
-  text-align: center;
-  padding: 6px 10px;
-  border-radius: 6px;
-  position: absolute;
-  bottom: 125%; /* فوق العنصر */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  white-space: normal;
-  font-size: 14px;
-  line-height: 1.3;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.tooltip-container:hover .tooltip-text {
-  visibility: visible;
-  opacity: 1;
-}
-.tooltip-text::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -6px;
-  border-width: 6px;
-  border-style: solid;
-  border-color: #004080 transparent transparent transparent;
-}
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      font-family: 'Amiri', 'Noto Sans Arabic', Tahoma, sans-serif;
-      background: #f4e7d3 url('https://www.transparenttextures.com/patterns/arabesque.png') repeat;
-      direction: rtl;
-      overflow-x: hidden;
-      color: #3c2f2f;
-    }
-    .container {
-      width: 100%;
-      max-width: 1000px;
-      margin: 0 auto;
-      background: #fffcf7;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      box-sizing: border-box;
-      min-height: 100%;
-      border: 3px solid #d4a373;
-    }
-    h2, h3 {
-      color: #004aad;
-      margin: 15px 0;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-      position: relative;
-    }
-    h2::after, h3::after {
-      content: '';
-      display: block;
-      width: 100px;
-      height: 4px;
-      background: linear-gradient(to left, #d4a373, #004aad);
-      margin: 10px auto;
-      border-radius: 2px;
-    }
-    label {
-      font-weight: bold;
-      color: #3c2f2f;
-      display: block;
-    }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      box-sizing: border-box;
-      font-size: 16px;
-      min-height: 48px;
-      border: 2px solid #d4a373;
-      border-radius: 8px;
-      background: #fff;
-      color: #3c2f2f;
-    }
-    button {
-      background: linear-gradient(45deg, #004aad, #007bff);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 18px;
-      font-weight: bold;
-      transition: transform 0.2s, background 0.3s;
-    }
-    button:hover {
-      background: linear-gradient(45deg, #003087, #005bb5);
-      transform: scale(1.02);
-    }
-    .table-responsive {
-      overflow-x: auto;
-      margin-top: 15px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      background: #fffcf7;
-      border: 2px solid #d4a373;
-    }
-    th, td {
-      border: 1px solid #d4a373;
-      padding: 10px;
-      text-align: center;
-      color: #3c2f2f;
-    }
-    th {
-      background: linear-gradient(to bottom, #004aad, #007bff);
-      color: white;
-      font-weight: bold;
-    }
-    .section-title {
-      background: #e8f5e9;
-      font-weight: bold;
-      font-size: 18px;
-      color: #2e7d32;
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 20px;
-      border: 2px solid #d4a373;
-      position: relative;
-      overflow: hidden;
-    }
-    .section-title::before {
-      content: '◇◆◇';
-      position: absolute;
-      top: 50%;
-      left: 10px;
-      transform: translateY(-50%);
-      color: #d4a373;
-      opacity: 0.3;
-    }
-    .floor-total {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      direction: rtl;
-      font-size: 16px;
-      margin-bottom: 10px;
-      gap: 10px;
-      flex-wrap: wrap;
-      background: #fff3cd;
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid #d4a373;
-    }
-    .left {
-      text-align: left;
-      direction: ltr;
-      flex: 1;
-      color: #28a745;
-      font-weight: bold;
-    }
-    .center {
-      flex: 2;
-      text-align: center;
-      font-weight: normal;
-    }
-    .right {
-      text-align: right;
-      flex: 1;
-    }
-    .price-color {
-      color: #007bff;
-      font-size: 22px;
-      font-weight: bold;
-    }
-    .meter-color {
-      font-weight: bold;
-      font-size: 22px;
-    }
-    .final-total {
-      background: #ffebee;
-      font-weight: bold;
-      font-size: 20px;
-      color: #c62828;
-      padding: 15px;
-      margin-top: 25px;
-      border-radius: 12px;
-      text-align: center;
-      border: 2px solid #d4a373;
-    }
-    .house-type {
-      background: #ede7f6;
-      color: #512da8;
-      font-weight: bold;
-      padding: 12px;
-      margin: 15px 0;
-      border-radius: 10px;
-      text-align: center;
-      border: 2px solid #d4a373;
-    }
-    input.unit-price-input, input.base-qty-input {
-      width: 80px;
-      padding: 6px;
-      font-size: 14px;
-      border: 1px solid #d4a373;
-      border-radius: 6px;
-      text-align: center;
-    }
-    table[border="1"] {
-      width: 100%;
-      max-width: 90%;
-      margin: 20px auto;
-      border-collapse: collapse;
-      font-family: 'Amiri', 'Noto Sans Arabic', Arial, sans-serif;
-      background: #fffcf7;
-      border: 2px solid #d4a373;
-    }
-    button[onclick="exportTablesToExcel()"] {
-      background-color: #B4462F;
-      color: #F5E8D3;
-      font-size: 18px;
-      font-family: 'Cinzel', serif;
-      padding: 14px 24px;
-      border: 2px solid #D4A017;
-      border-radius: 12px;
-      cursor: pointer;
-      display: block;
-      margin: 20px auto;
-      text-align: center;
-      direction: rtl;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
-    }
-    button[onclick="exportTablesToExcel()"]:hover {
-      background-color: #2E8B57;
-      transform: scale(1.05);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-    }
-    @media only screen and (max-width: 600px) {
-      body {
-        padding: 5px;
-      }
-      .container {
-        padding: 10px;
-      }
-      h2, h3 {
-        font-size: 16px;
-      }
-      table {
-        font-size: 13px;
-      }
-      th, td {
-        padding: 6px;
-      }
-      input.unit-price-input, input.base-qty-input {
-        width: 60px;
-        font-size: 12px;
-      }
-      button {
-        font-size: 14px;
-        padding: 10px;
-      }
-      table[border="1"] {
-        max-width: 100%;
-      }
-      .section-title, .floor-total, .final-total, .house-type {
-        font-size: 14px;
-        padding: 8px;
-      }
-    }
-	
-	
-	
-	.table-wrapper {
-  width: 100%;
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            font-size: 0.9em;
+        }
 
-.table-scroll {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
 
-.table-scroll table {
-  border-collapse: collapse;
-  min-width: 600px; /* prevent column squish on phone */
-}
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
 
-.table-scroll thead th {
-  position: sticky;
-  top: 0;
-  background-color: #004aad; /* match your header color */
-  color: white;
-  z-index: 5;
-}
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
 
+        .component-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
 
+        .component-cell img {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
 
+        .component-text span {
+            display: block;
+        }
 
-.floating-header table {
-  border-collapse: collapse;
-  width: 100%;
-}
-.floating-header th {
-  background-color: #004aad;
-  color: white;
-  padding: 10px;
-  border: 1px solid #d4a373;
-}
+        input[type="number"] {
+            width: 70px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
 
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
 
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
 
+        button:hover {
+            background-color: #45a049;
+        }
 
-@keyframes blink {
-    0%, 50%, 100% { opacity: 1; }
-    25%, 75% { opacity: 0; }
-  }
-  .animate-blink {
-    animation: blink 1.5s infinite;
-  }
+        button span {
+            display: block;
+        }
 
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 5px;
+        }
 
-/* Mobile-specific: Force horizontal scroll hint */
-@media (max-width: 768px) {
-  #costTable {
-    overflow-x: scroll;
-  }
-}
+        #results h2 {
+            text-align: center;
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
 
+        #results h2 span {
+            display: block;
+            margin: 5px 0;
+        }
 
-  </style>
+        #results table {
+            margin: 0 auto;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .tip, p {
+                font-size: 0.85em;
+            }
+
+            table {
+                font-size: 0.8em;
+            }
+
+            input[type="number"] {
+                width: 60px;
+                font-size: 0.8em;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .component-cell img {
+                width: 25px;
+                height: 25px;
+            }
+
+            button {
+                padding: 8px 16px;
+                font-size: 0.9em;
+            }
+
+            #results h2 {
+                font-size: 1.3em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.2em;
+            }
+
+            .tip, p {
+                font-size: 0.75em;
+            }
+
+            input[type="number"] {
+                width: 50px;
+                font-size: 0.75em;
+            }
+
+            th, td {
+                padding: 6px;
+            }
+
+            .component-cell img {
+                width: 20px;
+                height: 20px;
+            }
+
+            #results h2 {
+                font-size: 1.1em;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
-  <div class="container mx-auto p-6 max-w-4xl">
-    <h1 class="text-3xl font-bold text-center mb-4 text-blue-800">حاسبة تكلفة بناء منزل مع أسعار المواد الحالية</h1>
-
-    <!-- Input Form -->
-    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-	
-   <div style="background-color:#f0f8ff; border: 2px solid #4a90e2; padding: 15px; border-radius: 8px; font-family: 'Arial', sans-serif; color: #333; max-width: 800px; line-height: 1.5; margin: 50px auto; text-align: center;">
-  <p style="font-size: 18px; margin: 0; display: inline-block; text-align: right;">
-    <span style="color: #e67e22; font-weight: bold;">📌</span> يمكنك تعديل <strong>المساحة</strong> وعدد <strong>الطوابق</strong> حسب مشروعك، ثم الضغط على 
-    <span style="background-color: #4a90e2; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold;">احسب التكلفة</span> 
-    للحصول على تقدير تقريبي يوضح فكرة عامة عن التكلفة. يمكنك أيضاً طباعة النتائج بصيغتي <strong>PDF</strong> أو <strong>Excel</strong> للاحتفاظ بها.
-  </p>
-   </div>
-	
-	
-	
-	
-    <div id="errorMessage" class="text-red-600 mb-4 hidden"></div>
-
-      <!-- Dimensions Section -->
-      <h3 class="text-lg font-semibold mb-3 text-blue-600">الأبعاد</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-          <label class="block text-sm font-medium" for="buildLength">طول المبنى (متر):</label>
-          <input id="buildLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="10" placeholder="مثال: 10" aria-label="طول المبنى بالمتر">
-        </div>
-        <div>
-          <label class="block text-sm font-medium" for="buildWidth">عرض المبنى (متر):</label>
-          <input id="buildWidth" type="number" min="0" max="15"  step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض المبنى بالمتر">
-        </div>
-		
-		      <div>
-          <label class="block text-sm font-medium" for="landLength">  </label>
-          <input id="landLength" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="10" placeholder="مثال: 10" aria-label="طول الأرض بالمتر"  style="display: none;" >
-        </div>
-        <div>
-          <label class="block text-sm font-medium" for="landWidth"> </label>
-          <input id="landWidth" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="12" placeholder="مثال: 12" aria-label="عرض الأرض بالمتر"  style="display: none;">
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium" for="numFloors">عدد الطوابق (بدون السطح):</label>
-          <input id="numFloors" type="number" min="1" step="1" class="mt-1 p-2 w-full border rounded" value="2" placeholder="2ثال: 1" aria-label="عدد الطوابق">
-        </div>
-        
-
-		
-
-<div>
-  <label class="block text-lg font-medium" for="hasBasement" style="color: blue;">
-    هل يوجد قبو ؟ (La cave)
-  </label>
-  <small style="color: gray;">إذا كان لديك قبو، ضع علامة هنا</small><br>
-  <input 
-    id="hasBasement" 
-    type="checkbox" 
-    style="width: 16px; height: 16px;"
-    aria-label="إضافة قبو"
-  >
-</div>
-
-
-
-	
-        <div>
-          <label class="block text-sm font-medium" for="semelleCount">
-		  
-		عدد السملات (Semelle) — القاعدة
-		  
-		  </label>
-          <input id="semelleCount" type="number" min="1" step="1" class="mt-1 p-2 w-full border rounded" value="16" placeholder="مثال: 16" aria-label="عدد السملات">
-        </div>
-      </div>
-	  
-
-      <!-- Material Prices Section -->
-      
-	<h3 class="text-lg font-semibold mt-6 mb-3 text-blue-600">
-  أسعار مواد البناء الخاصة بالأشغال الكبرى (gros œuvre)، وفق الأسعار الحالية. يمكنكم تعديلها عند تغيّر الأسعار.
-</h3>
-
-	  
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium" for="betonPrice">سعر البيتون (درهم مغربي/م³):</label>
-          <input id="betonPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="850" placeholder="مثال: 850" aria-label="سعر البيتون لكل متر مكعب">
-        </div>
-        <div>
-          <label class="block text-sm font-medium" for="b15Price">سعر خرسانة النظافة B15 (درهم مغربي/م³):</label>
-          <input id="b15Price" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="850" placeholder="مثال: 850" aria-label="سعر خرسانة النظافة B15">
-        </div>
-        <div>
-          <label class="block text-sm font-medium" for="ironPrice">سعر الحديد (درهم مغربي/كجم):</label>
-          <input id="ironPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="9.5" placeholder="مثال: 9.5" aria-label="سعر الحديد لكل كيلوغرام">
-        </div>
-        <div>
-          <label class="block text-sm font-medium" for="cementPrice">سعر الأسمنت (درهم مغربي/خنشة):</label>
-          <input id="cementPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="82" placeholder="مثال: 82" aria-label="سعر الأسمنت لكل خنشة">
-        </div>
-        <div>
-          <label class="block text-sm font-medium" for="excavationPrice">سعر الحفر (درهم مغربي/م³):</label>
-          <input id="excavationPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="35" placeholder="مثال: 35" aria-label="سعر الحفر لكل متر مكعب">
-        </div>
-		
-
-        
-		
-<div class="tooltip-container">
-  <label for="gravelPrice" class="block text-sm font-medium">سعر حصى الفياج (درهم مغربي/م³):</label>
-  <input 
-    id="gravelPrice" 
-    type="number" 
-    min="0" 
-    step="0.1" 
-    value="148" 
-    placeholder="مثال: 148" 
-    aria-label="سعر حصى الفياج"
-    class="mt-1 p-2 w-full border rounded"
-  >
-  <div class="tooltip-text" style="
-    background-color: #004080;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 6px;
-    margin-top: 5px;
-    font-size: 14px;
-  ">
-    التغطية (فياج) التي تساوي 25 م³ تكلف 3700 درهم، أي 148 درهم للمتر المكعب .
-  </div>
-</div>
-
-		
-		
-		<div>
-          <label class="block text-sm font-medium" for="brickPrice">سعر الطوب (درهم مغربي/حبة):</label>
-          <input id="brickPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="6.5" placeholder="مثال: 6.5" aria-label="سعر الطوب لكل حبة">
-        </div>
-		
-		
-		
-
-
-<div class="tooltip-container">
-  <label for="sandPrice" class="block text-sm font-medium">سعر رمل البناء (درهم مغربي/م³):</label>
-  <input 
-    id="sandPrice" 
-    type="number" 
-    min="0" 
-    step="0.1" 
-    value="240" 
-    placeholder="مثال: 240" 
-    aria-label="سعر رمل البناء"
-  >
-  <div class="tooltip-text">
-    كمية 25 م² تكلف 6000 درهم، والتغطية (فياج) هي 240 درهم للمتر المكعب.
-  </div>
-</div>
-
-
-		
-         
-		
-				<div>
-          <label class="block text-sm font-medium" for="aggregatePrice">سعر الحصى (درهم مغربي/م³):</label>
-          <input id="aggregatePrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="160" placeholder="مثال: 160" aria-label="سعر الحصى">
-        </div>
-		
-		
-		
-		
-
-        <div>
-          <label class="block text-sm font-medium" for="laborPrice">سعر اليد العاملة (درهم مغربي/م²):</label>
-          <input id="laborPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="240" placeholder="مثال: 240" aria-label="سعر اليد العاملة لكل متر مربع">
-        </div>
-		
-		
-		
-		
-		
-        <div>
-          <label class="block text-sm font-medium" for="combinedMaterialPrice">سعر الوردي والبودر والشبكة (درهم مغربي/م²):</label>
-          <input id="combinedMaterialPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="85" placeholder="مثال: 85" aria-label="سعر الوردي والبودر والشبكة لكل متر مربع">
-        </div>
-        <div>
-          <label class="block text-sm font-medium" for="stonePrice">سعر الحجر للبلوكاج (درهم مغربي/فياج):</label>
-          <input id="stonePrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="3500" placeholder="مثال: 3500" aria-label="سعر الحجر للبلوكاج لكل فياج">
-        </div>
-        <div>
-          <label class="block text-sm font-medium" for="sacksPrice"> </label>
-          <input id="sacksPrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="3500" placeholder="مثال: 3500" aria-label="سعر الكياس لكل فياج"  style="display: none;" >
-        </div>
-
-
-	  <div>
-    <label class="block text-sm font-medium" for="sandFayagePrice"> </label>
-    <input id="sandFayagePrice" type="number" min="0" step="0.1" class="mt-1 p-2 w-full border rounded" value="6000" placeholder="مثال: 6000" aria-label="سعر الرمل لكل فياج" style="display: none;">
-</div>
-
-
-      </div>
-
-
-
-      <div class="flex justify-center gap-4 mt-6">
-        <button onclick="calculateCost()" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">احسب التكلفة الآن</button>
- 
- <!--      <button onclick="resetForm()" class="w-full bg-gray-600 text-white p-2 rounded hover:bg-gray-700">إعادة تعيين</button>  -->
-
-    </div>
-    </div>
-
-    <!-- Cost Output -->
-    <div id="costOutput" class="bg-white p-6 rounded-lg shadow-md mb-6 hidden">
-	
-	
-<h3 style="color: #004aad; font-size: 20px; text-align: center;">
-  يمكنك تحديث تكلفة المنزل بتغيير أسعار الكميات وأسعار الوحدة في الجدول أعلاه.
-  يمكنك أيضًا تعديل تكلفة الحفر، وسيتم حساب الإجمالي تلقائيًا.
-  في النهاية، سترى ملخص التكلفة لكل مادة ولكامل المنزل، مع إمكانية طباعة التقرير بصيغة PDF أو Excel.
-  <span style="color: red; font-weight: bold;">ملاحظة:</span>
-  لرؤية الجدول بشكل أفضل، يُفضل تدوير الهاتف أفقيًا أو استخدام الكمبيوتر، ويمكنك التمرير يمينًا ويسارًا لمشاهدة المحتوى كاملاً.
-</h3	
-<!-- Floating Title -->
-
-
-
-
-
-
-<div class="tooltip-container" style="text-align: center; margin-top: 1rem;">
-  <h3 class="text-blue-800 font-bold text-4xl">
-    الإجمالي: <span id="totalCostTop" class="animate-blink">0</span> dh
-  </h3>
-  <div class="tooltip-text" style="
-    background-color: #004080;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 6px;
-    margin-top: 5px;
-    font-size: 14px;
-    display: inline-block;
-  ">
-    مليون تنطح مليون 😊
-  </div>
-</div>
-
-
-<p style="color: #004aad; font-size: 16px; text-align: center;">
-  بالنسبة للحديد، يرجى التواصل مع مكتب الدراسات للحصول على الكمية والتكوين الصحيحين.
-</p>
-
-
-
-
-
-
-<!-- The Table 
-<table class="w-full border-collapse mb-6">
-  <thead>
-    <tr class="bg-blue-600 text-white">
-      <th class="border p-2">المادة</th>
-      <th class="border p-2">المرحلة</th>
-      <th class="border p-2">الكمية</th>
-      <th class="border p-2">التكلفة لكل وحدة</th>
-      <th class="border p-2">التكلفة</th>
-      <th class="border p-2">المساحة المغطاة (م²)</th>
-    </tr>
-  </thead>
-  <tbody id="costTableBody"></tbody>
-</table>
--->
-
-
-<div class="table-wrapper">
-  <div class="table-scroll">
-    <table class="w-full border-collapse mb-6">
-      <thead>
-        <tr>
-      <th class="border p-2">المادة</th>
-      <th class="border p-2">المرحلة</th>
-      <th class="border p-2">الكمية</th>
-	  	  <th class="border p-2">المساحة المغطاة (م²)</th>
-		  <th class="border p-2">التكلفة لكل م² </th>
-      <th class="border p-2">التكلفة</th>
-      <th class="border p-2">التكلفة لكل وحدة</th>
-        </tr>
-      </thead>
-      <tbody id="costTableBody"></tbody>
-    </table>
-  </div>
-</div>
-
-	  
-	  
-	  
-      <h3 class="text-lg font-semibold mt-4 text-blue-800">الإجمالي: <span id="totalCost">0</span> درهم مغربي</h3>
-
-      <!-- Summary by Product -->
-      <h2 class="text-xl font-semibold mt-6 mb-4 text-blue-700">ملخص التكلفة حسب المادة</h2>
-      <table class="w-full border-collapse">
-        <thead>
-          <tr class="bg-blue-200">
-            <th class="border p-2">المادة</th>
-            <th class="border p-2">إجمالي الكمية</th>
-            <th class="border p-2">إجمالي التكلفة (درهم مغربي)</th>
-            <th class="border p-2">النسبة المئوية (%)</th>
-          </tr>
-        </thead>
-        <tbody id="summaryTableBody"></tbody>
-      </table>
-    </div>
-
-    <!-- Export Buttons -->
-    <div class="flex justify-center gap-4 mb-6">
-      <button onclick="exportToPDF()" class="bg-green-600 text-white p-2 rounded hover:bg-green-700">📄 تصدير إلى PDF</button>
-<!--      <button onclick="exportToExcel()" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">تصدير الجداول إلى Excel</button> -->
-      <button onclick="exportCostEstimation()" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">تصدير الجداول إلى Excel</button>
-
-    </div>
-  </div>
-
- 
- 
- 
- 
-
-
- <script>
- 
- 
-  const buildWidthInput = document.getElementById("buildWidth");
-  buildWidthInput.addEventListener("input", function () {
-    if (parseFloat(this.value) > 20) {
-      this.value = 10;
-	  
- showError("العرض لا يتجاوز 20م، ولزيادة المساحة يمكنك رفع الطول.");
-	 
-	 return;
-    }
-  });
-  
-  
-    const buildLengthInput = document.getElementById("buildLength");
-  buildLengthInput.addEventListener("input", function () {
-    if (parseFloat(this.value) > 20) {
-      this.value = 12;
-	  
-showError("الطول L والعرض W يجب ألا يتجاوزا 20م.");	 
-	 return;
-    }
-  });
-  
-  
-  
-  
-  
-    let costData = [];
-
-    function validateInputs(inputs) {
-      const errors = [];
-      const requiredInputs = { ...inputs };
-      delete requiredInputs.landLength;
-      delete requiredInputs.landWidth;
-      delete requiredInputs.buildLength;
-      delete requiredInputs.buildWidth;
-      for (const [id, value] of Object.entries(requiredInputs)) {
-        if (isNaN(value) || value <= 0) {
-          errors.push(`يرجى إدخال قيمة صحيحة وموجبة لـ ${document.querySelector(`label[for="${id}"]`).textContent}`);
-        }
-      }
-      return errors;
-    }
-
-    function showError(message) {
-      const errorDiv = document.getElementById('errorMessage');
-      errorDiv.textContent = message;
-      errorDiv.classList.remove('hidden');
-    }
-
-    function clearError() {
-      const errorDiv = document.getElementById('errorMessage');
-      errorDiv.textContent = '';
-      errorDiv.classList.add('hidden');
-    }
-
-    function resetForm() {
-      const inputs = document.querySelectorAll('input[type="number"], input[type="checkbox"]');
-      inputs.forEach(input => {
-        if (input.type === 'number') {
-          input.value = input.id === 'numFloors' ? 1 : input.id === 'semelleCount' ? 16 : input.id === 'betonPrice' ? 600 : 
-                        input.id === 'b15Price' ? 600 : input.id === 'ironPrice' ? 9.5 : input.id === 'cementPrice' ? 82 : 
-                        input.id === 'excavationPrice' ? 35 : input.id === 'gravelPrice' ? 200 : input.id === 'brickPrice' ? 6.5 : 
-                        input.id === 'sandPrice' ? 240 : input.id === 'aggregatePrice' ? 160 : input.id === 'laborPrice' ? 100 : 
-                        input.id === 'combinedMaterialPrice' ? 85 : input.id === 'stonePrice' ? 3500 : input.id === 'sacksPrice' ? 3500 : 
-                        input.id === 'sandFayagePrice' ? 6000 : input.id === 'landWidth' ? 12 : input.id === 'buildWidth' ? 12 : '';
-        } else if (input.type === 'checkbox') {
-          input.checked = input.id === 'hasBasement';
-        }
-      });
-      document.getElementById('costOutput').classList.add('hidden');
-      clearError();
-    }
-
-    function updateTables() {
-      const totalCost = costData.reduce((sum, item) => sum + (item.stage.includes('للمعلومات') ? 0 : item.totalCost), 0);
-      const costTableBody = document.getElementById('costTableBody');
-      costTableBody.innerHTML = costData.map((item, idx) => `
-        <tr class="${item.material.startsWith('الحديد ') ? 'bg-gray-100' : item.material === 'الوردي والبودر والشبكة' || item.material === 'الحجر (للبلوكاج)' || item.material === 'الكياس' || item.material === 'الرمل' ? 'bg-blue-100' : idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
-          <td class="border p-2">${item.material}</td>
-          <td class="border p-2">${item.stage}</td>
-          <td class="border p-2"><input type="number" value="${item.quantity}" step="0.1" min="0" onchange="updateQuantity(${idx}, this.value)" class="w-full p-1 border rounded" aria-label="الكمية لـ ${item.material}"></td>
-          <td class="border p-2">${item.coveredArea.toFixed(2)}</td>
-          <td class="border p-2"><input type="number" value="${item.unitPrice}" step="0.1" min="0" onchange="updateUnitPrice(${idx}, this.value)" class="w-full p-1 border rounded" aria-label="سعر الوحدة لـ ${item.material}"></td>
-          <td class="border p-2">${item.totalCost.toFixed(2)}</td>
-		            <td class="border p-2">${item.costPerM2.toFixed(2)}</td>
-        </tr>
-      `).join('');
-      const materials = [
-        'حفر الأساسات',
-        'الحديد',
-        'البيتون',
-        'خرسانة النظافة B15',
-        'الأسمنت',
-        'حصى الفياج',
-        'الطوب',
-        'رمل البناء',
-        'الحصى',
-        'اليد العاملة',
-        'الوردي والبودر والشبكة',
-        'الحجر (للبلوكاج)',
-        'الكياس',
-        'الرمل'
-      ];
-      const summaryData = materials.map(material => {
-        const items = costData.filter(item => (item.material === material || item.material.startsWith(material + ' ')) && !item.stage.includes('للمعلومات'));
-        const totalQuantity = items.reduce((sum, item) => sum + parseFloat(item.quantity), 0);
-        const totalCostItem = items.reduce((sum, item) => sum + item.totalCost, 0);
-        return {
-          material,
-          quantity: totalQuantity.toFixed(2),
-          unit: items.length > 0 ? items[0].unit : '',
-          totalCost: totalCostItem,
-          percentage: totalCost > 0 ? (totalCostItem / totalCost * 100).toFixed(2) : 0
-        };
-      }).filter(item => item.quantity > 0);
-      const summaryTableBody = document.getElementById('summaryTableBody');
-      summaryTableBody.innerHTML = summaryData.map(item => `
-        <tr class="${item.material === 'الوردي والبودر والشبكة' || item.material === 'الحجر (للبلوكاج)' || item.material === 'الكياس' || item.material === 'الرمل' ? 'bg-blue-100' : ''}">
-          <td class="border p-2">${item.material}</td>
-          <td class="border p-2">${item.quantity} ${item.unit}</td>
-          <td class="border p-2">${item.totalCost.toFixed(2)}</td>
-          <td class="border p-2">${item.percentage}%</td>
-        </tr>
-      `).join('');
-	  
-	  
-	  
-	 const rounded = Math.round(totalCost / 100) * 100; 
-     document.getElementById('totalCostTop').textContent = rounded.toLocaleString('fr-FR');
-	 document.getElementById('totalCost').textContent = rounded.toLocaleString('fr-FR');
- 
-  
- }
-
-    function calculateCost() {
-      const inputs = {
-        landLength: parseFloat(document.getElementById('landLength').value),
-        landWidth: parseFloat(document.getElementById('landWidth').value),
-        buildLength: parseFloat(document.getElementById('buildLength').value),
-        buildWidth: parseFloat(document.getElementById('buildWidth').value),
-        numFloors: parseInt(document.getElementById('numFloors').value),
-        semelleCount: parseInt(document.getElementById('semelleCount').value),
-        betonPrice: parseFloat(document.getElementById('betonPrice').value),
-        b15Price: parseFloat(document.getElementById('b15Price').value),
-        ironPrice: parseFloat(document.getElementById('ironPrice').value),
-        cementPrice: parseFloat(document.getElementById('cementPrice').value),
-        excavationPrice: parseFloat(document.getElementById('excavationPrice').value),
-        gravelPrice: parseFloat(document.getElementById('gravelPrice').value),
-        brickPrice: parseFloat(document.getElementById('brickPrice').value),
-        sandPrice: parseFloat(document.getElementById('sandPrice').value),
-        aggregatePrice: parseFloat(document.getElementById('aggregatePrice').value),
-        laborPrice: parseFloat(document.getElementById('laborPrice').value),
-        combinedMaterialPrice: parseFloat(document.getElementById('combinedMaterialPrice').value),
-        stonePrice: parseFloat(document.getElementById('stonePrice').value),
-        sacksPrice: parseFloat(document.getElementById('sacksPrice').value),
-        sandFayagePrice: parseFloat(document.getElementById('sandFayagePrice').value)
-      };
-
-      const errors = validateInputs(inputs);
-      if (errors.length > 0) {
-        showError(errors.join('\n'));
-        return;
-      }
-      clearError();
-
-      const landLength = isNaN(inputs.landLength) || inputs.landLength <= 0 ? 10 : inputs.landLength;
-      const landWidth = isNaN(inputs.landWidth) || inputs.landWidth <= 0 ? 12 : inputs.landWidth;
-      const buildLength = isNaN(inputs.buildLength) || inputs.buildLength <= 0 ? 12 : inputs.buildLength;
-      const buildWidth = isNaN(inputs.buildWidth) || inputs.buildWidth <= 0 ? 12 : inputs.buildWidth;
-      const numFloors = inputs.numFloors || 1;
-      const hasBasement = document.getElementById('hasBasement').checked;
-      const semelleCount = inputs.semelleCount || 16;
-      const semelleLength = 1.5;
-      const semelleWidth = 1.5;
-      const semelleHeight = 0.3;
-      const betonPrice = inputs.betonPrice || 600;
-      const b15Price = inputs.b15Price || 600;
-      const ironPrice = inputs.ironPrice || 9.5;
-      const cementPrice = inputs.cementPrice || 82;
-      const excavationPrice = inputs.excavationPrice || 35;
-      const gravelPrice = inputs.gravelPrice || 200;
-      const brickPrice = inputs.brickPrice || 6.5;
-      const sandPrice = inputs.sandPrice || 240;
-      const aggregatePrice = inputs.aggregatePrice || 160;
-      const laborPrice = inputs.laborPrice || 100;
-      const combinedMaterialPrice = inputs.combinedMaterialPrice || 85;
-      const stonePrice = inputs.stonePrice || 3500;
-      const sacksPrice = inputs.sacksPrice || 3500;
-      const sandFayagePrice = inputs.sandFayagePrice || 6000;
-
-      const baseBuildArea = buildLength * buildWidth;
-      const upperFloorArea = buildLength * (buildWidth + 1);
-      const landArea = landLength * landWidth;
-      const projectionArea = 10;
-
-      const floorAreas = [baseBuildArea];
-      let totalArea = baseBuildArea;
-      for (let i = 1; i <= numFloors; i++) {
-        floorAreas.push(upperFloorArea);
-        totalArea += upperFloorArea;
-      }
-      const terraceArea = baseBuildArea * 0.4;
-      totalArea += terraceArea;
-      if (hasBasement) totalArea += (baseBuildArea + projectionArea);
-
-      costData = [];
-
-      const excavationVolume = baseBuildArea * 3;
-      const excavationCost = excavationVolume * excavationPrice;
-      costData.push({
-        material: 'حفر الأساسات',
-        stage: 'الأساسات',
-        quantity: excavationVolume.toFixed(2),
-        unit: 'م³',
-        unitPrice: excavationPrice,
-        coveredArea: baseBuildArea,
-        totalCost: excavationCost,
-        costPerM2: excavationCost / baseBuildArea
-      });
-
-//      const mainIronPerM2 = 7500 / 120;
-      let mainIronPerM2;
-
-
-
-if (baseBuildArea < 80) {
-    mainIronPerM2 = 5000 / 80;
-} else if (baseBuildArea >= 80 && baseBuildArea < 90) {
-    mainIronPerM2 = 5500 / 80;
-} else if (baseBuildArea >= 90 && baseBuildArea < 100) {
-    mainIronPerM2 = 6000 / 90;
-} else if (baseBuildArea >= 100 && baseBuildArea < 110) {
-    mainIronPerM2 = 6500 / 100;
-} else if (baseBuildArea >= 110 && baseBuildArea < 120) {
-    mainIronPerM2 = 7000 / 110;
-} else if (baseBuildArea >= 120 && baseBuildArea < 130) {
-    mainIronPerM2 = 7500 / 110;
-} else if (baseBuildArea >= 130 && baseBuildArea < 140) {
-    mainIronPerM2 = 7700 / 120;
-} else if (baseBuildArea >= 140 && baseBuildArea < 150) {
-    mainIronPerM2 = 8200 / 120;
-} else if (baseBuildArea >= 180 ) {
-    mainIronPerM2 = 8500 / 120;
-}
-
-
-
-	  
-	  
-      let mainIronKg = mainIronPerM2 * baseBuildArea;
-      let basementIronKg = 0;
-      let totalIronKg = mainIronKg;
-      if (hasBasement) {
-        basementIronKg = (2250 * baseBuildArea) / 120;
-        totalIronKg += basementIronKg;
-      }
-      costData.push({
-        material: 'الحديد',
-        stage: 'كامل المشروع (بدون قبو)',
-        quantity: mainIronKg.toFixed(2),
-        unit: 'كجم',
-        unitPrice: ironPrice,
-        coveredArea: totalArea,
-        totalCost: mainIronKg * ironPrice,
-        costPerM2: (mainIronKg * ironPrice) / totalArea
-      });
-      if (hasBasement) {
-        costData.push({
-          material: 'الحديد',
-          stage: 'القبو',
-          quantity: basementIronKg.toFixed(2),
-          unit: 'كجم',
-          unitPrice: ironPrice,
-          coveredArea: baseBuildArea + projectionArea,
-          totalCost: basementIronKg * ironPrice,
-          costPerM2: (basementIronKg * ironPrice) / (baseBuildArea + projectionArea)
-        });
-      }
-
-
-      const ironSizes = [
-        { size: '6 مم', quantityKg: 1500 },
-        { size: '8 مم', quantityKg: 200 },
-        { size: '10 مم', quantityKg: 350 },
-        { size: '14 مم', quantityKg: 300 }
-      ];
-      ironSizes.forEach(({ size, quantityKg }) => {
-        const scaledQuantity = (quantityKg * baseBuildArea / 120).toFixed(2);
-        costData.push({
-          material: `الحديد ${size}`,
-          stage: 'الطبلة (للمعلومات)',
-          quantity: scaledQuantity,
-          unit: 'كجم',
-          unitPrice: ironPrice,
-          coveredArea: baseBuildArea,
-          totalCost: 0,
-          costPerM2: 0
-        });
-      });
-
-      const semelleBeton = Math.ceil(semelleCount * 0.675);
-      const dalleBeton = Math.ceil(baseBuildArea * 0.12);
-      const terraceBeton = Math.ceil(terraceArea * 0.12);
-      let basementBeton = 0;
-      if (hasBasement) {
-        basementBeton = Math.ceil((baseBuildArea + projectionArea) * 0.12);
-      }
-      costData.push({
-        material: 'البيتون',
-        stage: 'الأساسات (Semelle)',
-        quantity: semelleBeton.toFixed(2),
-        unit: 'م³',
-        unitPrice: betonPrice,
-        coveredArea: baseBuildArea,
-        totalCost: semelleBeton * betonPrice,
-        costPerM2: (semelleBeton * betonPrice) / baseBuildArea
-      });
-	  
-	  console.log("Total Cost Beton:", totalCost);
-      costData.push({
-        material: 'البيتون',
-        stage: 'الأساسات (Dalle)',
-        quantity: dalleBeton.toFixed(2),
-        unit: 'م³',
-        unitPrice: betonPrice,
-        coveredArea: baseBuildArea,
-        totalCost: dalleBeton * betonPrice,
-        costPerM2: (dalleBeton * betonPrice) / baseBuildArea
-      });
-      const rdcBeton = Math.ceil(baseBuildArea * 0.12);
-      costData.push({
-        material: 'البيتون',
-        stage: 'الطابق الأرضي (RDC)',
-        quantity: rdcBeton.toFixed(2),
-        unit: 'م³',
-        unitPrice: betonPrice,
-        coveredArea: baseBuildArea,
-        totalCost: rdcBeton * betonPrice,
-        costPerM2: (rdcBeton * betonPrice) / baseBuildArea
-      });
-      for (let i = 1; i <= numFloors; i++) {
-        const floorBeton = Math.ceil(upperFloorArea * 0.12);
-        costData.push({
-          material: 'البيتون',
-          stage: `الطابق ${i} (R+${i})`,
-          quantity: floorBeton.toFixed(2),
-          unit: 'م³',
-          unitPrice: betonPrice,
-          coveredArea: upperFloorArea,
-          totalCost: floorBeton * betonPrice,
-          costPerM2: (floorBeton * betonPrice) / upperFloorArea
-        });
-      }
-      costData.push({
-        material: 'البيتون',
-        stage: 'السطح (Terrace)',
-        quantity: terraceBeton.toFixed(2),
-        unit: 'م³',
-        unitPrice: betonPrice,
-        coveredArea: terraceArea,
-        totalCost: terraceBeton * betonPrice,
-        costPerM2: (terraceBeton * betonPrice) / terraceArea
-      });
-      if (hasBasement) {
-        costData.push({
-          material: 'البيتون',
-          stage: 'القبو',
-          quantity: basementBeton.toFixed(2),
-          unit: 'م³',
-          unitPrice: betonPrice,
-          coveredArea: baseBuildArea + projectionArea,
-          totalCost: basementBeton * betonPrice,
-          costPerM2: (basementBeton * betonPrice) / (baseBuildArea + projectionArea)
-        });
-      }
-
-      const b15Beton = Math.ceil(semelleCount === 16 ? 11 : (11 * (semelleCount / 16)));
-      const b15Cost = b15Beton * b15Price;
-      costData.push({
-        material: 'خرسانة النظافة B15',
-        stage: 'الطبلة',
-        quantity: b15Beton.toFixed(2),
-        unit: 'م³',
-        unitPrice: b15Price,
-        coveredArea: baseBuildArea,
-        totalCost: b15Cost,
-        costPerM2: b15Cost / baseBuildArea
-      });
-
-      const cementPerStage = {
-        'Fondation': 92,
-        'RDC': 85,
-        'R+1': 85,
-        'R+2': 85,
-        'R+3': 85,
-        'R+4': 85,
-         'Terrace': 20,
-        'Basement': 68
-      };
-      let totalCementBags = cementPerStage['Fondation'] * (baseBuildArea / 120);
-      totalCementBags += cementPerStage['RDC'] * (baseBuildArea / 120);
-      for (let i = 1; i <= numFloors; i++) {
-        totalCementBags += cementPerStage[`R+${i}`] * (upperFloorArea / 120);
-      }
-      totalCementBags += cementPerStage['Terrace'] * (baseBuildArea / 120);
-      if (hasBasement) totalCementBags += cementPerStage['Basement'] * (baseBuildArea / 120);
-      costData.push({
-        material: 'الأسمنت',
-        stage: 'الأساسات',
-        quantity: (cementPerStage['Fondation'] * baseBuildArea / 120).toFixed(2),
-        unit: 'خنشة',
-        unitPrice: cementPrice,
-        coveredArea: baseBuildArea,
-        totalCost: (cementPerStage['Fondation'] * baseBuildArea / 120) * cementPrice,
-        costPerM2: ((cementPerStage['Fondation'] * baseBuildArea / 120) * cementPrice) / baseBuildArea
-      });
-      costData.push({
-        material: 'الأسمنت',
-        stage: 'الطابق الأرضي (RDC)',
-        quantity: (cementPerStage['RDC'] * baseBuildArea / 120).toFixed(2),
-        unit: 'خنشة',
-        unitPrice: cementPrice,
-        coveredArea: baseBuildArea,
-        totalCost: (cementPerStage['RDC'] * baseBuildArea / 120) * cementPrice,
-        costPerM2: ((cementPerStage['RDC'] * baseBuildArea / 120) * cementPrice) / baseBuildArea
-      });
-      for (let i = 1; i <= numFloors; i++) {
-        costData.push({
-          material: 'الأسمنت',
-          stage: `الطابق ${i} (R+${i})`,
-          quantity: (cementPerStage[`R+${i}`] * upperFloorArea / 120).toFixed(2),
-          unit: 'خنشة',
-          unitPrice: cementPrice,
-          coveredArea: upperFloorArea,
-          totalCost: (cementPerStage[`R+${i}`] * upperFloorArea / 120) * cementPrice,
-          costPerM2: ((cementPerStage[`R+${i}`] * upperFloorArea / 120) * cementPrice) / upperFloorArea
-        });
-      }
-      costData.push({
-        material: 'الأسمنت',
-        stage: 'السطح (Terrace)',
-        quantity: (cementPerStage['Terrace'] * baseBuildArea / 120).toFixed(2),
-        unit: 'خنشة',
-        unitPrice: cementPrice,
-        coveredArea: terraceArea,
-        totalCost: (cementPerStage['Terrace'] * baseBuildArea / 120) * cementPrice,
-        costPerM2: ((cementPerStage['Terrace'] * baseBuildArea / 120) * cementPrice) / terraceArea
-      });
-      if (hasBasement) {
-        costData.push({
-          material: 'الأسمنت',
-          stage: 'القبو',
-          quantity: (cementPerStage['Basement'] * baseBuildArea / 120).toFixed(2),
-          unit: 'خنشة',
-          unitPrice: cementPrice,
-          coveredArea: baseBuildArea + projectionArea,
-          totalCost: (cementPerStage['Basement'] * baseBuildArea / 120) * cementPrice,
-          costPerM2: ((cementPerStage['Basement'] * baseBuildArea / 120) * cementPrice) / (baseBuildArea + projectionArea)
-        });
-      }
-
-      const gravelVolume = (25 * baseBuildArea) / 120;
-      const gravelCost = gravelVolume * gravelPrice;
-      costData.push({
-        material: 'حصى الفياج',
-        stage: 'الأساسات',
-        quantity: gravelVolume.toFixed(2),
-        unit: 'م³',
-        unitPrice: gravelPrice,
-        coveredArea: baseBuildArea,
-        totalCost: gravelCost,
-        costPerM2: gravelCost / baseBuildArea
-      });
-
-      const mainBricks = (4000 * baseBuildArea) / 120;
-      const partitionBricks = (5000 * baseBuildArea) / 120;
-      const totalBricks = mainBricks + partitionBricks;
-      const brickCost = totalBricks * brickPrice;
-      costData.push({
-        material: 'الطوب',
-        stage: 'كامل المشروع',
-        quantity: totalBricks.toFixed(2),
-        unit: 'حبة',
-        unitPrice: brickPrice,
-        coveredArea: totalArea,
-        totalCost: brickCost,
-        costPerM2: brickCost / totalArea
-      });
-
-      const sandVolume = (25 * baseBuildArea) / 120;
-      const sandCost = sandVolume * sandPrice;
-      costData.push({
-        material: 'رمل البناء',
-        stage: 'كامل المشروع',
-        quantity: sandVolume.toFixed(2),
-        unit: 'م³',
-        unitPrice: sandPrice,
-        coveredArea: totalArea,
-        totalCost: sandCost,
-        costPerM2: sandCost / totalArea
-      });
-
-      const aggregateVolume = (25 * baseBuildArea) / 120;
-      const aggregateCost = aggregateVolume * aggregatePrice;
-      costData.push({
-        material: 'الحصى',
-        stage: 'كامل المشروع',
-        quantity: aggregateVolume.toFixed(2),
-        unit: 'م³',
-        unitPrice: aggregatePrice,
-        coveredArea: totalArea,
-        totalCost: aggregateCost,
-        costPerM2: aggregateCost / totalArea
-      });
-
-      const laborPerStage = 100;
-      let totalLaborCost = laborPerStage * baseBuildArea;
-      totalLaborCost += laborPerStage * baseBuildArea;
-      for (let i = 1; i <= numFloors; i++) {
-        totalLaborCost += laborPerStage * upperFloorArea;
-      }
-      totalLaborCost += laborPerStage * terraceArea;
-      if (hasBasement) totalLaborCost += laborPerStage * (baseBuildArea + projectionArea);
-      totalLaborCost *= laborPrice / 100;
-      costData.push({
-        material: 'اليد العاملة',
-        stage: 'الأساسات',
-        quantity: baseBuildArea.toFixed(2),
-        unit: 'م²',
-        unitPrice: laborPrice,
-        coveredArea: baseBuildArea,
-        totalCost: laborPerStage * baseBuildArea * (laborPrice / 100),
-        costPerM2: laborPerStage * (laborPrice / 100)
-      });
-      costData.push({
-        material: 'اليد العاملة',
-        stage: 'الطابق الأرضي (RDC)',
-        quantity: baseBuildArea.toFixed(2),
-        unit: 'م²',
-        unitPrice: laborPrice,
-        coveredArea: baseBuildArea,
-        totalCost: laborPerStage * baseBuildArea * (laborPrice / 100),
-        costPerM2: laborPerStage * (laborPrice / 100)
-      });
-      for (let i = 1; i <= numFloors; i++) {
-        costData.push({
-          material: 'اليد العاملة',
-          stage: `الطابق ${i} (R+${i})`,
-          quantity: upperFloorArea.toFixed(2),
-          unit: 'م²',
-          unitPrice: laborPrice,
-          coveredArea: upperFloorArea,
-          totalCost: laborPerStage * upperFloorArea * (laborPrice / 100),
-          costPerM2: laborPerStage * (laborPrice / 100)
-        });
-      }
-      costData.push({
-        material: 'اليد العاملة',
-        stage: 'السطح (Terrace)',
-        quantity: terraceArea.toFixed(2),
-        unit: 'م²',
-        unitPrice: laborPrice,
-        coveredArea: terraceArea,
-        totalCost: laborPerStage * terraceArea * (laborPrice / 100),
-        costPerM2: laborPerStage * (laborPrice / 100)
-      });
-      if (hasBasement) {
-        costData.push({
-          material: 'اليد العاملة',
-          stage: 'القبو',
-          quantity: (baseBuildArea + projectionArea).toFixed(2),
-          unit: 'م²',
-          unitPrice: laborPrice,
-          coveredArea: baseBuildArea + projectionArea,
-          totalCost: laborPerStage * (baseBuildArea + projectionArea) * (laborPrice / 100),
-          costPerM2: laborPerStage * (laborPrice / 100)
-        });
-      }
-
-      // Combined Material: الوردي والبودر والشبكة
-      costData.push({
-        material: 'الوردي والبودر والشبكة',
-        stage: 'كامل المشروع',
-        quantity: totalArea.toFixed(2),
-        unit: 'م²',
-        unitPrice: combinedMaterialPrice,
-        coveredArea: totalArea,
-        totalCost: totalArea * combinedMaterialPrice,
-        costPerM2: combinedMaterialPrice
-      });
-
-      // New Materials: الحجر (للبلوكاج), الكياس, الرمل
-      const fayageQuantity = (baseBuildArea / 25).toFixed(2);
-      costData.push({
-        material: 'الحجر (للبلوكاج)',
-        stage: 'كامل المشروع',
-        quantity: fayageQuantity,
-        unit: 'فياج',
-        unitPrice: stonePrice,
-        coveredArea: baseBuildArea,
-        totalCost: fayageQuantity * stonePrice,
-        costPerM2: (fayageQuantity * stonePrice) / baseBuildArea
-      });
-      costData.push({
-        material: 'الكياس',
-        stage: 'كامل المشروع',
-        quantity: fayageQuantity,
-        unit: 'فياج',
-        unitPrice: sacksPrice,
-        coveredArea: baseBuildArea,
-        totalCost: fayageQuantity * sacksPrice,
-        costPerM2: (fayageQuantity * sacksPrice) / baseBuildArea
-      });
-      costData.push({
-        material: 'الرمل',
-        stage: 'كامل المشروع',
-        quantity: fayageQuantity,
-        unit: 'فياج',
-        unitPrice: sandFayagePrice,
-        coveredArea: baseBuildArea,
-        totalCost: fayageQuantity * sandFayagePrice,
-        costPerM2: (fayageQuantity * sandFayagePrice) / baseBuildArea
-      });
-
-      document.getElementById('costOutput').classList.remove('hidden');
-      updateTables();
-    }
-
-    function updateUnitPrice(index, newPrice) {
-      const price = parseFloat(newPrice);
-      if (isNaN(price) || price < 0) {
-        showError('يرجى إدخال سعر وحدة صالح وموجب');
-        return;
-      }
-      costData[index].unitPrice = price;
-      costData[index].totalCost = parseFloat(costData[index].quantity) * costData[index].unitPrice;
-      costData[index].costPerM2 = costData[index].coveredArea > 0 ? costData[index].totalCost / costData[index].coveredArea : 0;
-      if (costData[index].stage.includes('للمعلومات')) {
-        costData[index].totalCost = 0;
-        costData[index].costPerM2 = 0;
-      }
-      clearError();
-      updateTables();
-    }
-
-    function updateQuantity(index, newQuantity) {
-      const quantity = parseFloat(newQuantity);
-      if (isNaN(quantity) || quantity < 0) {
-        showError('يرجى إدخال كمية صالحة وموجبة');
-        return;
-      }
-      costData[index].quantity = quantity.toFixed(2);
-      costData[index].totalCost = parseFloat(costData[index].quantity) * costData[index].unitPrice;
-      costData[index].costPerM2 = costData[index].coveredArea > 0 ? costData[index].totalCost / costData[index].coveredArea : 0;
-      if (costData[index].stage.includes('للمعلومات')) {
-        costData[index].totalCost = 0;
-        costData[index].costPerM2 = 0;
-      }
-      clearError();
-      updateTables();
-    }
-
-    function OLDexportToPDF() {
-      const element = document.getElementById('costOutput');
-      const inputsSummary = `
-        <div class="mb-4">
-          <h2 class="text-xl font-semibold">ملخص المدخلات</h2>
-          <p>طول الأرض: ${document.getElementById('landLength').value || 10} م</p>
-          <p>عرض الأرض: ${document.getElementById('landWidth').value || 12} م</p>
-          <p>طول المبنى: ${document.getElementById('buildLength').value || 12} م</p>
-          <p>عرض المبنى: ${document.getElementById('buildWidth').value || 12} م</p>
-          <p>عدد الطوابق: ${document.getElementById('numFloors').value || 1}</p>
-          <p>وجود قبو: ${document.getElementById('hasBasement').checked ? 'نعم' : 'لا'}</p>
-        </div>
-      `;
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = inputsSummary + element.outerHTML;
-      html2pdf().from(tempDiv).save('cost_estimation.pdf');
-    }
-
-
-
-
-function exportToPDF() {
-  const element = document.getElementById('costOutput');
-  const inputsSummary = `
-    <div style="font-family: Tahoma, Arial, sans-serif; direction: rtl; text-align: right;">
-      <h2 style="font-weight: 600; font-size: 1.25rem;">ملخص المدخلات</h2>
-      <p>طول الأرض: ${document.getElementById('landLength').value || 10} م</p>
-      <p>عرض الأرض: ${document.getElementById('landWidth').value || 12} م</p>
-      <p>طول المبنى: ${document.getElementById('buildLength').value || 12} م</p>
-      <p>عرض المبنى: ${document.getElementById('buildWidth').value || 12} م</p>
-      <p>عدد الطوابق: ${document.getElementById('numFloors').value || 1}</p>
-      <p>وجود قبو: ${document.getElementById('hasBasement').checked ? 'نعم' : 'لا'}</p>
-    </div>
-  `;
-
-  const tempDiv = document.createElement('div');
-  tempDiv.style.direction = 'rtl';
-  tempDiv.style.textAlign = 'right';
-  tempDiv.style.fontFamily = "Tahoma, Arial, sans-serif";
-  tempDiv.innerHTML = inputsSummary + element.outerHTML;
-
-  const options = {
-    margin: 0.3,
-    filename: 'cost_estimation.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      logging: false,
-      letterRendering: true,
-      useCORS: true,
-    },
-    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-  };
-
-  setTimeout(() => {
-    html2pdf()
-      .set(options)
-      .from(tempDiv)
-      .outputPdf('blob')
-      .then(pdfBlob => {
-        if (/Mobi|Android/i.test(navigator.userAgent)) {
-          const url = URL.createObjectURL(pdfBlob);
-          const newWindow = window.open(url, '_blank');
-          if (!newWindow) {
-            alert('يرجى السماح بفتح النوافذ المنبثقة لتصدير PDF.');
-          }
-        } else {
-          html2pdf().set(options).from(tempDiv).save();
-        }
-      })
-      .catch(err => {
-        console.error('PDF generation failed:', err);
-        alert('حدث خطأ أثناء تصدير PDF، حاول مرة أخرى.');
-      });
-  }, 500);
-}
-
-
-
-
-
-    function _OLDexportToExcel() {
-      const costTable = document.getElementById('costTableBody');
-      const summaryTable = document.getElementById('summaryTableBody');
-      const wb = XLSX.utils.book_new();
-      const costRows = costTable.getElementsByTagName('tr');
-      const costData = [['المادة', 'المرحلة', 'الكمية', 'المساحة المغطاة (م²)', 'التكلفة لكل وحدة (درهم مغربي)', 'التكلفة (درهم مغربي)', 'التكلفة لكل م² (درهم مغربي)']];
-      for (let row of costRows) {
-        const cells = row.getElementsByTagName('td');
-        costData.push([
-          cells[0].textContent,
-          cells[1].textContent,
-          cells[2].getElementsByTagName('input')[0].value,
-          cells[3].textContent,
-          cells[4].getElementsByTagName('input')[0].value,
-          cells[5].textContent,
-          cells[6].textContent
-        ]);
-      }
-      const costWs = XLSX.utils.aoa_to_sheet(costData);
-      XLSX.utils.book_append_sheet(wb, costWs, 'Detailed Cost');
-      const summaryRows = summaryTable.getElementsByTagName('tr');
-      const summaryData = [['المادة', 'إجمالي الكمية', 'إجمالي التكلفة (درهم مغربي)', 'النسبة المئوية (%)']];
-      for (let row of summaryRows) {
-        const cells = row.getElementsByTagName('td');
-        summaryData.push([
-          cells[0].textContent,
-          cells[1].textContent,
-          cells[2].textContent,
-          cells[3].textContent
-        ]);
-      }
-      const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
-      XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary by Product');
-      XLSX.writeFile(wb, 'cost_estimation.xlsx');
-    }
-	
-	
-	
-	
-	function exportToExcel() {
-  const costTable = document.getElementById('costTableBody');
-  const summaryTable = document.getElementById('summaryTableBody');
-  const wb = XLSX.utils.book_new();
-
-  // Prepare cost data
-  const costRows = costTable.getElementsByTagName('tr');
-  const costData = [['المادة', 'المرحلة', 'الكمية', 'المساحة المغطاة (م²)', 'التكلفة لكل وحدة (درهم مغربي)', 'التكلفة (درهم مغربي)', 'التكلفة لكل م² (درهم مغربي)']];
-  for (let row of costRows) {
-    const cells = row.getElementsByTagName('td');
-    costData.push([
-      cells[0].textContent,
-      cells[1].textContent,
-      cells[2].getElementsByTagName('input')[0].value,
-      cells[3].textContent,
-      cells[4].getElementsByTagName('input')[0].value,
-      cells[5].textContent,
-      cells[6].textContent
-    ]);
-  }
-  const costWs = XLSX.utils.aoa_to_sheet(costData);
-  XLSX.utils.book_append_sheet(wb, costWs, 'Detailed Cost');
-
-  // Prepare summary data
-  const summaryRows = summaryTable.getElementsByTagName('tr');
-  const summaryData = [['المادة', 'إجمالي الكمية', 'إجمالي التكلفة (درهم مغربي)', 'النسبة المئوية (%)']];
-  for (let row of summaryRows) {
-    const cells = row.getElementsByTagName('td');
-    summaryData.push([
-      cells[0].textContent,
-      cells[1].textContent,
-      cells[2].textContent,
-      cells[3].textContent
-    ]);
-  }
-  const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
-  XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary by Product');
-
-  // Generate binary string
-  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-
-  // Create blob from array buffer
-  const blob = new Blob([wbout], { type: 'application/octet-stream' });
-
-  // Create a download link and trigger it
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'cost_estimation.xlsx';
-  document.body.appendChild(a);
-  a.click();
-
-  // Clean up
-  setTimeout(() => {
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  }, 0);
-}
-
-	
-// Assuming your table has an ID, e.g., id="costTable". Add id="costTable" to the <table> tag.
-window.addEventListener('load', function() {
-  const table = document.getElementById('costTable');
-  if (!table) return;
-
-  // Clone the header row
-  const header = table.querySelector('thead');
-  const floatingHeader = header.cloneNode(true);
-  floatingHeader.id = 'floatingTableHeader';
-  floatingHeader.style.position = 'fixed';
-  floatingHeader.style.top = '0';
-  floatingHeader.style.width = table.offsetWidth + 'px';
-  floatingHeader.style.backgroundColor = '#f8f8f8';
-  floatingHeader.style.display = 'none';
-  document.body.appendChild(floatingHeader);
-
-  // Show/hide on scroll
-  const tableTop = table.getBoundingClientRect().top;
-  window.addEventListener('scroll', function() {
-    if (window.scrollY > tableTop) {
-      floatingHeader.style.display = 'table';
-    } else {
-      floatingHeader.style.display = 'none';
-    }
-  });
-
-  // Handle resize to match widths
-  window.addEventListener('resize', function() {
-    floatingHeader.style.width = table.offsetWidth + 'px';
-  });
-});	
-
-
-
-function OLDexportTablesToCSV(filename) {
-  function tableBodyToArray(tableBody) {
-    const rows = tableBody.getElementsByTagName('tr');
-    const data = [];
-    for (let row of rows) {
-      const cells = row.getElementsByTagName('td');
-      const rowData = [];
-      for (let cell of cells) {
-        // If the cell has an input, get its value; otherwise get textContent
-        const input = cell.querySelector('input');
-        rowData.push(input ? input.value : cell.textContent.trim());
-      }
-      data.push(rowData);
-    }
-    return data;
-  }
-
-  const costTableBody = document.getElementById('costTableBody');
-  const summaryTableBody = document.getElementById('summaryTableBody');
-
-  // Headers for CSV
-  const costHeaders = ['المادة', 'المرحلة', 'الكمية', 'المساحة المغطاة (م²)', 'التكلفة لكل وحدة (درهم مغربي)', 'التكلفة (درهم مغربي)', 'التكلفة لكل م² (درهم مغربي)'];
-  const summaryHeaders = ['المادة', 'إجمالي الكمية', 'إجمالي التكلفة (درهم مغربي)', 'النسبة المئوية (%)'];
-
-  const costData = [costHeaders, ...tableBodyToArray(costTableBody)];
-  const summaryData = [summaryHeaders, ...tableBodyToArray(summaryTableBody)];
-
-  function arrayToCSV(data) {
-    return data.map(row =>
-      row.map(item => {
-        // Escape double quotes
-        let str = item.replace(/"/g, '""');
-        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-          str = `"${str}"`;
-        }
-        return str;
-      }).join(',')
-    ).join('\n');
-  }
-
-  // Join both tables with a separator line (optional)
-  const csvContent = arrayToCSV(costData) + '\n\n' + arrayToCSV(summaryData);
-
-  // Trigger CSV download
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-
-function isMobile() {
-  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-}
-
-function exportCostEstimation() {
-  if (isMobile()) {
-    exportTablesToCSV('cost_estimation.csv');
-  } else {
-    exportToExcel(); // your XLSX export function
-  }
-}
-
-
-
-
-function exportTablesToCSV(filename) {
-  function tableBodyToArray(tableBody) {
-    const rows = tableBody.getElementsByTagName('tr');
-    const data = [];
-    for (let row of rows) {
-      const cells = row.getElementsByTagName('td');
-      const rowData = [];
-      for (let cell of cells) {
-        const input = cell.querySelector('input');
-        rowData.push(input ? input.value : cell.textContent.trim());
-      }
-      data.push(rowData);
-    }
-    return data;
-  }
-
-  const costTableBody = document.getElementById('costTableBody');
-  const summaryTableBody = document.getElementById('summaryTableBody');
-
-  const costHeaders = ['المادة', 'المرحلة', 'الكمية', 'المساحة المغطاة (م²)', 'التكلفة لكل وحدة (درهم مغربي)', 'التكلفة (درهم مغربي)', 'التكلفة لكل م² (درهم مغربي)'];
-  const summaryHeaders = ['المادة', 'إجمالي الكمية', 'إجمالي التكلفة (درهم مغربي)', 'النسبة المئوية (%)'];
-
-  const costData = [costHeaders, ...tableBodyToArray(costTableBody)];
-  const summaryData = [summaryHeaders, ...tableBodyToArray(summaryTableBody)];
-
-  function arrayToCSV(data) {
-    return data.map(row =>
-      row.map(item => {
-        let str = item.replace(/"/g, '""');
-        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-          str = `"${str}"`;
-        }
-        return str;
-      }).join(',')
-    ).join('\r\n');  // Use Windows line endings
-  }
-
-  const csvContent = arrayToCSV(costData) + '\r\n\r\n' + arrayToCSV(summaryData);
-
-  // UTF-8 BOM character
-  const BOM = new Uint8Array([0xEF, 0xBB, 0xBF]);
-
-  // Create blob with BOM + CSV content
-  const blob = new Blob([BOM, csvContent], { type: 'text/csv;charset=utf-8;' });
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-
-
-  </script>
-
-  
-</body>
-</html>
-
+<body>
+    <div class="container">
+        <h1>
+            <span>حساب كمية الحديد للأساس ديال الدار</span>
+            <span>Calculateur de l'acier pour les fondations de maison</span>
+        </h1>
+        <p>
+            <span>دخل العدد والمقايسات ديال العناصر باش تحسب كمية الحديد على حسب العادات المغربية</span>
+            <span>Entrez le nombre et les dimensions des éléments pour estimer l'acier selon les pratiques marocaines</span>
+        </p>
+        <p class="tip">
+            <span>💡 نصيحة: باش تشوف الجدول مزيان، جرب دور تيليفونك على الجنب ولا استعمل الكومبيوتر، وتقدر تسكرول يمين وشمال باش تشوف كل التفاصيل</span>
+            <span>💡 Conseil : Pour une meilleure visualisation du tableau, essayez de tourner votre téléphone horizontalement ou utilisez un ordinateur, et vous pouvez faire défiler à droite et à gauche pour voir tous les détails</span>
+        </p>
+        <div class="table-container">
+            <table id="elementTable">
+                <thead>
+                    <tr>
+                        <th>
+                            <span>العنصر</span>
+                            <span>Composant</span>
+                        </th>
+                        <th>
+                            <span>العدد</span>
+                            <span>Nombre</span>
+                        </th>
+                        <th>
+                            <span>الطول (م)</span>
+                            <span>Longueur (m)</span>
+                        </th>
+                        <th>
+                            <span>العرض (م)</span>
+                            <span>Largeur (m)</span>
+                        </th>
+                        <th>
+                            <span>الارتفاع (م)</span>
+                            <span>Hauteur (m)</span>
+                        </th>
+                        <th>
+                            <span>معدل الحديد (كغ/م³)</span>
+                            <span>Taux d'acier (kg/m³)</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="القواعد | Fondations continues">
+                            <div class="component-text">
+                                <span>القواعد</span>
+                                <span>Fondations continues</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="chainageNum" value="1" min="0"></td>
+                        <td><input type="number" id="chainageLength" value="36" min="0" step="0.01"></td>
+                        <td><input type="number" id="chainageWidth" value="0.4" min="0" step="0.01"></td>
+                        <td><input type="number" id="chainageHeight" value="0.2" min="0" step="0.01"></td>
+                        <td>
+                            <span>100 كغ/م³</span>
+                            <span>100 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1593642532973-d31b97d0e6b8" alt="القواعد المنفصلة | Fondations isolées">
+                            <div class="component-text">
+                                <span>القواعد المنفصلة</span>
+                                <span>Fondations isolées</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="isolatedNum" value="0" min="0"></td>
+                        <td><input type="number" id="isolatedLength" value="1" min="0" step="0.01"></td>
+                        <td><input type="number" id="isolatedWidth" value="1" min="0" step="0.01"></td>
+                        <td><input type="number" id="isolatedHeight" value="0.4" min="0" step="0.01"></td>
+                        <td>
+                            <span>125 كغ/م³</span>
+                            <span>125 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1560448204-603b3ec8f7e7" alt="العمدان | Colonnes">
+                            <div class="component-text">
+                                <span>العمدان</span>
+                                <span>Colonnes</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="columnNum" value="4" min="0"></td>
+                        <td><input type="number" id="columnLength" value="0.3" min="0" step="0.01"></td>
+                        <td><input type="number" id="columnWidth" value="0.3" min="0" step="0.01"></td>
+                        <td><input type="number" id="columnHeight" value="3" min="0" step="0.01"></td>
+                        <td>
+                            <span>140 كغ/م³</span>
+                            <span>140 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1503387762-5927c29adf34" alt="الجسور | Poutres">
+                            <div class="component-text">
+                                <span>الجسور</span>
+                                <span>Poutres</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="beamNum" value="4" min="0"></td>
+                        <td><input type="number" id="beamLength" value="6" min="0" step="0.01"></td>
+                        <td><input type="number" id="beamWidth" value="0.3" min="0" step="0.01"></td>
+                        <td><input type="number" id="beamHeight" value="0.45" min="0" step="0.01"></td>
+                        <td>
+                            <span>150 كغ/م³</span>
+                            <span>150 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158" alt="السقف | Dalles">
+                            <div class="component-text">
+                                <span>السقف</span>
+                                <span>Dalles</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="slabNum" value="1" min="0"></td>
+                        <td><input type="number" id="slabLength" value="12" min="0" step="0.01"></td>
+                        <td><input type="number" id="slabWidth" value="6" min="0" step="0.01"></td>
+                        <td><input type="number" id="slabHeight" value="0.15" min="0" step="0.01"></td>
+                        <td>
+                            <span>100 كغ/م³</span>
+                            <span>100 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="الحيطان المسلحة | Murs de cisaillement">
+                            <div class="component-text">
+                                <span>الحيطان المسلحة</span>
+                                <span>Murs de cisaillement</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="wallNum" value="0" min="0"></td>
+                        <td><input type="number" id="wallLength" value="3" min="0" step="0.01"></td>
+                        <td><input type="number" id="wallWidth" value="0.2" min="0" step="0.01"></td>
+                        <td><input type="number" id="wallHeight" value="3" min="0" step="0.01"></td>
+                        <td>
+                            <span>90 كغ/م³</span>
+                            <span>90 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="السلالام | Escaliers">
+                            <div class="component-text">
+                                <span>السلالام</span>
+                                <span>Escaliers</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="stairsNum" value="0" min="0"></td>
+                        <td><input type="number" id="stairsLength" value="3" min="0" step="0.01"></td>
+                        <td><input type="number" id="stairsWidth" value="1" min="0" step="0.01"></td>
+                        <td><input type="number" id="stairsHeight" value="0.3" min="0" step="0.01"></td>
+                        <td>
+                            <span>110 كغ/م³</span>
+                            <span>110 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="الحيطان الاستنادية | Murs de soutènement">
+                            <div class="component-text">
+                                <span>الحيطان الاستنادية</span>
+                                <span>Murs de soutènement</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="retainingNum" value="0" min="0"></td>
+                        <td><input type="number" id="retainingLength" value="5" min="0" step="0.01"></td>
+                        <td><input type="number" id="retainingWidth" value="0.3" min="0" step="0.01"></td>
+                        <td><input type="number" id="retainingHeight" value="2" min="0" step="0.01"></td>
+                        <td>
+                            <span>125 كغ/م³</span>
+                            <span>125 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158" alt="السقف المفرغ | Dalles creuses">
+                            <div class="component-text">
+                                <span>السقف المفرغ</span>
+                                <span>Dalles creuses</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="hollowSlabNum" value="0" min="0"></td>
+                        <td><input type="number" id="hollowSlabLength" value="12" min="0" step="0.01"></td>
+                        <td><input type="number" id="hollowSlabWidth" value="6" min="0" step="0.01"></td>
+                        <td><input type="number" id="hollowSlabHeight" value="0.2" min="0" step="0.01"></td>
+                        <td>
+                            <span>80 كغ/م³</span>
+                           
