@@ -241,12 +241,12 @@
           <label>طول الأرض (م):</label>
           <input type="number" id="landLength" value="10" min="5" max="20" placeholder="مثال: 8 أو 10"
 																										 
-                 oninput="if(this.value!==''&&(this.value<5||this.value>20)){alert('الرجاء إدخال طول الأرض بين 5 و 20 متر');this.value=Math.min(Math.max(this.value,5),20);}">
+                 oninput="if(this.value!==''&&(this.value<0||this.value>20)){alert('الرجاء إدخال طول الأرض بين 5 و 20 متر');this.value=Math.min(Math.max(this.value,5),20);}">
         </div>
         <div class="form-row">
           <label>عرض الأرض (م):</label>
           <input type="number" id="landWidth" value="10" min="5" max="20" placeholder="مثال: 5 أو 10"
-                 oninput="if(this.value!==''&&(this.value<5||this.value>20)){alert('الرجاء إدخال عرض الأرض بين 5 و 20 متر');this.value=Math.min(Math.max(this.value,5),20);}">
+                 oninput="if(this.value!==''&&(this.value<0||this.value>20)){alert('الرجاء إدخال عرض الأرض بين 5 و 20 متر');this.value=Math.min(Math.max(this.value,5),20);}">
 	
         </div>
         <div class="form-row">
