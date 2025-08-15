@@ -146,21 +146,18 @@
       margin-bottom: 10px;
     }
 
-					   
-    .form-row label {
-      font-size: 18px;
-      white-space: nowrap;
-      min-width: 100px;
-      text-align: right;
-    }
+<!-- input view change  } -->				   
+<!--.form-row label {      font-size: 18px;      white-space: nowrap;      min-width: 200px;      text-align: right;    } -->
+.form-row input[type="number"] { width: 100%; padding: 10px; font-size: 18px; border: 2px solid #d4a373; border-radius: 8px; box-sizing: border-box; }
 
 					   
     .form-row input[type="number"] {
-      width: 80px;
-      padding: 8px;
-      font-size: 16px;
-      border: 2px solid #d4a373;
-      border-radius: 8px;
+  width: 100%; /* fill container width */
+  padding: 10px;
+  font-size: 18px;
+  border: 2px solid #d4a373;
+  border-radius: 8px;
+  box-sizing: border-box; /* keeps padding inside width */
     }
 
     .form-row input[type="checkbox"] {
@@ -234,6 +231,26 @@
     </div>
 
     <!-- User Interface: Cost Calculation -->
+	
+	
+	
+	
+	  <div style="background-color:#f0f8ff; border: 2px solid #4a90e2; padding: 15px; border-radius: 8px; font-family: 'Arial', sans-serif; color: #333; max-width: 800px; line-height: 1.5; margin: 50px auto; text-align: center;">
+  <p style="font-size: 18px; margin: 0; display: inline-block; text-align: right;">
+    <span style="color: #e67e22; font-weight: bold;">📌</span> يمكنك تعديل <strong>المساحة</strong> وعدد <strong>الطوابق</strong> حسب مشروعك، ثم الضغط على 
+    <span style="background-color: #4a90e2; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold;">احسب التكلفة</span> 
+    للحصول على تقدير تقريبي يوضح فكرة عامة عن التكلفة. يمكنك أيضاً طباعة النتائج بصيغتي <strong>PDF</strong> أو <strong>Excel</strong> للاحتفاظ بها.
+	
+	📊 حدّث الأسعار في أي وقت — غيّر أسعار الكميات أو أسعار الوحدة، وسيتم حساب الإجمالي تلقائيًا.
+	💡 نصيحة: لعرض أفضل للجدول، جرّب تدوير هاتفك أفقيًا أو استخدم الكمبيوتر، ويمكنك التمرير يمينًا ويسارًا لمشاهدة جميع التفاصيل
+	
+  </p>
+   </div>
+	
+	
+	
+	
+	
     <div id="user-panel">
       <h2>حساب تكلفة البناء</h2>
       <div class="form-container" style="max-width: 500px;">
@@ -376,20 +393,20 @@ let lastItemIdx = null;
 
 // Static price table (in-memory for the session)
 let priceTable = {
-    'الرمل': { name: 'الرمل', unit: '100', price: 150 },
-    'الأسمنت (35)': { name: 'الأسمنت (35)', unit: '100', price: 75 },
+    'الرمل': { name: 'الرمل', unit: '100', price: 320 },
+    'الأسمنت (35)': { name: 'الأسمنت (35)', unit: '100', price: 79 },
     'الأسمنت (45)': { name: 'الأسمنت (45)', unit: '100', price: 81 },
-    'الحديد (6 مم)': { name: 'الحديد (6 مم)', unit: '100', price: 9.4 },
-    'الحديد (10 مم)': { name: 'الحديد (10 مم)', unit: '100', price: 9.2 },
-    'الحديد (12 مم)': { name: 'الحديد (12 مم)', unit: '100', price: 9.2 },
-    'الحديد (14 مم)': { name: 'الحديد (14 مم)', unit: '100', price: 9.2 },
+    'الحديد (6 مم)': { name: 'الحديد (6 مم)', unit: '100', price: 9.8 },
+    'الحديد (10 مم)': { name: 'الحديد (10 مم)', unit: '100', price: 9.5 },
+    'الحديد (12 مم)': { name: 'الحديد (12 مم)', unit: '100', price: 9.5 },
+    'الحديد (14 مم)': { name: 'الحديد (14 مم)', unit: '100', price: 9.5 },
     'البيطون (B25)': { name: 'البيطون (B25)', unit: '100', price: 850 },
     'البيطون (B35)': { name: 'البيطون (B35)', unit: '100', price: 850 },
     'الياجور (7)': { name: 'الياجور (7)', unit: '100', price: 2.5 },
     'الياجور (15)': { name: 'الياجور (15)', unit: '100', price: 5.5 },
     'حفر الأساسات': { name: 'حفر الأساسات', unit: '100', price: 30 },
-    'الحجر (للبلوكاج)': { name: 'الحجر (للبلوكاج)', unit: '100', price: 1500 },
-    'أنابيب PVC (200)': { name: 'أنابيب PVC (200)', unit: '100', price: 20 },
+    'الحجر (للبلوكاج)': { name: 'الحجر (للبلوكاج)', unit: '100', price: 250 },
+    'أنابيب PVC (200)': { name: 'أنابيب PVC (200)', unit: '20', price: 249 },
     'السلك والمسامير': { name: 'السلك والمسامير', unit: '100', price: 16 },
     'ميكا': { name: 'ميكا', unit: '100', price: 20 },
     'الوردي والبودر والشبكة': { name: 'الوردي والبودر والشبكة', unit: '100', price: 85 },
@@ -402,37 +419,38 @@ const fallbackModel = [
     "name": " الطابق الأرضي RDC fallback",
     "items": [
       {"item": "الحديد (6 مم)", "unit": "100", "unitPrice": 9.8, "baseQty": 600},
-      {"item": "الحديد (8 مم)", "unit": "100", "unitPrice": 9.6, "baseQty": 50},
-      {"item": "الحديد (10 مم)", "unit": "100", "unitPrice": 9.6, "baseQty": 500},
-      {"item": "الحديد (12 مم)", "unit": "100", "unitPrice": 9.6, "baseQty": 1000},
-      {"item": "الحديد (14 مم)", "unit": "100", "unitPrice": 9.26, "baseQty": 100},
+      {"item": "الحديد (8 مم)", "unit": "100", "unitPrice": 9.5, "baseQty": 50},
+      {"item": "الحديد (10 مم)", "unit": "100", "unitPrice": 9.5, "baseQty": 500},
+      {"item": "الحديد (12 مم)", "unit": "100", "unitPrice": 9.5, "baseQty": 1000},
+      {"item": "الحديد (14 مم)", "unit": "100", "unitPrice": 9.5, "baseQty": 100},
       {"item": "البيطون (B25)", "unit": "100", "unitPrice": 850, "baseQty": 50},
       {"item": "الوردي والبودر والشبكة", "unit": "100", "unitPrice": 85, "baseQty": 105},
       {"item": "الياجور (15)", "unit": "100", "unitPrice": 5.5, "baseQty": 2500},
       {"item": "أنابيب PVC (200)", "unit": "100", "unitPrice": 65, "baseQty": 18},
       {"item": "الياجور (7)", "unit": "100", "unitPrice": 2, "baseQty": 2000},
-      {"item": "الأسمنت (35)", "unit": "100", "unitPrice": 82, "baseQty": 60},
+      {"item": "الأسمنت (35)", "unit": "100", "unitPrice": 79, "baseQty": 60},
       {"item": "الرمل", "unit": "100", "unitPrice": 320, "baseQty": 6},
       {"item": "الحجر (للبلوكاج)", "unit": "100", "unitPrice": 320, "baseQty": 6},
       {"item": "الكياس", "unit": "100", "unitPrice": 150, "baseQty": 6},
       {"item": "اليد العاملة", "unit": "100", "unitPrice": 250, "baseQty": 150},
-      {"item": "حفر الأساسات", "unit": "100", "unitPrice": 3000, "baseQty": 1}
+      {"item": "حفر الأساسات", "unit": "100", "unitPrice": 30, "baseQty": 100}
     ]
   },
   {
     "name": "R+1 الطابق الأول fallback",
     "items": [
       {"item": "الحديد (6 مم)", "unit": "100", "unitPrice": 9.8, "baseQty": 300},
-      {"item": "الحديد (8 مم)", "unit": "100", "unitPrice": 9.6, "baseQty": 60},
-      {"item": "الحديد (10 مم)", "unit": "100", "unitPrice": 9.6, "baseQty": 300},
-      {"item": "الحديد (12 مم)", "unit": "100", "unitPrice": 9.6, "baseQty": 700},
-      {"item": "الحديد (14 مم)", "unit": "100", "unitPrice": 9.6, "baseQty": 100},
+      {"item": "الحديد (8 مم)", "unit": "100", "unitPrice": 9.5, "baseQty": 60},
+      {"item": "الحديد (10 مم)", "unit": "100", "unitPrice": 9.5, "baseQty": 300},
+      {"item": "الحديد (12 مم)", "unit": "100", "unitPrice": 9.5, "baseQty": 700},
+      {"item": "الحديد (14 مم)", "unit": "100", "unitPrice": 9.5, "baseQty": 100},
       {"item": "البيطون (B25)", "unit": "100", "unitPrice": 850, "baseQty": 24},
-      {"item": "الوردي والبودر والشبكة", "unit": "100", "unitPrice": 85, "baseQty": 105.8823529},
+      {"item": "الوردي والبودر والشبكة", "unit": "100", "unitPrice": 85, "baseQty": 106},
       {"item": "الياجور (15)", "unit": "100", "unitPrice": 5.5, "baseQty": 800},
       {"item": "الياجور (7)", "unit": "100", "unitPrice": 2, "baseQty": 3000},
-      {"item": "الأسمنت (35)", "unit": "100", "unitPrice": 82, "baseQty": 20},
-      {"item": "الرمل", "unit": "100", "unitPrice": 320, "baseQty": 6},
+      {"item": "الأسمنت (35)", "unit": "100", "unitPrice": 79, "baseQty": 20},
+      {"item": "الأسمنت (45)", "unit": "100", "unitPrice": 81, "baseQty": 0},
+	  {"item": "الرمل", "unit": "100", "unitPrice": 320, "baseQty": 6},
       {"item": "الحجر (للبلوكاج)", "unit": "100", "unitPrice": 150, "baseQty": 6},
       {"item": "اليد العاملة", "unit": "100", "unitPrice": 250, "baseQty": 107}
     ]
@@ -458,20 +476,20 @@ const fallbackModel = [
   {
     "name": "R+3 الطابق الثالث fallback",
     "items": [
-      {"item": "الحديد (6 مم)", "unit": "100", "unitPrice": 9.8, "baseQty": 300},
+     {"item": "الحديد (6 مم)", "unit": "100", "unitPrice": 9.8, "baseQty": 300},
       {"item": "الحديد (8 مم)", "unit": "100", "unitPrice": 9.6, "baseQty": 60},
       {"item": "الحديد (10 مم)", "unit": "100", "unitPrice": 9.6, "baseQty": 300},
       {"item": "الحديد (12 مم)", "unit": "100", "unitPrice": 9.6, "baseQty": 700},
       {"item": "الحديد (14 مم)", "unit": "100", "unitPrice": 9.6, "baseQty": 100},
       {"item": "البيطون (B25)", "unit": "100", "unitPrice": 850, "baseQty": 24},
-      {"item": "الوردي والبودر والشبكة", "unit": "100", "unitPrice": 85, "baseQty": 105},
+      {"item": "الوردي والبودر والشبكة", "unit": "100", "unitPrice": 85, "baseQty": 106},
       {"item": "الياجور (15)", "unit": "100", "unitPrice": 5.5, "baseQty": 800},
       {"item": "الياجور (7)", "unit": "100", "unitPrice": 2, "baseQty": 3000},
       {"item": "الأسمنت (35)", "unit": "100", "unitPrice": 82, "baseQty": 20},
       {"item": "الرمل", "unit": "100", "unitPrice": 320, "baseQty": 6},
       {"item": "الحجر (للبلوكاج)", "unit": "100", "unitPrice": 150, "baseQty": 6},
       {"item": "اليد العاملة", "unit": "100", "unitPrice": 250, "baseQty": 107}
-    ]
+     ]
   },
   {
     "name": "R+T السطح fallback",
@@ -1097,7 +1115,20 @@ function loadItemDetails() {
   document.getElementById('itemPrice').value = it.unitPrice != null ? it.unitPrice.toFixed(2) : '';
   document.getElementById('itemQty').value = it.baseQty != null ? it.baseQty : '';
 }
-  </script>
+
+
+function isMobile() {
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+}
+
+function exportCostEstimation() {
+  if (isMobile()) {
+    exportTablesToCSV('cost_estimation.csv');
+  } else {
+    exportToExcel(); // your XLSX export function
+  }
+}
+
   </script>
   
 
