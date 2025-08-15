@@ -210,9 +210,10 @@
   }
 }
 
-@media (max-width: 600px) {
-  .form-row input[type="number"] {
-    width: 220px; /* bigger on mobile */
+@media (max-width:600px){
+  .form-row input[type="number"]{
+    width:100%; /* full width on phone */
+    box-sizing:border-box; /* keep padding inside width */
   }
 }
 
