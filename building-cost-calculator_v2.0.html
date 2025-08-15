@@ -175,14 +175,7 @@
 						 
     }
 
-    /* Mobile adjustments */
-    @media (max-width: 600px) {
-      body { padding: 10px; }
-      .container { padding: 15px; }
-      .form-row {
-        flex-wrap: nowrap; /* Keep label and input on same line */
-        gap: 5px;
-      }
+  
 
       .form-row label {
         font-size: 16px;
@@ -204,21 +197,7 @@
       }
 
   
-  @media (min-width: 601px) {
-  .form-row input[type="number"] {
-    width: 200px; /* bigger on PC */
-  }
-}
-
-
-
-@media (max-width:600px){
-  .form-row input[type="number"]{
-    width:100%; /* full width on phone */
-    box-sizing:border-box; /* keep padding inside width */
-  }
-}
-
+ 
  @media (max-width:600px) {
   .form-row {
     flex-wrap: wrap; /* allow label and input to break into two lines */
