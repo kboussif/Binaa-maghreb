@@ -210,6 +210,8 @@
   }
 }
 
+
+
 @media (max-width:600px){
   .form-row input[type="number"]{
     width:100%; /* full width on phone */
@@ -217,8 +219,15 @@
   }
 }
 
-
- 
+ @media (max-width:600px) {
+  .form-row {
+    flex-wrap: wrap; /* allow label and input to break into two lines */
+  }
+  .form-row input[type="number"] {
+    flex: 1 1 100%; /* take full row */
+    width: 100%;
+  }
+}
  
   </style>
 <head>
