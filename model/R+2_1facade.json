@@ -50,24 +50,7 @@
       {"item":"اليد العاملة","unit":"100","unitPrice":250,"baseQty":100}
     ]
   },
-  {
-    "name": "الطابق الثاني R+2 ",
-    "items": [
-      {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
-      {"item":"الحديد (10 مم)","unit":"100","unitPrice":9.2,"baseQty":500},
-      {"item":"الحديد (12 مم)","unit":"100","unitPrice":9.2,"baseQty":800},
-      {"item":"الحديد (14 مم)","unit":"100","unitPrice":9.2,"baseQty":0},
-      {"item":"البيطون (B35)","unit":"100","unitPrice":850,"baseQty":0},
-      {"item":"الأسمنت (35)","unit":"100","unitPrice":75,"baseQty":25},
-      {"item":"الأسمنت (45)","unit":"100","unitPrice":81,"baseQty":0},
-      {"item":"الوردي والبودر والشبكة","unit":"100","unitPrice":85,"baseQty":0},
-      {"item":"الياجور (7)","unit":"100","unitPrice":2.5,"baseQty":0},
-      {"item":"الياجور (15)","unit":"100","unitPrice":5.5,"baseQty":1500},
-      {"item":"الرمل","unit":"100","unitPrice":4,"baseQty":350},
-      {"item":"اليد العاملة","unit":"100","unitPrice":250,"baseQty":100}
-    ]
-  },
-  {
+   {
     "name": "السطح Terrace",
     "items": [
       {"item":"الحديد (6 مم)","unit":"100","unitPrice":9.4,"baseQty":400},
