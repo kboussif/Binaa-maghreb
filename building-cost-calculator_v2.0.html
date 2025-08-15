@@ -199,19 +199,22 @@
     }
 
     /* PC adjustments */
-    @media (min-width: 601px) {
-      .form-row {
+    @media (min-width: 601px) {     .form-row {
         flex-wrap: nowrap; /* Ensure no wrapping on PC */
       }
 
-      .form-row label {
-        min-width: 100px; /* Consistent width for PC */
-      }
+  
+  @media (min-width: 601px) {
+  .form-row input[type="number"] {
+    width: 200px; /* bigger on PC */
+  }
+}
 
-      .form-row input[type="number"] {
-        width: 80px; /* Consistent input width for PC */
-      }
-    }
+@media (max-width: 600px) {
+  .form-row input[type="number"] {
+    width: 120px; /* bigger on mobile */
+  }
+}
 
 
  
