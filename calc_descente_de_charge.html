@@ -9,52 +9,62 @@
             font-family: Arial, sans-serif;
             margin: 20px;
             background-color: #f4f4f4;
-            direction: ltr;
+            direction: ltr; /* Default LTR */
+        }
+        body.rtl {
+            direction: rtl; /* RTL for Darija */
+            text-align: right;
         }
         h1 {
             text-align: center;
             color: #333;
-            font-size: 1.8em; /* Smaller for mobile */
+            font-size: 1.8em;
         }
         table {
             width: 100%;
-            max-width: 800px; /* Smaller table width */
+            max-width: 800px;
             border-collapse: collapse;
             margin: 20px auto;
             background-color: #fff;
-            font-size: 1em; /* Smaller font size */
+            font-size: 1em;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px; /* Smaller padding */
+            padding: 8px;
             text-align: center;
+        }
+        .rtl th, .rtl td {
+            text-align: center; /* Keep center alignment for numbers in RTL */
         }
         th {
             background-color: #4CAF50;
             color: white;
-            font-size: 1.1em; /* Smaller header font */
+            font-size: 1.1em;
         }
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
         input {
-            width: 60px; /* Smaller input width */
-            padding: 6px; /* Smaller padding */
+            width: 60px;
+            padding: 6px;
             text-align: center;
-            font-size: 0.9em; /* Smaller input font */
+            font-size: 0.9em;
+        }
+        .rtl input {
+            text-align: center; /* Center numbers in inputs for RTL */
         }
         input.invalid {
             border: 2px solid red;
         }
         button {
-            padding: 8px 16px; /* Smaller buttons */
+            padding: 8px 16px;
             background-color: #4CAF50;
             color: white;
             border: none;
             cursor: pointer;
             display: inline-block;
             margin: 10px 5px;
-            font-size: 0.9em; /* Smaller button font */
+            font-size: 0.9em;
         }
         button:hover {
             background-color: #45a049;
@@ -65,7 +75,10 @@
             background-color: #e8f5e9;
             border-radius: 5px;
             text-align: left;
-            font-size: 0.9em; /* Smaller results font */
+            font-size: 0.9em;
+        }
+        .rtl #results {
+            text-align: right; /* RTL for results */
         }
         .label {
             font-weight: bold;
@@ -77,16 +90,19 @@
             border-radius: 8px;
             font-family: Arial, sans-serif;
             color: #333;
-            max-width: 600px; /* Smaller info-box */
+            max-width: 600px;
             line-height: 1.5;
             margin: 20px auto;
             text-align: center;
-            font-size: 0.9em; /* Smaller font */
+            font-size: 0.9em;
+        }
+        .rtl .info-box {
+            text-align: right; /* RTL for info-box */
         }
         canvas {
-            width: 100% !important; /* Responsive width */
-            max-width: 800px; /* Compact for desktop */
-            height: 400px !important; /* Compact height */
+            width: 100% !important;
+            max-width: 800px;
+            height: 400px !important;
             margin: 20px auto;
             background: #fff;
             padding: 10px;
@@ -95,18 +111,18 @@
         /* Media query for mobile devices */
         @media screen and (max-width: 600px) {
             table {
-                font-size: 0.8em; /* Smaller font for mobile */
+                font-size: 0.8em;
             }
             th, td {
-                padding: 6px; /* Smaller padding */
+                padding: 6px;
             }
             input {
-                width: 50px; /* Smaller input fields */
+                width: 50px;
                 font-size: 0.8em;
             }
             canvas {
-                max-width: 100%; /* Full width on mobile */
-                height: 300px !important; /* Smaller height for mobile */
+                max-width: 100%;
+                height: 300px !important;
             }
             h1 {
                 font-size: 1.4em;
@@ -217,19 +233,19 @@
     <script>
         // Initial data for floors
         const initial = [
-            { floor: { en: "Terrace", fr: "Terrasse" }, level: 0, G0: 12, Q0: 10 },
-            { floor: { en: "4th Floor", fr: "PH 4ème" }, level: 1, G0: 10, Q0: 8 },
-            { floor: { en: "3rd Floor", fr: "PH 3ème" }, level: 2, G0: 10, Q0: 6 },
-            { floor: { en: "2nd Floor", fr: "PH 2ème" }, level: 3, G0: 10, Q0: 6 },
-            { floor: { en: "1st Floor", fr: "PH 1er" }, level: 4, G0: 10, Q0: 6 },
-            { floor: { en: "Ground Floor", fr: "PH RDC" }, level: 5, G0: 10, Q0: 6 },
+            { floor: { en: "Terrace", fr: "Terrasse", ma: "السطح" }, level: 0, G0: 12, Q0: 10 },
+            { floor: { en: "4th Floor", fr: "PH 4ème", ma: "الطابق الرابع" }, level: 1, G0: 10, Q0: 8 },
+            { floor: { en: "3rd Floor", fr: "PH 3ème", ma: "الطابق الثالث" }, level: 2, G0: 10, Q0: 6 },
+            { floor: { en: "2nd Floor", fr: "PH 2ème", ma: "الطابق الثاني" }, level: 3, G0: 10, Q0: 6 },
+            { floor: { en: "1st Floor", fr: "PH 1er", ma: "الطابق الأول" }, level: 4, G0: 10, Q0: 6 },
+            { floor: { en: "Ground Floor", fr: "PH RDC", ma: "الطابق الأرضي" }, level: 5, G0: 10, Q0: 6 },
         ];
 
         let rows = JSON.parse(JSON.stringify(initial));
         let chart = null;
         let language = "en";
 
-        // Translations for English and French
+        // Translations for English, French, and Moroccan Darija
         const translations = {
             en: {
                 title: "Column Load Transfer Calculator",
@@ -266,6 +282,24 @@
                 download: "Télécharger CSV",
                 switchLang: "Passer à l'anglais",
                 invalidInput: "Veuillez entrer un nombre valide et non négatif."
+            },
+            ma: {
+                title: "حاسبة نقل الحمل على العمود",
+                infoText: "دخل البوج الثابت (G0) والبوج المتغير (Q0) لكل طابق (من المستوى 0 للسطح تا الطابق الأرضي 5) باش تحسب الحمل على العمود. المستويات ثابتة (0 تا 5). الحسابات كتتحدث أتوماتيكي.",
+                floor: "الطابق",
+                level: "المستوى",
+                g0: "البوج الثابت (طن)",
+                sumG0: "مجموع البوج الثابت (طن)",
+                q0: "البوج المتغير (طن)",
+                sumQ0: "مجموع البوج المتغير (طن)",
+                nu: "الحمل النهائي (طن)",
+                ns: "الحمل العادي (طن)",
+                results: "النتائج",
+                calculate: "حسب",
+                reset: "رجع للأصل",
+                download: "نزل CSV",
+                switchLang: "بدل للدارجة",
+                invalidInput: "دخل رقم صحيح وما يكونش ناقص."
             }
         };
 
@@ -366,10 +400,19 @@
             for (let i = 0; i < 6; i++) {
                 document.getElementById(`floor-${i}`).textContent = initial[i].floor[language];
             }
+
+            // Toggle RTL for Darija
+            document.body.classList.toggle('rtl', language === 'ma');
         }
 
         function toggleLanguage() {
-            language = language === 'en' ? 'fr' : 'en';
+            if (language === 'en') {
+                language = 'fr';
+            } else if (language === 'fr') {
+                language = 'ma';
+            } else {
+                language = 'en';
+            }
             updateLanguage();
             render();
         }
@@ -442,7 +485,7 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: "Load (t)",
+                                text: translations[language].nu.includes('Ultimate') ? "Load (t)" : "الحمل (طن)",
                                 font: {
                                     size: 14
                                 }
@@ -451,7 +494,7 @@
                         x: {
                             title: {
                                 display: true,
-                                text: "Floor",
+                                text: translations[language].floor,
                                 font: {
                                     size: 14
                                 }
