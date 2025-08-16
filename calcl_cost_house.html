@@ -1,66 +1,420 @@
-<!doctype html>
-<html lang="fr">
+<!DOCTYPE html>
+<html lang="ar">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Descente de charge avec graphique</title>
-  <style>
-    body {
-      background: #0b0e14; color: #e6e9ef;
-      font: 14px/1.5 system-ui, sans-serif;
-      margin: 0; padding: 20px;
-    }
-    h1 { font-size: 20px; margin-bottom: 12px; }
-    .toolbar { margin-bottom: 10px; }
-    button, input {
-      background: #1a2136; border: 1px solid #2b3558;
-      border-radius: 6px; padding: 6px 12px; margin-right: 8px;
-      color: #e6e9ef;
-    }
-    button:hover { border-color: #6ea8fe; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 8px 10px; text-align: right; }
-    th { color: #aab2c0; font-size: 12px; }
-    td { background: #111730; }
-    td:first-child, th:first-child { text-align: left; }
-    td[contenteditable="true"] { outline: none; }
-    td[contenteditable="true"]:focus { background: #0f1630; }
-    canvas { max-width: 800px; margin: 20px 0; }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حساب كمية الحديد للأساس ديال الدار | Calculateur de l'acier pour les fondations de maison</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            direction: rtl;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #f0f8ff;
+            border: 2px solid #4a90e2;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        h1 span, p span {
+            display: block;
+            margin: 5px 0;
+        }
+
+        .tip {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .tip span {
+            display: block;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            font-size: 0.9em;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .component-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .component-cell img {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .component-text span {
+            display: block;
+        }
+
+        input[type="number"] {
+            width: 70px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button span {
+            display: block;
+        }
+
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 5px;
+        }
+
+        #results h2 {
+            text-align: center;
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        #results h2 span {
+            display: block;
+            margin: 5px 0;
+        }
+
+        #results table {
+            margin: 0 auto;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .tip, p {
+                font-size: 0.85em;
+            }
+
+            table {
+                font-size: 0.8em;
+            }
+
+            input[type="number"] {
+                width: 60px;
+                font-size: 0.8em;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .component-cell img {
+                width: 25px;
+                height: 25px;
+            }
+
+            button {
+                padding: 8px 16px;
+                font-size: 0.9em;
+            }
+
+            #results h2 {
+                font-size: 1.3em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.2em;
+            }
+
+            .tip, p {
+                font-size: 0.75em;
+            }
+
+            input[type="number"] {
+                width: 50px;
+                font-size: 0.75em;
+            }
+
+            th, td {
+                padding: 6px;
+            }
+
+            .component-cell img {
+                width: 20px;
+                height: 20px;
+            }
+
+            #results h2 {
+                font-size: 1.1em;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Descente de charge – Tableau interactif avec graphique</h1>
-
-  <div class="toolbar">
-    <label>ψ₀: <input id="psi0" type="number" step="0.1" value="0.7" min="0" max="1"></label>
-    <button id="reset">Réinitialiser</button>
-    <button id="downloadCsv">Télécharger CSV</button>
-  </div>
-
-  <table id="tbl">
-    <thead>
-      <tr>
-        <th>Plancher</th><th>Niv</th><th>Gi (kN)</th><th>∑Gi (kN)</th>
-        <th>Qi (kN)</th><th>∑Qi (kN)</th><th>Nu (kN)</th><th>Ns (kN)</th>
-      </tr>
-    </theadarth
-    <tbody></tbody>
-  </table>
-
-  <canvas id="loadChart"></canvas>
-
-  <script>
-    const initial = [
-      { Plancher: "Terrasse", Niv: 0, Gi: 12, Qi: 10 },
-      { Plancher: "PH 4ème", Niv: 1, Gi: 10, Qi: 8 },
-      { Plancher: "PH 3ème", Niv: 2, Gi: 10, Qi: 5.3 },
-      { Plancher: "PH 2ème", Niv: 3, Gi: 10, Qi: 4.7 },
-      { Plancher: "PH 1er", Niv: 4, Gi: 10, Qi: 4.1 },
-      { Plancher: "PH RDC", Niv: 5, Gi: 10, Qi: 3.5 },
-    ];
-
-    let rows = JSON.parse(JSON.stringify(initial));
-    const tbodyრ�
-
-System: * Today's date and time is 10:26 PM EDT on Friday, August 15, 2025.
+    <div class="container">
+        <h1>
+            <span>حساب كمية الحديد للأساس ديال الدار</span>
+            <span>Calculateur de l'acier pour les fondations de maison</span>
+        </h1>
+        <p>
+            <span>دخل العدد والمقايسات ديال العناصر باش تحسب كمية الحديد على حسب العادات المغربية</span>
+            <span>Entrez le nombre et les dimensions des éléments pour estimer l'acier selon les pratiques marocaines</span>
+        </p>
+        <p class="tip">
+            <span>💡 نصيحة: باش تشوف الجدول مزيان، جرب دور تيليفونك على الجنب ولا استعمل الكومبيوتر، وتقدر تسكرول يمين وشمال باش تشوف كل التفاصيل</span>
+            <span>💡 Conseil : Pour une meilleure visualisation du tableau, essayez de tourner votre téléphone horizontalement ou utilisez un ordinateur, et vous pouvez faire défiler à droite et à gauche pour voir tous les détails</span>
+        </p>
+        <div class="table-container">
+            <table id="elementTable">
+                <thead>
+                    <tr>
+                        <th>
+                            <span>العنصر</span>
+                            <span>Composant</span>
+                        </th>
+                        <th>
+                            <span>العدد</span>
+                            <span>Nombre</span>
+                        </th>
+                        <th>
+                            <span>الطول (م)</span>
+                            <span>Longueur (m)</span>
+                        </th>
+                        <th>
+                            <span>العرض (م)</span>
+                            <span>Largeur (m)</span>
+                        </th>
+                        <th>
+                            <span>الارتفاع (م)</span>
+                            <span>Hauteur (m)</span>
+                        </th>
+                        <th>
+                            <span>معدل الحديد (كغ/م³)</span>
+                            <span>Taux d'acier (kg/m³)</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="القواعد | Fondations continues">
+                            <div class="component-text">
+                                <span>القواعد</span>
+                                <span>Fondations continues</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="chainageNum" value="1" min="0"></td>
+                        <td><input type="number" id="chainageLength" value="36" min="0" step="0.01"></td>
+                        <td><input type="number" id="chainageWidth" value="0.4" min="0" step="0.01"></td>
+                        <td><input type="number" id="chainageHeight" value="0.2" min="0" step="0.01"></td>
+                        <td>
+                            <span>100 كغ/م³</span>
+                            <span>100 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1593642532973-d31b97d0e6b8" alt="القواعد المنفصلة | Fondations isolées">
+                            <div class="component-text">
+                                <span>القواعد المنفصلة</span>
+                                <span>Fondations isolées</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="isolatedNum" value="0" min="0"></td>
+                        <td><input type="number" id="isolatedLength" value="1" min="0" step="0.01"></td>
+                        <td><input type="number" id="isolatedWidth" value="1" min="0" step="0.01"></td>
+                        <td><input type="number" id="isolatedHeight" value="0.4" min="0" step="0.01"></td>
+                        <td>
+                            <span>125 كغ/م³</span>
+                            <span>125 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1560448204-603b3ec8f7e7" alt="العمدان | Colonnes">
+                            <div class="component-text">
+                                <span>العمدان</span>
+                                <span>Colonnes</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="columnNum" value="4" min="0"></td>
+                        <td><input type="number" id="columnLength" value="0.3" min="0" step="0.01"></td>
+                        <td><input type="number" id="columnWidth" value="0.3" min="0" step="0.01"></td>
+                        <td><input type="number" id="columnHeight" value="3" min="0" step="0.01"></td>
+                        <td>
+                            <span>140 كغ/م³</span>
+                            <span>140 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1503387762-5927c29adf34" alt="الجسور | Poutres">
+                            <div class="component-text">
+                                <span>الجسور</span>
+                                <span>Poutres</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="beamNum" value="4" min="0"></td>
+                        <td><input type="number" id="beamLength" value="6" min="0" step="0.01"></td>
+                        <td><input type="number" id="beamWidth" value="0.3" min="0" step="0.01"></td>
+                        <td><input type="number" id="beamHeight" value="0.45" min="0" step="0.01"></td>
+                        <td>
+                            <span>150 كغ/م³</span>
+                            <span>150 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158" alt="السقف | Dalles">
+                            <div class="component-text">
+                                <span>السقف</span>
+                                <span>Dalles</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="slabNum" value="1" min="0"></td>
+                        <td><input type="number" id="slabLength" value="12" min="0" step="0.01"></td>
+                        <td><input type="number" id="slabWidth" value="6" min="0" step="0.01"></td>
+                        <td><input type="number" id="slabHeight" value="0.15" min="0" step="0.01"></td>
+                        <td>
+                            <span>100 كغ/م³</span>
+                            <span>100 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="الحيطان المسلحة | Murs de cisaillement">
+                            <div class="component-text">
+                                <span>الحيطان المسلحة</span>
+                                <span>Murs de cisaillement</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="wallNum" value="0" min="0"></td>
+                        <td><input type="number" id="wallLength" value="3" min="0" step="0.01"></td>
+                        <td><input type="number" id="wallWidth" value="0.2" min="0" step="0.01"></td>
+                        <td><input type="number" id="wallHeight" value="3" min="0" step="0.01"></td>
+                        <td>
+                            <span>90 كغ/م³</span>
+                            <span>90 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="السلالام | Escaliers">
+                            <div class="component-text">
+                                <span>السلالام</span>
+                                <span>Escaliers</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="stairsNum" value="0" min="0"></td>
+                        <td><input type="number" id="stairsLength" value="3" min="0" step="0.01"></td>
+                        <td><input type="number" id="stairsWidth" value="1" min="0" step="0.01"></td>
+                        <td><input type="number" id="stairsHeight" value="0.3" min="0" step="0.01"></td>
+                        <td>
+                            <span>110 كغ/م³</span>
+                            <span>110 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="الحيطان الاستنادية | Murs de soutènement">
+                            <div class="component-text">
+                                <span>الحيطان الاستنادية</span>
+                                <span>Murs de soutènement</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="retainingNum" value="0" min="0"></td>
+                        <td><input type="number" id="retainingLength" value="5" min="0" step="0.01"></td>
+                        <td><input type="number" id="retainingWidth" value="0.3" min="0" step="0.01"></td>
+                        <td><input type="number" id="retainingHeight" value="2" min="0" step="0.01"></td>
+                        <td>
+                            <span>125 كغ/م³</span>
+                            <span>125 kg/m³</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="component-cell">
+                            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158" alt="السقف المفرغ | Dalles creuses">
+                            <div class="component-text">
+                                <span>السقف المفرغ</span>
+                                <span>Dalles creuses</span>
+                            </div>
+                        </td>
+                        <td><input type="number" id="hollowSlabNum" value="0" min="0"></td>
+                        <td><input type="number" id="hollowSlabLength" value="12" min="0" step="0.01"></td>
+                        <td><input type="number" id="hollowSlabWidth" value="6" min="0" step="0.01"></td>
+                        <td><input type="number" id="hollowSlabHeight" value="0.2" min="0" step="0.01"></td>
+                        <td>
+                            <span>80 كغ/م³</span>
+                           
