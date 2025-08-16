@@ -1,89 +1,66 @@
-const initial = [
-  { Plancher: "Terrasse", Niv: 0, Gi: 12, Qi: 10 },
-  { Plancher: "PH 4ème", Niv: 1, Gi: 10, Qi: 8 },
-  { Plancher: "PH 3ème", Niv: 2, Gi: 10, Qi: 5.3 },
-  { Plancher: "PH 2ème", Niv: 3, Gi: 10, Qi: 4.7 },
-  { Plancher: "PH 1er", Niv: 4, Gi: 10, Qi: 4.1 },
-  { Plancher: "PH RDC", Niv: 5, Gi: 10, Qi: 3.5 },
-];
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Descente de charge avec graphique</title>
+  <style>
+    body {
+      background: #0b0e14; color: #e6e9ef;
+      font: 14px/1.5 system-ui, sans-serif;
+      margin: 0; padding: 20px;
+    }
+    h1 { font-size: 20px; margin-bottom: 12px; }
+    .toolbar { margin-bottom: 10px; }
+    button, input {
+      background: #1a2136; border: 1px solid #2b3558;
+      border-radius: 6px; padding: 6px 12px; margin-right: 8px;
+      color: #e6e9ef;
+    }
+    button:hover { border-color: #6ea8fe; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 8px 10px; text-align: right; }
+    th { color: #aab2c0; font-size: 12px; }
+    td { background: #111730; }
+    td:first-child, th:first-child { text-align: left; }
+    td[contenteditable="true"] { outline: none; }
+    td[contenteditable="true"]:focus { background: #0f1630; }
+    canvas { max-width: 800px; margin: 20px 0; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Descente de charge – Tableau interactif avec graphique</h1>
 
-let rows = JSON.parse(JSON.stringify(initial));
-const tbody = document.querySelector('#tbl tbody');
-const scaleToggle = document.getElementById('scaleToggle');
+  <div class="toolbar">
+    <label>ψ₀: <input id="psi0" type="number" step="0.1" value="0.7" min="0" max="1"></label>
+    <button id="reset">Réinitialiser</button>
+    <button id="downloadCsv">Télécharger CSV</button>
+  </div>
 
-function toNum(v) {
-  const n = parseFloat(String(v).replace(',', '.'));
-  return isFinite(n) ? n : 0;
-}
+  <table id="tbl">
+    <thead>
+      <tr>
+        <th>Plancher</th><th>Niv</th><th>Gi (kN)</th><th>∑Gi (kN)</th>
+        <th>Qi (kN)</th><th>∑Qi (kN)</th><th>Nu (kN)</th><th>Ns (kN)</th>
+      </tr>
+    </theadarth
+    <tbody></tbody>
+  </table>
 
-function recompute() {
-  let sG = 0, sQ = 0;
-  const alpha_n = 0.8; // Load reduction factor for 6 floors
-  for (const r of rows) {
-    sG += toNum(r.Gi);
-    sQ += toNum(r.Qi);
-    r.sumGi = sG;
-    r.sumQi = sQ;
-    r.Nu = 1.35 * r.sumGi + 1.5 * (alpha_n * r.sumQi);
-    r.Ns = r.sumGi + (alpha_n * r.sumQi);
-  }
-}
+  <canvas id="loadChart"></canvas>
 
-function render() {
-  recompute();
-  tbody.innerHTML = '';
-  rows.forEach((r, idx) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${r.Plancher}</td>
-      <td>${r.Niv}</td>
-      <td contenteditable="true" data-idx="${idx}" data-field="Gi">${r.Gi}</td>
-      <td>${(r.sumGi).toFixed(2)}</td>
-      <td contenteditable="true" data-idx="${idx}" data-field="Qi">${r.Qi}</td>
-      <td>${(r.sumQi).toFixed(2)}</td>
-      <td>${(r.Nu).toFixed(2)}</td>
-      <td>${(r.Ns).toFixed(2)}</td>`;
-    tbody.appendChild(tr);
-  });
-  bindEditing();
-}
+  <script>
+    const initial = [
+      { Plancher: "Terrasse", Niv: 0, Gi: 12, Qi: 10 },
+      { Plancher: "PH 4ème", Niv: 1, Gi: 10, Qi: 8 },
+      { Plancher: "PH 3ème", Niv: 2, Gi: 10, Qi: 5.3 },
+      { Plancher: "PH 2ème", Niv: 3, Gi: 10, Qi: 4.7 },
+      { Plancher: "PH 1er", Niv: 4, Gi: 10, Qi: 4.1 },
+      { Plancher: "PH RDC", Niv: 5, Gi: 10, Qi: 3.5 },
+    ];
 
-function bindEditing() {
-  tbody.querySelectorAll('td[contenteditable="true"]').forEach(td => {
-    td.addEventListener('blur', () => {
-      const idx = +td.dataset.idx;
-      const field = td.dataset.field;
-      rows[idx][field] = toNum(td.textContent);
-      render();
-    });
-    td.addEventListener('keydown', e => {
-      if (e.key === "Enter") { e.preventDefault(); td.blur(); }
-    });
-  });
-}
+    let rows = JSON.parse(JSON.stringify(initial));
+    const tbodyრ�
 
-document.getElementById('reset').addEventListener('click', () => {
-  rows = JSON.parse(JSON.stringify(initial));
-  render();
-});
-
-scaleToggle.addEventListener('change', render); // Note: Checkbox is now redundant but kept for compatibility
-
-document.getElementById('downloadCsv').addEventListener('click', () => {
-  recompute();
-  const header = ['Plancher','Niv','Gi','∑Gi','Qi','∑Qi','Nu','Ns'];
-  const lines = [header.join(',')];
-  rows.forEach(r => {
-    lines.push([
-      r.Plancher, r.Niv, r.Gi, r.sumGi.toFixed(2), r.Qi, r.sumQi.toFixed(2), r.Nu.toFixed(2), r.Ns.toFixed(2)
-    ].join(','));
-  });
-  const blob = new Blob([lines.join('\n')], {type: 'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'descente_de_charge.csv';
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
-});
-
-render();
+System: * Today's date and time is 10:26 PM EDT on Friday, August 15, 2025.
