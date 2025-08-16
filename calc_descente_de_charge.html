@@ -1,66 +1,339 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Descente de charge avec graphique</title>
-  <style>
-    body {
-      background: #0b0e14; color: #e6e9ef;
-      font: 14px/1.5 system-ui, sans-serif;
-      margin: 0; padding: 20px;
-    }
-    h1 { font-size: 20px; margin-bottom: 12px; }
-    .toolbar { margin-bottom: 10px; }
-    button, input {
-      background: #1a2136; border: 1px solid #2b3558;
-      border-radius: 6px; padding: 6px 12px; margin-right: 8px;
-      color: #e6e9ef;
-    }
-    button:hover { border-color: #6ea8fe; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 8px 10px; text-align: right; }
-    th { color: #aab2c0; font-size: 12px; }
-    td { background: #111730; }
-    td:first-child, th:first-child { text-align: left; }
-    td[contenteditable="true"] { outline: none; }
-    td[contenteditable="true"]:focus { background: #0f1630; }
-    canvas { max-width: 800px; margin: 20px 0; }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descente de charge sur poteau | Column Load Transfer Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            direction: ltr;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        input {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: block;
+            margin: 10px auto;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 5px;
+            text-align: left;
+        }
+        .label {
+            font-weight: bold;
+        }
+        .info-box {
+            background-color: #f0f8ff;
+            border: 2px solid #4a90e2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            color: #333;
+            max-width: 800px;
+            line-height: 1.5;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .tooltip { position: relative; display: inline-block; }
+        .tooltip .tooltiptext {
+            visibility: hidden; width: 200px; background: #1a2136; color: #e6e9ef;
+            text-align: center; border-radius: 6px; padding: 5px; position: absolute;
+            z-index: 1; top: 100%; left: 50%; margin-left: -100px;
+        }
+        .tooltip:hover .tooltiptext { visibility: visible; }
+        canvas { max-width: 800px; margin: 20px auto; background: #fff; padding: 10px; border-radius: 5px; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <h1>Descente de charge – Tableau interactif avec graphique</h1>
+    <h1>Descente de charge sur poteau | Column Load Transfer Calculator</h1>
+    <div class="info-box">
+        <p>Entrez les charges permanentes (G0) et variables (Q0) pour chaque étage pour calculer les charges sur un poteau (basé sur les normes Eurocode). | Enter the permanent (G0) and variable (Q0) loads for each floor to calculate column loads (based on Eurocode standards).</p>
+        <p>💡 Conseil : Pour une meilleure visualisation, utilisez un ordinateur ou tournez votre téléphone en mode paysage.</p>
+    </div>
 
-  <div class="toolbar">
-    <label>ψ₀: <input id="psi0" type="number" step="0.1" value="0.7" min="0" max="1"></label>
-    <button id="reset">Réinitialiser</button>
-    <button id="downloadCsv">Télécharger CSV</button>
-  </div>
+    <div class="tooltip">
+        <label>Type de bâtiment: 
+            <select id="buildingType" disabled>
+                <option value="0.7" selected>Résidentiel | Residential (ψ₀=0.7)</option>
+            </select>
+        </label>
+        <span class="tooltiptext">ψ₀ réduit les charges variables pour tenir compte du fait que tous les étages ne sont pas chargés au maximum simultanément (Eurocode 1). | ψ₀ reduces variable loads to account for non-simultaneous maximum loading (Eurocode 1).</span>
+    </div>
 
-  <table id="tbl">
-    <thead>
-      <tr>
-        <th>Plancher</th><th>Niv</th><th>Gi (kN)</th><th>∑Gi (kN)</th>
-        <th>Qi (kN)</th><th>∑Qi (kN)</th><th>Nu (kN)</th><th>Ns (kN)</th>
-      </tr>
-    </theadarth
-    <tbody></tbody>
-  </table>
+    <table id="tbl">
+        <thead>
+            <tr>
+                <th>Plancher | Floor</th>
+                <th>Niv | Level</th>
+                <th>G0 (t) | Permanent Load (t)</th>
+                <th>∑G0 (t) | Cumulative G0 (t)</th>
+                <th>Q0 (t) | Variable Load (t)</th>
+                <th>∑Q0 (t) | Cumulative Q0 (t)</th>
+                <th>Nu (t) | Ultimate Load (t)</th>
+                <th>Ns (t) | Service Load (t)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Terrasse | Terrace</td>
+                <td>0</td>
+                <td><input type="number" data-idx="0" data-field="G0" value="12" min="0" step="0.01"></td>
+                <td></td>
+                <td><input type="number" data-idx="0" data-field="Q0" value="10" min="0" step="0.01"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>PH 4ème | 4th Floor</td>
+                <td>1</td>
+                <td><input type="number" data-idx="1" data-field="G0" value="10" min="0" step="0.01"></td>
+                <td></td>
+                <td><input type="number" data-idx="1" data-field="Q0" value="8" min="0" step="0.01"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>PH 3ème | 3rd Floor</td>
+                <td>2</td>
+                <td><input type="number" data-idx="2" data-field="G0" value="10" min="0" step="0.01"></td>
+                <td></td>
+                <td><input type="number" data-idx="2" data-field="Q0" value="6" min="0" step="0.01"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>PH 2ème | 2nd Floor</td>
+                <td>3</td>
+                <td><input type="number" data-idx="3" data-field="G0" value="10" min="0" step="0.01"></td>
+                <td></td>
+                <td><input type="number" data-idx="3" data-field="Q0" value="6" min="0" step="0.01"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>PH 1er | 1st Floor</td>
+                <td>4</td>
+                <td><input type="number" data-idx="4" data-field="G0" value="10" min="0" step="0.01"></td>
+                <td></td>
+                <td><input type="number" data-idx="4" data-field="Q0" value="6" min="0" step="0.01"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>PH RDC | Ground Floor</td>
+                <td>5</td>
+                <td><input type="number" data-idx="5" data-field="G0" value="10" min="0" step="0.01"></td>
+                <td></td>
+                <td><input type="number" data-idx="5" data-field="Q0" value="6" min="0" step="0.01"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
 
-  <canvas id="loadChart"></canvas>
+    <button onclick="calculateLoads()">Calculer les charges | Calculate Loads</button>
+    <button onclick="resetTable()">Réinitialiser | Reset</button>
+    <button onclick="downloadCsv()">Télécharger CSV | Download CSV</button>
 
-  <script>
-    const initial = [
-      { Plancher: "Terrasse", Niv: 0, Gi: 12, Qi: 10 },
-      { Plancher: "PH 4ème", Niv: 1, Gi: 10, Qi: 8 },
-      { Plancher: "PH 3ème", Niv: 2, Gi: 10, Qi: 5.3 },
-      { Plancher: "PH 2ème", Niv: 3, Gi: 10, Qi: 4.7 },
-      { Plancher: "PH 1er", Niv: 4, Gi: 10, Qi: 4.1 },
-      { Plancher: "PH RDC", Niv: 5, Gi: 10, Qi: 3.5 },
-    ];
+    <div id="results"></div>
+    <canvas id="loadChart"></canvas>
 
-    let rows = JSON.parse(JSON.stringify(initial));
-    const tbodyრ�
+    <script>
+        const initial = [
+            { Plancher: "Terrasse | Terrace", Niv: 0, G0: 12, Q0: 10 },
+            { Plancher: "PH 4ème | 4th Floor", Niv: 1, G0: 10, Q0: 8 },
+            { Plancher: "PH 3ème | 3rd Floor", Niv: 2, G0: 10, Q0: 6 },
+            { Plancher: "PH 2ème | 2nd Floor", Niv: 3, G0: 10, Q0: 6 },
+            { Plancher: "PH 1er | 1st Floor", Niv: 4, G0: 10, Q0: 6 },
+            { Plancher: "PH RDC | Ground Floor", Niv: 5, G0: 10, Q0: 6 },
+        ];
 
-System: * Today's date and time is 10:26 PM EDT on Friday, August 15, 2025.
+        let rows = JSON.parse(JSON.stringify(initial));
+        let chart = null;
+
+        function toNum(v) {
+            const n = parseFloat(String(v).replace(',', '.'));
+            return isFinite(n) && n >= 0 ? n : 0; // Prevent negative loads
+        }
+
+        function recompute() {
+            let sG = 0, sQ = 0;
+            const psi_0 = 0.7; // Fixed for residential
+            const n = rows.length;
+            const alpha_n = n <= 2 ? 1 : (2 + (n - 2) * psi_0) / n;
+            for (const r of rows) {
+                sG += toNum(r.G0);
+                sQ += toNum(r.Q0);
+                r.sumG0 = sG;
+                r.sumQ0 = sQ;
+                r.Nu = 1.35 * r.sumG0 + 1.5 * (alpha_n * r.sumQ0);
+                r.Ns = r.sumG0 + (alpha_n * r.sumQ0);
+            }
+        }
+
+        function render() {
+            recompute();
+            const tbody = document.querySelector('#tbl tbody');
+            tbody.querySelectorAll('input').forEach(input => {
+                const idx = +input.dataset.idx;
+                const field = input.dataset.field;
+                input.value = rows[idx][field];
+            });
+            tbody.querySelectorAll('td:not(:nth-child(1)):not(:nth-child(3)):not(:nth-child(5))').forEach((td, index) => {
+                const rowIndex = Math.floor(index / 6);
+                const colIndex = index % 6;
+                if (colIndex === 0) td.textContent = rows[rowIndex].Niv;
+                if (colIndex === 1) td.textContent = rows[rowIndex].sumG0.toFixed(2);
+                if (colIndex === 2) td.textContent = rows[rowIndex].sumQ0.toFixed(2);
+                if (colIndex === 3) td.textContent = rows[rowIndex].Nu.toFixed(2);
+                if (colIndex === 4) td.textContent = rows[rowIndex].Ns.toFixed(2);
+            });
+            updateResults();
+            updateChart();
+            bindEditing();
+        }
+
+        function bindEditing() {
+            document.querySelectorAll('#tbl input').forEach(input => {
+                input.addEventListener('input', () => {
+                    const idx = +input.dataset.idx;
+                    const field = input.dataset.field;
+                    rows[idx][field] = toNum(input.value);
+                    render();
+                });
+            });
+        }
+
+        function updateResults() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <h2>Résultats | Results</h2>
+                ${rows.map((r, idx) => `
+                    <p><span class="label">${r.Plancher}:</span>
+                        ∑G0: ${r.sumG0.toFixed(2)} t | Cumulative G0: ${r.sumG0.toFixed(2)} t,
+                        ∑Q0: ${r.sumQ0.toFixed(2)} t | Cumulative Q0: ${r.sumQ0.toFixed(2)} t,
+                        Nu: ${r.Nu.toFixed(2)} t | Ultimate Load: ${r.Nu.toFixed(2)} t,
+                        Ns: ${r.Ns.toFixed(2)} t | Service Load: ${r.Ns.toFixed(2)} t
+                    </p>
+                `).join('')}
+            `;
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('loadChart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: rows.map(r => r.Plancher.split(' | ')[0]),
+                    datasets: [
+                        {
+                            label: 'Nu (Ultimate Load, t) | Charge ultime (t)',
+                            data: rows.map(r => r.Nu),
+                            backgroundColor: '#007BFF',
+                            borderColor: '#005BBB',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Ns (Service Load, t) | Charge de service (t)',
+                            data: rows.map(r => r.Ns),
+                            backgroundColor: '#4FC3F7',
+                            borderColor: '#039BE5',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Charge | Load (tonnes)', color: '#333' },
+                            ticks: { color: '#333' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Plancher | Floor', color: '#333' },
+                            ticks: { color: '#333' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#333' } }
+                    }
+                }
+            });
+        }
+
+        function calculateLoads() {
+            render();
+        }
+
+        function resetTable() {
+            rows = JSON.parse(JSON.stringify(initial));
+            render();
+        }
+
+        function downloadCsv() {
+            recompute();
+            const header = ['Plancher | Floor','Niv | Level','G0 (t) | Permanent Load (t)','∑G0 (t) | Cumulative G0 (t)','Q0 (t) | Variable Load (t)','∑Q0 (t) | Cumulative Q0 (t)','Nu (t) | Ultimate Load (t)','Ns (t) | Service Load (t)'];
+            const lines = [header.join(',')];
+            rows.forEach(r => {
+                lines.push([
+                    r.Plancher, r.Niv, r.G0, r.sumG0.toFixed(2), r.Q0, r.sumQ0.toFixed(2), r.Nu.toFixed(2), r.Ns.toFixed(2)
+                ].join(','));
+            });
+            const blob = new Blob([lines.join('\n')], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'descente_de_charge_poteau_tonnes.csv';
+            document.body.appendChild(a); a.click(); a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        render();
+    </script>
+</body>
+</html>
