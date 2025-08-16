@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Descente de charge</title>
+  <style>
+    body {
+      background: #0b0e14; color: #e6e9ef;
+      font: 14px/1.5 system-ui, sans-serif;
+      margin: 0; padding: 20px;
+    }
+    h1 { font-size: 20px; margin-bottom: 12px; }
+    .toolbar { margin-bottom: 10px; }
+    button, label {
+      background: #1a2136; border: 1px solid #2b3558;
+      border-radius: 6px; padding: 6px 12px; margin-right: 8px;
+      color: #e6e9ef; cursor: pointer;
+    }
+    button:hover { border-color: #6ea8fe; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 8px 10px; text-align: right; }
+    th { color: #aab2c0; font-size: 12px; }
+    td { background: #111730; }
+    td:first-child, th:first-child { text-align: left; }
+    td[contenteditable="true"] { outline: none; }
+    td[contenteditable="true"]:focus { background: #0f1630; }
+  </style>
+</head>
+<body>
+  <h1>Descente de charge – Tableau interactif</h1>
+
+  <div class="toolbar">
+    <label><input id="scaleToggle" type="checkbox"> Afficher Nu/Ns × 0.1</label>
+    <button id="reset">Réinitialiser</button>
+    <button id="downloadCsv">Télécharger CSV</button>
+  </div>
+
+  <table id="tbl">
+    <thead>
+      <tr>
+        <th>Plancher</th><th>Niv</th><th>Gi</th><th>∑Gi</th>
+        <th>Qi</th><th>∑Qi</th><th>Nu</th><th>Ns</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const initial = [
+      { Plancher: "Terrasse", Niv: 0, Gi: 12, Qi: 10 },
+      { Plancher: "PH 4ème", Niv: 1, Gi: 10, Qi: 8 },
+      { Plancher: "PH 3ème", Niv: 2, Gi: 10, Qi: 5.3 },
+      { Plancher: "PH 2ème", Niv: 3, Gi: 10, Qi: 4.7 },
+      { Plancher: "PH 1er", Niv: 4, Gi: 10, Qi: 4.1 },
+      { Plancher: "PH RDC", Niv: 5, Gi: 10, Qi: 3.5 },
+    ];
+
+    let rows = JSON.parse(JSON.stringify(initial));
+    const tbody = document.querySelector('#tbl tbody');
+    const scaleToggle = document.getElementById('scaleToggle');
+
+    function toNum(v) {
+      const n = parseFloat(String(v).replace(',', '.'));
+      return isFinite(n) ? n : 0;
+    }
+
+    function recompute() {
+      let sG = 0, sQ = 0;
+      for (const r of rows) {
+        sG += toNum(r.Gi);
+        sQ += toNum(r.Qi);
+        r.sumGi = sG;
+        r.sumQi = sQ;
+        r.Nu = 1.35 * r.sumGi + 1.5 * r.sumQi;
+        r.Ns = r.sumGi + r.sumQi;
+      }
+    }
+
+    function fmt(n) {
+      const s = scaleToggle.checked ? n * 0.1 : n;
+      return (Math.round(s * 100) / 100).toString();
+    }
+
+    function render() {
+      recompute();
+      tbody.innerHTML = '';
+      rows.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.Plancher}</td>
+          <td>${r.Niv}</td>
+          <td contenteditable="true" data-idx="${idx}" data-field="Gi">${r.Gi}</td>
+          <td>${fmt(r.sumGi)}</td>
+          <td contenteditable="true" data-idx="${idx}" data-field="Qi">${r.Qi}</td>
+          <td>${fmt(r.sumQi)}</td>
+          <td>${fmt(r.Nu)}</td>
+          <td>${fmt(r.Ns)}</td>`;
+        tbody.appendChild(tr);
+      });
+      bindEditing();
+    }
+
+    function bindEditing() {
+      tbody.querySelectorAll('td[contenteditable="true"]').forEach(td => {
+        td.addEventListener('blur', () => {
+          const idx = +td.dataset.idx;
+          const field = td.dataset.field;
+          rows[idx][field] = toNum(td.textContent);
+          render();
+        });
+        td.addEventListener('keydown', e => {
+          if (e.key === "Enter") { e.preventDefault(); td.blur(); }
+        });
+      });
+    }
+
+    document.getElementById('reset').addEventListener('click', () => {
+      rows = JSON.parse(JSON.stringify(initial));
+      render();
+    });
+
+    scaleToggle.addEventListener('change', render);
+
+    document.getElementById('downloadCsv').addEventListener('click', () => {
+      recompute();
+      const header = ['Plancher','Niv','Gi','∑Gi','Qi','∑Qi','Nu','Ns'];
+      const lines = [header.join(',')];
+      rows.forEach(r => {
+        lines.push([
+          r.Plancher, r.Niv, r.Gi, r.sumGi, r.Qi, r.sumQi, r.Nu, r.Ns
+        ].join(','));
+      });
+      const blob = new Blob([lines.join('\n')], {type: 'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'descente_de_charge.csv';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    render();
+  </script>
+</body>
+</html>
+
+
