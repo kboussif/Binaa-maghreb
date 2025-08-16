@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ar-MA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة الخرسانة المسلحة / Calculatrice de béton armé (Eurocode 2)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #e8ecef;
+            direction: rtl;
+            text-align: right;
+        }
+        h1 {
+            color: #1a3c6e;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2, h3 {
+            color: #2e5b9e;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .input-section, .output-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        .output-section {
+            flex: 2;
+            min-width: 400px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #1a3c6e;
+            font-weight: 500;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #b0c4de;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2e5b9e;
+            box-shadow: 0 0 5px rgba(46, 91, 158, 0.3);
+        }
+        button {
+            background-color: #2e5b9e;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #1a3c6e;
+        }
+        canvas {
+            border: 1px solid #b0c4de;
+            border-radius: 4px;
+            margin-top: 20px;
+            max-width: 100%;
+        }
+        #inputDiagram, #poteauDiagram {
+            margin-bottom: 20px;
+        }
+        .output {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .output-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .output-table th, .output-table td {
+            padding: 10px;
+            text-align: right;
+            border: 1px solid #b0c4de;
+        }
+        .output-table th {
+            background-color: #2e5b9e;
+            color: white;
+            font-weight: bold;
+        }
+        .output-table tr:nth-child(1) { background-color: #e6f0fa; } /* Concrete volume */
+        .output-table tr:nth-child(2) { background-color: #e6ffe6; } /* Longitudinal weight */
+        .output-table tr:nth-child(3) { background-color: #f3e6ff; } /* Stirrup weight */
+        .output-table tr:nth-child(4) { background-color: #ffe6e6; } /* Total steel weight */
+        .output-table tr:nth-child(5) { background-color: #e6f7ff; } /* Reinforcement ratio */
+        .output-table tr:nth-child(6) { background-color: #fff3e6; } /* Bar spacing */
+        .output-table tr:nth-child(7) { background-color: #e6fffa; } /* Neutral axis */
+        .output-table tr:nth-child(8) { background-color: #f5f5f5; } /* Concrete stress */
+        .output-table tr:nth-child(9) { background-color: #e9ecef; } /* Steel stress */
+        .output-table tr:nth-child(10) { background-color: #ffe6f0; } /* Crack width */
+        .output-table tr:nth-child(11) { background-color: #fffde6; } /* Shear resistance */
+        .pass { color: #28a745; }
+        .fail { color: #dc3545; }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1a3c6e;
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>حاسبة الخرسانة المسلحة / Calculatrice de béton armé (Eurocode 2)</h1>
+    <div class="container">
+        <div class="input-section">
+            <h2>المعطيات / Données</h2>
+            <h3>المقطع العرضي / Section transversale</h3>
+            <canvas id="inputDiagram" width="400" height="300"></canvas>
+            <label for="elementType">نوع العنصر / Type d'élément:</label>
+            <select id="elementType" onchange="updateInputs()">
+                <option value="column" selected>Poteau (عمود)</option>
+                <option value="footing">Semelle (أساس)</option>
+            </select>
+            <label for="width">العرض / Largeur (م) <span class="tooltip">ⓘ<span class="tooltiptext">عرض الـ section transversale ديال العنصر</span></span>:</label>
+            <input type="number" id="width" step="0.01" min="0.1" value="0.3" oninput="drawInputDiagram()">
+            <label for="depth">العمق / Profondeur (م) <span class="tooltip">ⓘ<span class="tooltiptext">عمق الـ section transversale ديال العنصر</span></span>:</label>
+            <input type="number" id="depth" step="0.01" min="0.1" value="0.3" oninput="drawInputDiagram()">
+            <label for="height">الارتفاع/السماكة / Hauteur/Épaisseur (م) <span class="tooltip">ⓘ<span class="tooltiptext">ارتفاع العمود أو سماكة الأساس</span></span>:</label>
+            <input type="number" id="height" step="0.01" min="0.1" value="1.4" oninput="drawInputDiagram()">
+            <label for="concreteClass">نوع الخرسانة / Classe de béton:</label>
+            <select id="concreteClass" onchange="drawInputDiagram()">
+                <option value="25">C25/30</option>
+                <option value="30" selected>C30/37</option>
+                <option value="35">C35/45</option>
+                <option value="40">C40/50</option>
+            </select>
+            <label for="cover">الغطاء الخرساني / Couverture (ملم) <span class="tooltip">ⓘ<span class="tooltiptext">الغطاء الخرساني للـ armatures</span></span>:</label>
+            <input type="number" id="cover" min="20" value="30" oninput="drawInputDiagram()">
+            <label for="numBars">عدد القضبان الطولية / Nombre de barres longitudinales <span class="tooltip">ⓘ<span class="tooltiptext">4 للزوايا فقط، 8 للزوايا والمنتصف / 4 pour les coins seulement, 8 pour les coins et les milieux</span></span>:</label>
+            <input type="number" id="numBars" min="4" max="8" step="4" value="4" oninput="drawInputDiagram()">
+            <label for="barDiameter">قطر القضيب / Diamètre des barres (ملم) <span class="tooltip">ⓘ<span class="tooltiptext">قطر الـ barres longitudinales</span></span>:</label>
+            <input type="number" id="barDiameter" min="8" value="12" oninput="drawInputDiagram()">
+            <label for="stirrupDiameter">قطر الركاب / Diamètre des étriers (ملم) <span class="tooltip">ⓘ<span class="tooltiptext">قطر الـ étriers</span></span>:</label>
+            <input type="number" id="stirrupDiameter" min="6" value="8" oninput="drawInputDiagram()">
+            <label for="stirrupSpacing">تباعد الركاب / Espacement des étriers (ملم) <span class="tooltip">ⓘ<span class="tooltiptext">المسافة بين الـ étriers</span></span>:</label>
+            <input type="number" id="stirrupSpacing" min="50" value="200" oninput="drawInputDiagram()">
+            <label for="axialLoad">الحمولة المحورية / Effort axial ELU (كيلو نيوتن) <span class="tooltip">ⓘ<span class="tooltiptext">الحمولة المحورية في حالة الحد القصوى</span></span>:</label>
+            <input type="number" id="axialLoad" min="0" value="200" oninput="drawInputDiagram()">
+            <label for="momentX">اللحظة حول محور X / Moment fléchissant X ELU (كيلو نيوتن متر) <span class="tooltip">ⓘ<span class="tooltiptext">الـ moment في اتجاه العرض</span></span>:</label>
+            <input type="number" id="momentX" min="0" value="20" oninput="drawInputDiagram()">
+            <label for="momentY">اللحظة حول محور Y / Moment fléchissant Y ELU (كيلو نيوتن متر) <span class="tooltip">ⓘ<span class="tooltiptext">الـ moment في اتجاه العمق</span></span>:</label>
+            <input type="number" id="momentY" min="0" value="20" oninput="drawInputDiagram()">
+            <label for="shearForce">قوة القص / Effort de cisaillement ELU (كيلو نيوتن) <span class="tooltip">ⓘ<span class="tooltiptext">قوة الـ cisaillement في حالة الحد القصوى</span></span>:</label>
+            <input type="number" id="shearForce" min="0" value="50" oninput="drawInputDiagram()">
+            <button onclick="calculate()">حساب / Calculer</button>
+        </div>
+        <div class="output-section">
+            <h2>النتائج / Résultats</h2>
+            <div id="error" class="error"></div>
+            <div id="output" class="output"></div>
+            <h3>المقطع العرضي / Section transversale</h3>
+            <canvas id="diagram" width="600" height="400"></canvas>
+            <h3>منظر العمود / Vue du poteau</h3>
+            <canvas id="poteauDiagram" width="400" height="300"></canvas>
+        </div>
+    </div>
+
+    <script>
+        function updateInputs() {
+            const elementType = document.getElementById('elementType').value;
+            const heightLabel = document.getElementById('height').previousElementSibling;
+            heightLabel.innerHTML = elementType === 'column' ? 
+                'الارتفاع / Hauteur (م) <span class="tooltip">ⓘ<span class="tooltiptext">ارتفاع الـ poteau</span></span>:' : 
+                'السماكة / Épaisseur (م) <span class="tooltip">ⓘ<span class="tooltiptext">سماكة الـ semelle</span></span>:';
+            drawInputDiagram();
+        }
+
+        function drawInputDiagram() {
+            const canvas = document.getElementById('inputDiagram');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Get input values
+            const width = parseFloat(document.getElementById('width').value) || 0.3;
+            const depth = parseFloat(document.getElementById('depth').value) || 0.3;
+            const cover = (parseFloat(document.getElementById('cover').value) || 30) / 1000; // Convert to m
+            const barDiameter = (parseFloat(document.getElementById('barDiameter').value) || 12) / 1000; // Convert to m
+            const stirrupDiameter = (parseFloat(document.getElementById('stirrupDiameter').value) || 8) / 1000; // Convert to m
+            const numBars = parseInt(document.getElementById('numBars').value) || 4;
+            const stirrupSpacing = parseFloat(document.getElementById('stirrupSpacing').value) || 200; // mm
+            const axialLoad = parseFloat(document.getElementById('axialLoad').value) || 200; // kN
+            const momentX = parseFloat(document.getElementById('momentX').value) || 20; // kNm
+            const momentY = parseFloat(document.getElementById('momentY').value) || 20; // kNm
+            const shearForce = parseFloat(document.getElementById('shearForce').value) || 50; // kN
+
+            // Diagram dimensions
+            const scale = Math.min(canvas.width / width, canvas.height / depth) * 0.6;
+            const offsetX = (canvas.width - width * scale) / 2;
+            const offsetY = (canvas.height - depth * scale) / 2;
+
+            // Draw concrete section
+            ctx.fillStyle = '#d3d3d3';
+            ctx.fillRect(offsetX, offsetY, width * scale, depth * scale);
+            ctx.strokeStyle = '#1a3c6e';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(offsetX, offsetY, width * scale, depth * scale);
+
+            // Draw longitudinal bars (4 corners)
+            const barRadius = (barDiameter / 2) * scale;
+            ctx.fillStyle = '#333';
+            const barPositions = [
+                { x: offsetX + (cover + barDiameter / 2) * scale, y: offsetY + (cover + barDiameter / 2) * scale },
+                { x: offsetX + (width - cover - barDiameter / 2) * scale, y: offsetY + (cover + barDiameter / 2) * scale },
+                { x: offsetX + (cover + barDiameter / 2) * scale, y: offsetY + (depth - cover - barDiameter / 2) * scale },
+                { x: offsetX + (width - cover - barDiameter / 2) * scale, y: offsetY + (depth - cover - barDiameter / 2) * scale }
+            ];
+            barPositions.forEach((pos, index) => {
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, barRadius, 0, 2 * Math.PI);
+                ctx.fill();
+                if (index === 0) {
+                    ctx.strokeStyle = '#dc3545'; // Red for top-left
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(pos.x, pos.y, barRadius + 2, 0, 2 * Math.PI);
+                    ctx.stroke();
+                }
+            });
+
+            // Draw stirrup
+            ctx.strokeStyle = '#2e5b9e';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(
+                offsetX + (cover + stirrupDiameter / 2) * scale,
+                offsetY + (cover + stirrupDiameter / 2) * scale,
+                (width - 2 * cover - stirrupDiameter) * scale,
+                (depth - 2 * cover - stirrupDiameter) * scale
+            );
+
+            // Annotations (original positioning)
+            ctx.fillStyle = '#1a3c6e';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`العرض / Largeur: ${width.toFixed(2)} م`, offsetX + (width * scale) / 2, offsetY - 10);
+            ctx.textAlign = 'left';
+            ctx.fillText(`العمق / Profondeur: ${depth.toFixed(2)} م`, offsetX + width * scale + 10, offsetY + (depth * scale) / 2);
+            ctx.fillText(`الغطاء / Couverture: ${(cover * 1000).toFixed(0)} ملم`, offsetX + cover * scale, offsetY + 20);
+            ctx.fillText(`القضبان / Barres: ${numBars} × ${(barDiameter * 1000).toFixed(0)} ملم`, offsetX + 10, offsetY + depth * scale + 20);
+            ctx.fillText(`الركاب / Étriers: ${(stirrupDiameter * 1000).toFixed(0)} ملم @ ${stirrupSpacing} ملم`, offsetX + cover * scale, offsetY + (cover + stirrupDiameter) * scale + 15);
+            ctx.fillText('الزاوية الأولى / Premier coin', offsetX + (cover + barDiameter) * scale + 5, offsetY + (cover + barDiameter / 2) * scale - 5);
+            ctx.textAlign = 'right';
+            ctx.fillText(`الحمولة المحورية / Effort axial: ${axialLoad} كيلو نيوتن`, offsetX - 10, offsetY + (depth * scale) / 2);
+            ctx.fillText(`اللحظة X / Moment X: ${momentX} كيلو نيوتن متر`, offsetX - 10, offsetY + (depth * scale) / 2 + 20);
+            ctx.fillText(`اللحظة Y / Moment Y: ${momentY} كيلو نيوتن متر`, offsetX - 10, offsetY + (depth * scale) / 2 + 40);
+            ctx.fillText(`قوة القص / Cisaillement: ${shearForce} كيلو نيوتن`, offsetX - 10, offsetY + (depth * scale) / 2 + 60);
+        }
+
+        function calculate() {
+            try {
+                // Input parsing
+                const elementType = document.getElementById('elementType').value;
+                const width = parseFloat(document.getElementById('width').value);
+                const depth = parseFloat(document.getElementById('depth').value);
+                const height = parseFloat(document.getElementById('height').value);
+                const concreteClass = parseFloat(document.getElementById('concreteClass').value);
+                const cover = parseFloat(document.getElementById('cover').value) / 1000; // Convert to m
+                const numBars = parseInt(document.getElementById('numBars').value);
+                const barDiameter = parseFloat(document.getElementById('barDiameter').value) / 1000; // Convert to m
+                const stirrupDiameter = parseFloat(document.getElementById('stirrupDiameter').value) / 1000; // Convert to m
+                const stirrupSpacing = parseFloat(document.getElementById('stirrupSpacing').value) / 1000; // Convert to m
+                const axialLoad = parseFloat(document.getElementById('axialLoad').value) * 1000; // Convert to N
+                const momentX = parseFloat(document.getElementById('momentX').value) * 1000; // Convert to Nm
+                const momentY = parseFloat(document.getElementById('momentY').value) * 1000; // Convert to Nm
+                const shearForce = parseFloat(document.getElementById('shearForce').value) * 1000; // Convert to N
+
+                const errorDiv = document.getElementById('error');
+                errorDiv.textContent = '';
+
+                // Input validation
+                if (isNaN(width) || isNaN(depth) || isNaN(height) || width <= 0 || depth <= 0 || height <= 0) {
+                    errorDiv.textContent = 'من فضلك، دخل الأبعاد بطريقة صحيحة / Veuillez entrer des dimensions valides.';
+                    return;
+                }
+                if (isNaN(cover) || cover < 0.02) {
+                    errorDiv.textContent = 'الغطاء الخرساني / Couverture لازم يكون على الأقل 20 ملم / doit être au moins 20 mm.';
+                    return;
+                }
+                if (numBars !== 4 && numBars !== 8) {
+                    errorDiv.textContent = 'عدد القضبان الطولية / Nombre de barres longitudinales لازم يكون 4 أو 8 / doit être 4 ou 8.';
+                    return;
+                }
+                if (barDiameter <= 0 || stirrupDiameter <= 0 || stirrupSpacing <= 0) {
+                    errorDiv.textContent = 'أقطار القضبان وتباعد الركاب لازم تكون إيجابية / Les diamètres des barres et l\'espacement des étriers doivent être positifs.';
+                    return;
+                }
+                if (isNaN(axialLoad) || isNaN(momentX) || isNaN(momentY) || isNaN(shearForce)) {
+                    errorDiv.textContent = 'من فضلك، دخل قيم الحمولات بطريقة صحيحة / Veuillez entrer des valeurs de charges valides.';
+                    return;
+                }
+
+                // Material properties (Eurocode 2)
+                const fck = concreteClass; // MPa
+                const fyk = 500; // Steel yield strength, MPa
+                const gammaC = 1.5; // Partial safety factor for concrete
+                const gammaS = 1.15; // Partial safety factor for steel
+                const fcd = fck / gammaC; // Design compressive strength, MPa
+                const fyd = fyk / gammaS; // Design yield strength, MPa
+                const Es = 200000; // Steel modulus, MPa
+                const rhoSteel = 7850; // Steel density, kg/m³
+                const Ecm = 22 * ((fck + 8) / 10) ** 0.3 * 1000; // Concrete modulus, MPa
+
+                // Geometry calculations
+                const areaConcrete = width * depth; // m²
+                const concreteVolume = areaConcrete * height; // m³
+                const barArea = Math.PI * (barDiameter / 2) ** 2; // m²
+                const totalBarArea = numBars * barArea; // m²
+                const reinforcementRatio = totalBarArea / areaConcrete;
+
+                // Stirrup calculations
+                const stirrupPerimeter = 2 * (width + depth - 2 * cover - 2 * stirrupDiameter); // m
+                const stirrupsPerMeter = 1 / stirrupSpacing;
+                const stirrupLength = stirrupsPerMeter * stirrupPerimeter * height; // m
+                const stirrupArea = Math.PI * (stirrupDiameter / 2) ** 2; // m²
+
+                // Weight calculations
+                const longitudinalWeight = totalBarArea * height * rhoSteel; // kg
+                const stirrupWeight = stirrupArea * stirrupLength * rhoSteel; // kg
+                const totalSteelWeight = longitudinalWeight + stirrupWeight; // kg
+
+                // Eurocode 2 checks
+                const minRho = Math.max(0.002, 0.10 * fck / fyk); // Minimum reinforcement ratio
+                const maxRho = 0.04; // Maximum reinforcement ratio
+                const rhoCheck = reinforcementRatio >= minRho && reinforcementRatio <= maxRho ? 'نجاح / Succès' : 'فشل / Échec';
+                const rhoStatus = reinforcementRatio < minRho ? `منخفض جدًا / Trop faible (الحد الأدنى / minimum ${minRho.toFixed(4)})` :
+                                reinforcementRatio > maxRho ? `مرتفع جدًا / Trop élevé (الحد الأقصى / maximum ${maxRho.toFixed(4)})` : 'ضمن الحدود / Dans les limites';
+
+                // Spacing checks
+                const minSpacing = 0.02; // 20 mm
+                const maxSpacing = Math.min(2 * depth, 0.4); // m
+                const sideSpacing = numBars === 4 ? 
+                    Math.min(width - 2 * (cover + barDiameter), depth - 2 * (cover + barDiameter)) :
+                    Math.min((width - 2 * (cover + barDiameter)) / 2, (depth - 2 * (cover + barDiameter)) / 2); // Account for midpoints
+                const spacingCheck = (sideSpacing >= minSpacing && sideSpacing <= maxSpacing) ? 'نجاح / Succès' : 'فشل / Échec';
+
+                // Neutral axis and stress calculations
+                const d = depth - cover - stirrupDiameter - barDiameter / 2; // Effective depth, m
+                const As = totalBarArea; // Steel area, m²
+                const Ac = areaConcrete; // Concrete area, m²
+                const n = Es / Ecm; // Modular ratio
+                const k = (n * As * d + 0.5 * Ac * depth) / (n * As + Ac); // Neutral axis factor
+                const neutralAxis = k * depth; // m
+
+                // Moment of inertia (m⁴)
+                const Ic = (width * depth ** 3) / 12; // Concrete moment of inertia
+                const Is = n * As * (d - neutralAxis) ** 2; // Steel contribution
+                const I = Ic + Is; // Total moment of inertia, m⁴
+
+                // Stress calculations (MPa)
+                const stressConcrete = (axialLoad / areaConcrete + Math.max(
+                    (momentX * (depth / 2)) / I,
+                    (momentY * (width / 2)) / I
+                )) / 1e6; // Convert N/m² to MPa
+                const stressSteel = n * (axialLoad / areaConcrete + Math.max(
+                    (momentX * (d - neutralAxis)) / I,
+                    (momentY * (d - neutralAxis)) / I
+                )) / 1e6; // MPa
+                const utilizationConcrete = stressConcrete / fcd;
+                const utilizationSteel = stressSteel / fyd;
+
+                // Crack width calculation (Eurocode 2, simplified)
+                const k1 = 0.8; // Bond coefficient
+                const k2 = 0.5; // Strain distribution
+                const srm = numBars === 4 ? 
+                    Math.min(width - 2 * (cover + barDiameter), depth - 2 * (cover + barDiameter)) * 1000 :
+                    Math.min((width - 2 * (cover + barDiameter)) / 2, (depth - 2 * (cover + barDiameter)) / 2) * 1000; // mm
+                const eps_sm = Math.max((stressSteel - 0.4 * fck / (reinforcementRatio * Es)) / Es, 0); // Steel strain
+                const crackWidth = k1 * k2 * srm * eps_sm; // mm
+                const maxCrackWidth = elementType === 'column' ? 0.3 : 0.2; // mm
+                const crackCheck = crackWidth <= maxCrackWidth ? 'نجاح / Succès' : 'فشل / Échec';
+
+                // Shear check (Eurocode 2, simplified)
+                const kShear = Math.min(1 + Math.sqrt(0.2 / d), 2);
+                const rho = Math.min(reinforcementRatio, 0.02); // Limit per Eurocode 2
+                const Vrdc = (0.18 / gammaC * kShear * (100 * rho * fck) ** (1/3)) * width * d * 1000; // N
+                const shearCheck = Vrdc >= shearForce ? 'نجاح / Succès' : 'فشل / Échec';
+
+                // Debugging check for unrealistic values
+                if (stressConcrete > 100 || stressSteel > 1000 || crackWidth > 1) {
+                    errorDiv.textContent = 'خطأ في الحسابات: قيم غير واقعية. تحقق من المدخلات / Erreur dans les calculs : valeurs non réalistes. Vérifiez les entrées.';
+                    return;
+                }
+
+                // Output results as a table
+                const outputDiv = document.getElementById('output');
+                outputDiv.innerHTML = `
+                    <table class="output-table">
+                        <tr>
+                            <th>البيان / Description</th>
+                            <th>القيمة / Valeur</th>
+                        </tr>
+                        <tr>
+                            <td>حجم الخرسانة / Volume du béton</td>
+                            <td>${concreteVolume.toFixed(2)} م³</td>
+                        </tr>
+                        <tr>
+                            <td>وزن القضبان الطولية / Poids des barres longitudinales</td>
+                            <td>${longitudinalWeight.toFixed(2)} كغ</td>
+                        </tr>
+                        <tr>
+                            <td>وزن الركاب / Poids des étriers</td>
+                            <td>${stirrupWeight.toFixed(2)} كغ</td>
+                        </tr>
+                        <tr>
+                            <td>الوزن الكلي للحديد / Poids total de l'acier</td>
+                            <td>${totalSteelWeight.toFixed(2)} كغ</td>
+                        </tr>
+                        <tr>
+                            <td>نسبة التسليح / Ratio d'armature</td>
+                            <td>${(reinforcementRatio * 100).toFixed(2)}% 
+                                (<span class="${rhoCheck.includes('نجاح') ? 'pass' : 'fail'}">${rhoCheck}: ${rhoStatus}</span>)</td>
+                        </tr>
+                        <tr>
+                            <td>تباعد القضبان / Espacement des barres</td>
+                            <td>${(sideSpacing * 1000).toFixed(0)} ملم 
+                                (<span class="${spacingCheck.includes('نجاح') ? 'pass' : 'fail'}">${spacingCheck}</span>)</td>
+                        </tr>
+                        <tr>
+                            <td>عمق المحور المحايد / Profondeur de l'axe neutre</td>
+                            <td>${neutralAxis.toFixed(3)} م</td>
+                        </tr>
+                        <tr>
+                            <td>إجهاد الخرسانة / Contrainte du béton</td>
+                            <td>${stressConcrete.toFixed(2)} MPa (نسبة الاستخدام / Ratio d'utilisation: ${(utilizationConcrete * 100).toFixed(1)}%)</td>
+                        </tr>
+                        <tr>
+                            <td>إجهاد الحديد / Contrainte de l'acier</td>
+                            <td>${stressSteel.toFixed(2)} MPa (نسبة الاستخدام / Ratio d'utilisation: ${(utilizationSteel * 100).toFixed(1)}%)</td>
+                        </tr>
+                        <tr>
+                            <td>عرض الشقوق / Largeur des fissures</td>
+                            <td>${crackWidth.toFixed(3)} ملم 
+                                (<span class="${crackCheck.includes('نجاح') ? 'pass' : 'fail'}">${crackCheck}: الحد الأقصى / maximum ${maxCrackWidth} ملم</span>)</td>
+                        </tr>
+                        <tr>
+                            <td>مقاومة القص / Résistance au cisaillement (Vrd,c)</td>
+                            <td>${(Vrdc / 1000).toFixed(2)} كيلو نيوتن 
+                                (<span class="${shearCheck.includes('نجاح') ? 'pass' : 'fail'}">${shearCheck}</span>)</td>
+                        </tr>
+                    </table>
+                `;
+
+                // Draw output diagram (cross-section)
+                const canvas = document.getElementById('diagram');
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Scale to canvas
+                const scale = Math.min(canvas.width / width, canvas.height / depth) * 0.8;
+                const offsetX = (canvas.width - width * scale) / 2;
+                const offsetY = (canvas.height - depth * scale) / 2;
+
+                // Draw concrete section
+                ctx.fillStyle = '#d3d3d3';
+                ctx.fillRect(offsetX, offsetY, width * scale, depth * scale);
+                ctx.strokeStyle = '#1a3c6e';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(offsetX, offsetY, width * scale, depth * scale);
+
+                // Draw longitudinal bars
+                const barRadius = (barDiameter / 2) * scale;
+                ctx.fillStyle = '#333';
+                const barPositions = [
+                    { x: offsetX + (cover + barDiameter / 2) * scale, y: offsetY + (cover + barDiameter / 2) * scale },
+                    { x: offsetX + (width - cover - barDiameter / 2) * scale, y: offsetY + (cover + barDiameter / 2) * scale },
+                    { x: offsetX + (cover + barDiameter / 2) * scale, y: offsetY + (depth - cover - barDiameter / 2) * scale },
+                    { x: offsetX + (width - cover - barDiameter / 2) * scale, y: offsetY + (depth - cover - barDiameter / 2) * scale }
+                ];
+                if (numBars === 8) {
+                    barPositions.push(
+                        { x: offsetX + (width / 2) * scale, y: offsetY + (cover + barDiameter / 2) * scale },
+                        { x: offsetX + (width - cover - barDiameter / 2) * scale, y: offsetY + (depth / 2) * scale },
+                        { x: offsetX + (width / 2) * scale, y: offsetY + (depth - cover - barDiameter / 2) * scale },
+                        { x: offsetX + (cover + barDiameter / 2) * scale, y: offsetY + (depth / 2) * scale }
+                    );
+                }
+                barPositions.forEach((pos, index) => {
+                    ctx.beginPath();
+                    ctx.arc(pos.x, pos.y, barRadius, 0, 2 * Math.PI);
+                    ctx.fill();
+                    if (index === 0) {
+                        ctx.strokeStyle = '#dc3545'; // Red for top-left
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.arc(pos.x, pos.y, barRadius + 2, 0, 2 * Math.PI);
+                        ctx.stroke();
+                    }
+                });
+
+                // Draw stirrup (cadre)
+                ctx.strokeStyle = '#2e5b9e';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(
+                    offsetX + (cover + stirrupDiameter / 2) * scale,
+                    offsetY + (cover + stirrupDiameter / 2) * scale,
+                    (width - 2 * cover - stirrupDiameter) * scale,
+                    (depth - 2 * cover - stirrupDiameter) * scale
+                );
+
+                // Draw bar spacing
+                ctx.strokeStyle = '#ff8c00';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(offsetX + (cover + barDiameter / 2) * scale, offsetY + 10);
+                ctx.lineTo(offsetX + (width - cover - barDiameter / 2) * scale, offsetY + 10);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(offsetX + (cover + barDiameter / 2) * scale, offsetY + depth * scale + 10);
+                ctx.lineTo(offsetX + (width - cover - barDiameter / 2) * scale, offsetY + depth * scale + 10);
+                ctx.stroke();
+
+                // Annotations (original positioning)
+                ctx.fillStyle = '#1a3c6e';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`العرض / Largeur: ${width.toFixed(2)} م`, offsetX + (width * scale) / 2, offsetY - 10);
+                ctx.textAlign = 'left';
+                ctx.fillText(`العمق / Profondeur: ${depth.toFixed(2)} م`, offsetX + width * scale + 10, offsetY + (depth * scale) / 2);
+                ctx.fillText(`الغطاء / Couverture: ${(cover * 1000).toFixed(0)} ملم`, offsetX + cover * scale, offsetY + 20);
+                ctx.fillText(`القضبان / Barres: ${numBars} × ${(barDiameter * 1000).toFixed(0)} ملم`, offsetX + 10, offsetY + depth * scale + 20);
+                ctx.fillText(`الركاب / Étriers: ${(stirrupDiameter * 1000).toFixed(0)} ملم @ ${(stirrupSpacing * 1000).toFixed(0)} ملم`, offsetX + cover * scale, offsetY + (cover + stirrupDiameter) * scale + 15);
+                ctx.fillText(`تباعد القضبان / Espacement: ${(sideSpacing * 1000).toFixed(0)} ملم`, offsetX + (width * scale) / 2, offsetY + depth * scale + 40);
+                ctx.fillText('الزاوية الأولى / Premier coin', offsetX + (cover + barDiameter) * scale + 5, offsetY + (cover + barDiameter / 2) * scale - 5);
+                ctx.textAlign = 'right';
+                ctx.fillText(`الحمولة المحورية / Effort axial: ${axialLoad / 1000} كيلو نيوتن`, offsetX - 10, offsetY + (depth * scale) / 2);
+                ctx.fillText(`اللحظة X / Moment X: ${momentX / 1000} كيلو نيوتن متر`, offsetX - 10, offsetY + (depth * scale) / 2 + 20);
+                ctx.fillText(`اللحظة Y / Moment Y: ${momentY / 1000} كيلو نيوتن متر`, offsetX - 10, offsetY + (depth * scale) / 2 + 40);
+                ctx.fillText(`قوة القص / Cisaillement: ${shearForce / 1000} كيلو نيوتن`, offsetX - 10, offsetY + (depth * scale) / 2 + 60);
+
+                // Draw poteau diagram (longitudinal view)
+                const poteauCanvas = document.getElementById('poteauDiagram');
+                const poteauCtx = poteauCanvas.getContext('2d');
+                poteauCtx.clearRect(0, 0, poteauCanvas.width, poteauCanvas.height);
+
+                // Scale to canvas
+                const poteauScale = Math.min(poteauCanvas.width / width, poteauCanvas.height / height) * 0.6;
+                const poteauOffsetX = (poteauCanvas.width - width * poteauScale) / 2;
+                const poteauOffsetY = (poteauCanvas.height - height * poteauScale) / 2;
+
+                // Draw concrete column
+                poteauCtx.fillStyle = '#d3d3d3';
+                poteauCtx.fillRect(poteauOffsetX, poteauOffsetY, width * poteauScale, height * poteauScale);
+                poteauCtx.strokeStyle = '#1a3c6e';
+                poteauCtx.lineWidth = 2;
+                poteauCtx.strokeRect(poteauOffsetX, poteauOffsetY, width * poteauScale, height * poteauScale);
+
+                // Draw longitudinal bars
+                poteauCtx.fillStyle = '#333';
+                const poteauBarRadius = (barDiameter / 2) * poteauScale;
+                poteauCtx.beginPath();
+                poteauCtx.arc(poteauOffsetX + (cover + barDiameter / 2) * poteauScale, poteauOffsetY + poteauBarRadius, poteauBarRadius, 0, 2 * Math.PI);
+                poteauCtx.fill();
+                poteauCtx.beginPath();
+                poteauCtx.arc(poteauOffsetX + (width - cover - barDiameter / 2) * poteauScale, poteauOffsetY + poteauBarRadius, poteauBarRadius, 0, 2 * Math.PI);
+                poteauCtx.fill();
+                poteauCtx.beginPath();
+                poteauCtx.arc(poteauOffsetX + (cover + barDiameter / 2) * poteauScale, poteauOffsetY + height * poteauScale - poteauBarRadius, poteauBarRadius, 0, 2 * Math.PI);
+                poteauCtx.fill();
+                poteauCtx.beginPath();
+                poteauCtx.arc(poteauOffsetX + (width - cover - barDiameter / 2) * poteauScale, poteauOffsetY + height * poteauScale - poteauBarRadius, poteauBarRadius, 0, 2 * Math.PI);
+                poteauCtx.fill();
+                poteauCtx.strokeStyle = '#333';
+                poteauCtx.lineWidth = 2;
+                poteauCtx.beginPath();
+                poteauCtx.moveTo(poteauOffsetX + (cover + barDiameter / 2) * poteauScale, poteauOffsetY + poteauBarRadius);
+                poteauCtx.lineTo(poteauOffsetX + (cover + barDiameter / 2) * poteauScale, poteauOffsetY + height * poteauScale - poteauBarRadius);
+                poteauCtx.stroke();
+                poteauCtx.beginPath();
+                poteauCtx.moveTo(poteauOffsetX + (width - cover - barDiameter / 2) * poteauScale, poteauOffsetY + poteauBarRadius);
+                poteauCtx.lineTo(poteauOffsetX + (width - cover - barDiameter / 2) * poteauScale, poteauOffsetY + height * poteauScale - poteauBarRadius);
+                poteauCtx.stroke();
+
+                // Draw stirrups
+                poteauCtx.strokeStyle = '#2e5b9e';
+                poteauCtx.lineWidth = 2;
+                const numStirrups = Math.floor(height / stirrupSpacing) + 1;
+                for (let i = 0; i < numStirrups; i++) {
+                    const y = poteauOffsetY + (cover + stirrupDiameter / 2) * poteauScale + i * stirrupSpacing * poteauScale;
+                    if (y < poteauOffsetY + height * poteauScale - (cover + stirrupDiameter / 2) * poteauScale) {
+                        poteauCtx.beginPath();
+                        poteauCtx.moveTo(poteauOffsetX + (cover + stirrupDiameter / 2) * poteauScale, y);
+                        poteauCtx.lineTo(poteauOffsetX + (width - cover - stirrupDiameter / 2) * poteauScale, y);
+                        poteauCtx.stroke();
+                    }
+                }
+
+                // Annotations (original positioning)
+                poteauCtx.fillStyle = '#1a3c6e';
+                poteauCtx.font = '12px Arial';
+                poteauCtx.textAlign = 'center';
+                poteauCtx.fillText(`العرض / Largeur: ${width.toFixed(2)} م`, poteauOffsetX + (width * poteauScale) / 2, poteauOffsetY - 10);
+                poteauCtx.textAlign = 'left';
+                poteauCtx.fillText(`الارتفاع / Hauteur: ${height.toFixed(2)} م`, poteauOffsetX + width * poteauScale + 10, poteauOffsetY + (height * poteauScale) / 2);
+                poteauCtx.fillText(`الغطاء / Couverture: ${(cover * 1000).toFixed(0)} ملم`, poteauOffsetX + cover * poteauScale, poteauOffsetY + 20);
+                poteauCtx.fillText(`القضبان / Barres: ${(barDiameter * 1000).toFixed(0)} ملم`, poteauOffsetX + 10, poteauOffsetY + height * poteauScale + 20);
+                poteauCtx.fillText(`الركاب / Étriers: ${(stirrupDiameter * 1000).toFixed(0)} ملم @ ${(stirrupSpacing * 1000).toFixed(0)} ملم`, poteauOffsetX + 10, poteauOffsetY + (cover + stirrupDiameter) * poteauScale + 15);
+            } catch (e) {
+                const errorDiv = document.getElementById('error');
+                errorDiv.textContent = `خطأ في الحساب / Erreur de calcul: ${e.message}`;
+            }
+        }
+
+        // Initialize input labels and diagram
+        updateInputs();
+        drawInputDiagram();
+    </script>
+</body>
+</html>
