@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ar-MA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة تصميم الأساسات المنفردة / Calculatrice Semelle Isolée</title>
+    <style>
+        :root {
+            writing-mode: horizontal-tb;
+            direction: rtl;
+            text-orientation: mixed;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #e8ecef;
+            direction: inherit;
+            text-align: right;
+        }
+        h1 {
+            color: #1a3c6e;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2, h3 {
+            color: #2e5b9e;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .input-section, .output-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        .output-section {
+            flex: 2;
+            min-width: 400px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #1a3c6e;
+            font-weight: 500;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #b0c4de;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2e5b9e;
+            box-shadow: 0 0 5px rgba(46, 91, 158, 0.3);
+        }
+        button {
+            background-color: #2e5b9e;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #1a3c6e;
+        }
+        canvas {
+            border: 1px solid #b0c4de;
+            border-radius: 4px;
+            margin-top: 20px;
+            max-width: 100%;
+        }
+        #inputDiagram {
+            margin-bottom: 20px;
+        }
+        .output {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .output-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .output-table th, .output-table td {
+            padding: 10px;
+            text-align: right;
+            border: 1px solid #b0c4de;
+        }
+        .output-table th {
+            background-color: #2e5b9e;
+            color: white;
+            font-weight: bold;
+        }
+        .pass { color: #28a745; }
+        .fail { color: #dc3545; }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1a3c6e;
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .report {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>حاسبة تصميم الأساسات المنفردة / Calculatrice Semelle Isolée</h1>
+    <div class="container">
+        <div class="input-section">
+            <h2>المعطيات / Données</h2>
+            <h3>المقطع العرضي / Section transversale</h3>
+            <canvas id="inputDiagram" width="400" height="300"></canvas>
+            <label for="width">العرض (A) / Largeur (m) <span class="tooltip">ⓘ<span class="tooltiptext">عرض القاعدة</span></span>:</label>
+            <input type="number" id="width" step="0.01" min="0.1" value="1.15" oninput="drawInputDiagram()">
+            <label for="depth">العمق (B) / Profondeur (m) <span class="tooltip">ⓘ<span class="tooltiptext">عمق القاعدة</span></span>:</label>
+            <input type="number" id="depth" step="0.01" min="0.1" value="1.15" oninput="drawInputDiagram()">
+            <label for="height">السماكة (h) / Épaisseur (m) <span class="tooltip">ⓘ<span class="tooltiptext">سمك القاعدة</span></span>:</label>
+            <input type="number" id="height" step="0.01" min="0.1" value="0.25" oninput="drawInputDiagram()">
+            <label for="permanentLoad">الحمولة الدائمة (G) / Charge permanente (T) <span class="tooltip">ⓘ<span class="tooltiptext">الحمولة الدائمة</span></span>:</label>
+            <input type="number" id="permanentLoad" min="0" value="15" oninput="drawInputDiagram()">
+            <label for="variableLoad">الحمولة المتغيرة (Q) / Charge variable (T) <span class="tooltip">ⓘ<span class="tooltiptext">الحمولة المتغيرة</span></span>:</label>
+            <input type="number" id="variableLoad" min="0" value="5" oninput="drawInputDiagram()">
+            <label for="soilStress">إجهاد التربة المسموح (ത 𝜎𝑠𝑜𝑙) / Contrainte admissible du sol (Bars) <span class="tooltip">ⓘ<span class="tooltiptext">1 Bar = 0.1 MPa</span></span>:</label>
+            <input type="number" id="soilStress" step="0.1" min="0.1" value="1.5" oninput="drawInputDiagram()">
+            <label for="columnWidth">عرض العمود (a) / Largeur du poteau (m) <span class="tooltip">ⓘ<span class="tooltiptext">عرض العمود</span></span>:</label>
+            <input type="number" id="columnWidth" step="0.01" min="0.1" value="0.25" oninput="drawInputDiagram()">
+            <label for="columnDepth">عمق العمود (b) / Profondeur du poteau (m) <span class="tooltip">ⓘ<span class="tooltiptext">عمق العمود</span></span>:</label>
+            <input type="number" id="columnDepth" step="0.01" min="0.1" value="0.25" oninput="drawInputDiagram()">
+            <label for="columnHeight">ارتفاع العمود / Hauteur du poteau (m) <span class="tooltip">ⓘ<span class="tooltiptext">ارتفاع العمود فوق القاعدة</span></span>:</label>
+            <input type="number" id="columnHeight" step="0.01" min="0.1" value="0.5" oninput="drawInputDiagram()">
+            <h3>المواد (Matériaux)</h3>
+            <label for="concreteClass">مقاومة الخرسانة (fc) / Classe de béton (MPa):</label>
+            <select id="concreteClass" onchange="drawInputDiagram()">
+                <option value="20">B20/25 (20 MPa)</option>
+                <option value="25" selected>B25/30 (25 MPa)</option>
+                <option value="30">B30/37 (30 MPa)</option>
+                <option value="35">B35/45 (35 MPa)</option>
+            </select>
+            <label for="steelStrength">مقاومة الحديد (fe) / Résistance de l'acier (MPa):</label>
+            <select id="steelStrength" onchange="drawInputDiagram()">
+                <option value="400" selected>400 MPa</option>
+                <option value="500">500 MPa</option>
+            </select>
+            <label for="cover">الغطاء الخرساني / Couverture (cm) <span class="tooltip">ⓘ<span class="tooltiptext">الغطاء للـ armatures</span></span>:</label>
+            <input type="number" id="cover" min="2" value="5" oninput="drawInputDiagram()">
+            <button onclick="calculate()">حساب / Calculer</button>
+        </div>
+        <div class="output-section">
+            <h2>النتائج / Résultats</h2>
+            <div id="error" class="error"></div>
+            <div id="output" class="output"></div>
+            <h3>المقطع الأفقي / Section horizontale</h3>
+            <canvas id="diagramHorizontal" width="600" height="400"></canvas>
+            <h3>القطاع العمودي / Coupe Verticale</h3>
+            <canvas id="diagramVertical" width="600" height="500"></canvas>
+            <h3>التقرير / Rapport</h3>
+            <div id="report" class="report"></div>
+        </div>
+    </div>
+
+    <script>
+        // Bar data from Excel
+        const barData = {
+            6: { mass: 0.222, weights: [0.28, 0.57, 0.85, 1.13, 1.41, 1.7, 1.98, 2.26, 2.54, 2.83] },
+            8: { mass: 0.395, weights: [0.5, 1.01, 1.51, 2.01, 2.51, 3.02, 3.52, 4.02, 4.52, 5.03] },
+            10: { mass: 0.617, weights: [0.79, 1.57, 2.36, 3.14, 3.93, 4.71, 5.5, 6.28, 7.07, 7.85] },
+            12: { mass: 0.888, weights: [1.13, 2.26, 3.39, 4.52, 5.65, 6.79, 7.92, 9.05, 10.18, 11.31] },
+            14: { mass: 1.21, weights: [1.54, 3.08, 4.62, 6.16, 7.7, 9.24, 10.78, 12.31, 13.85, 15.39] },
+            16: { mass: 1.58, weights: [2.01, 4.02, 6.03, 8.04, 10.05, 12.06, 14.07, 16.08, 18.1, 20.11] },
+            20: { mass: 2.466, weights: [3.14, 6.28, 9.42, 12.57, 15.71, 18.85, 21.99, 25.13, 28.27, 31.42] },
+            25: { mass: 3.85, weights: [4.91, 9.82, 14.73, 19.63, 24.54, 29.45, 34.36, 39.27, 44.18, 49.09] },
+            32: { mass: 6.313, weights: [8.04, 16.08, 24.13, 32.17, 40.21, 48.25, 56.3, 64.34, 72.38, 80.42] },
+            40: { mass: 9.864, weights: [12.57, 25.13, 37.7, 50.26, 62.83, 75.4, 87.96, 100.53, 113.09, 125.66] }
+        };
+
+        const BAR_LENGTH = 12; // meters
+        const COST_PER_KG = 9.6; // DH/kg
+
+        function getBarCombination(requiredArea) {
+            let bestDiameter = 12; // Default diameter
+            let bestNumBars = 4; // Default number of bars
+            let minDifference = Infinity;
+
+            for (let diameter in barData) {
+                const data = barData[diameter];
+                const areaPerBar = (Math.PI * (diameter / 2000) ** 2); // Convert mm to m and calculate area
+                for (let num = 1; num <= 10; num++) {
+                    const totalArea = num * areaPerBar;
+                    const difference = Math.abs(requiredArea - totalArea);
+                    if (difference < minDifference) {
+                        minDifference = difference;
+                        bestDiameter = parseInt(diameter);
+                        bestNumBars = num;
+                    }
+                }
+            }
+            return { diameter: bestDiameter, numBars: bestNumBars };
+        }
+
+        function calculateCost(diameter, numBars) {
+            const data = barData[diameter];
+            const massPerMeter = data.mass;
+            const totalMass = massPerMeter * BAR_LENGTH * numBars; // kg for all bars
+            const totalCost = totalMass * COST_PER_KG; // DH
+            return { mass: totalMass, cost: totalCost };
+        }
+
+        function updateInputs() {
+            drawInputDiagram();
+        }
+
+        function drawInputDiagram() {
+            const canvas = document.getElementById('inputDiagram');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const width = parseFloat(document.getElementById('width').value) || 1.15;
+            const depth = parseFloat(document.getElementById('depth').value) || 1.15;
+            const height = parseFloat(document.getElementById('height').value) || 0.25;
+            const cover = (parseFloat(document.getElementById('cover').value) || 5) / 100;
+            const columnWidth = parseFloat(document.getElementById('columnWidth').value) || 0.25;
+            const columnDepth = parseFloat(document.getElementById('columnDepth').value) || 0.25;
+            const columnHeight = parseFloat(document.getElementById('columnHeight').value) || 0.5;
+
+            const scale = Math.min(canvas.width / width, canvas.height / (depth + columnHeight)) * 0.6;
+            const offsetX = (canvas.width - width * scale) / 2;
+            const offsetY = (canvas.height - (depth + columnHeight) * scale) / 2;
+
+            ctx.fillStyle = '#d3d3d3';
+            ctx.fillRect(offsetX, offsetY + columnHeight * scale, width * scale, depth * scale);
+            ctx.strokeStyle = '#1a3c6e';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(offsetX, offsetY + columnHeight * scale, width * scale, depth * scale);
+
+            ctx.fillStyle = '#b0c4de';
+            ctx.fillRect(offsetX + (width - columnWidth) * scale / 2, offsetY, columnWidth * scale, (columnHeight + depth) * scale);
+            ctx.strokeRect(offsetX + (width - columnWidth) * scale / 2, offsetY, columnWidth * scale, (columnHeight + depth) * scale);
+
+            ctx.fillStyle = '#1a3c6e';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`العرض (A): ${width.toFixed(2)} m`, offsetX + (width * scale) / 2, offsetY + columnHeight * scale - 10);
+            ctx.textAlign = 'left';
+            ctx.fillText(`العمق (B): ${depth.toFixed(2)} m`, offsetX + width * scale + 10, offsetY + columnHeight * scale + (depth * scale) / 2);
+            ctx.fillText(`السماكة (h): ${height.toFixed(2)} m`, offsetX + 10, offsetY + columnHeight * scale + height * scale + 20);
+            ctx.fillText(`الغطاء: ${cover * 100} cm`, offsetX + 10, offsetY + columnHeight * scale + depth * scale + 30);
+        }
+
+        function calculate() {
+            try {
+                const width = parseFloat(document.getElementById('width').value) || 1.15;
+                const depth = parseFloat(document.getElementById('depth').value) || 1.15;
+                const height = parseFloat(document.getElementById('height').value) || 0.25;
+                const permanentLoad = parseFloat(document.getElementById('permanentLoad').value) || 15; // in tons
+                const variableLoad = parseFloat(document.getElementById('variableLoad').value) || 5; // in tons
+                const soilStress = parseFloat(document.getElementById('soilStress').value) || 1.5; // in Bars
+                const columnWidth = parseFloat(document.getElementById('columnWidth').value) || 0.25;
+                const columnDepth = parseFloat(document.getElementById('columnDepth').value) || 0.25;
+                const columnHeight = parseFloat(document.getElementById('columnHeight').value) || 0.5;
+                const concreteClass = parseFloat(document.getElementById('concreteClass').value) || 25; // MPa
+                const steelStrength = parseFloat(document.getElementById('steelStrength').value) || 400; // MPa
+                const cover = (parseFloat(document.getElementById('cover').value) || 5) / 100; // in meters
+
+                const errorDiv = document.getElementById('error');
+                errorDiv.textContent = '';
+
+                if (isNaN(width) || isNaN(depth) || isNaN(height) || width <= 0 || depth <= 0 || height <= 0) {
+                    errorDiv.textContent = 'من فضلك، دخل الأبعاد بطريقة صحيحة / Veuillez entrer des dimensions valides.';
+                    return;
+                }
+                if (isNaN(permanentLoad) || isNaN(variableLoad) || permanentLoad < 0 || variableLoad < 0) {
+                    errorDiv.textContent = 'من فضلك، دخل قيم الحمولات بطريقة صحيحة / Veuillez entrer des valeurs de charges valides.';
+                    return;
+                }
+                if (isNaN(columnWidth) || isNaN(columnDepth) || columnWidth <= 0 || columnDepth <= 0) {
+                    errorDiv.textContent = 'من فضلك، دخل أبعاد العمود بطريقة صحيحة / Veuillez entrer des dimensions valides pour le poteau.';
+                    return;
+                }
+                if (isNaN(soilStress) || soilStress <= 0) {
+                    errorDiv.textContent = 'من فضلك، دخل إجهاد التربة المسموح بطريقة صحيحة / Veuillez entrer une contrainte admissible du sol valide.';
+                    return;
+                }
+
+                // Convert units
+                const Nser = (permanentLoad + variableLoad) * 9.81 * 1000; // Service load in N
+                const Nu = (1.35 * permanentLoad + 1.5 * variableLoad) * 9.81 * 1000; // Ultimate load in N
+                const soilStressMPa = soilStress * 0.1; // Convert Bars to MPa
+                const Ppropre = width * depth * height * 2500 * 9.81; // Self-weight in N
+                const fck = concreteClass; // Concrete compressive strength
+                const fyk = steelStrength; // Steel yield strength
+                const gammaC = 1.5; // Partial safety factor for concrete
+                const gammaS = 1.15; // Partial safety factor for steel
+                const fcd = fck / gammaC; // Design compressive strength
+                const fyd = fyk / gammaS; // Design yield strength
+
+                // Effective height calculation as per video
+                const h = Math.max((width - columnWidth) / 4, (depth - columnDepth) / 4); // 0.225 m, rounded to 0.25 m
+                const d = h; // Effective depth, assuming cover is included in height for simplicity
+
+                // Dimensioning
+                const requiredArea = Nser / (soilStressMPa * 1e6); // m²
+                const A = Math.sqrt(requiredArea * (columnWidth / columnDepth));
+                const B = Math.sqrt(requiredArea * (columnDepth / columnWidth));
+
+                // Stress verification
+                const sigmaSol = (Nser + Ppropre) / (width * depth * 1e6); // Actual soil stress in MPa
+
+                // Punching shear check
+                const kShear = Math.min(1 + Math.sqrt(200 / (d * 1000)), 2.0); // d in mm
+                const rho = 0.01; // Approximate reinforcement ratio
+                const uc = 2 * (columnWidth + columnDepth + 2 * d);
+                const NuPrime = Nu * (1 - ((columnWidth + 2 * d) * (columnDepth + 2 * d)) / (width * depth));
+                const Vrdc = 0.12 * kShear * (100 * rho * fck) ** (1/3) * uc * d * 1000; // N
+
+                // Reinforcement area
+                const AsA = Nu * (width - columnWidth) / (8 * d * fyd * 1e6); // m² per direction
+                const AsB = Nu * (depth - columnDepth) / (8 * d * fyd * 1e6); // m² per direction
+
+                // Select bars from data
+                const { diameter: barDiameterA, numBars: numBarsA } = getBarCombination(AsA);
+                const { diameter: barDiameterB, numBars: numBarsB } = getBarCombination(AsB);
+
+                // Calculate cost
+                const costA = calculateCost(barDiameterA, numBarsA);
+                const costB = calculateCost(barDiameterB, numBarsB);
+
+                // Output results
+                const outputDiv = document.getElementById('output');
+                const stressCheck = sigmaSol <= soilStressMPa ? 'نجاح / Succès' : 'فشل / Échec';
+                const punchCheck = NuPrime <= Vrdc ? 'نجاح / Succès' : 'فشل / Échec';
+                outputDiv.innerHTML = `
+                    <table class="output-table">
+                        <tr><th>البيان / Description</th><th>القيمة / Valeur</th></tr>
+                        <tr><td>الحمولة الدائمة (G)</td><td>${permanentLoad} T</td></tr>
+                        <tr><td>الحمولة المتغيرة (Q)</td><td>${variableLoad} T</td></tr>
+                        <tr><td>الحمولة الإجمالية (ELS)</td><td>${(Nser / 9.81 / 1000).toFixed(2)} T</td></tr>
+                        <tr><td>الحمولة القصوى (ELU)</td><td>${(Nu / 9.81 / 1000).toFixed(2)} T</td></tr>
+                        <tr><td>المساحة المطلوبة</td><td>${requiredArea.toFixed(2)} m²</td></tr>
+                        <tr><td>العرض (A)</td><td>${A.toFixed(2)} m</td></tr>
+                        <tr><td>العمق (B)</td><td>${B.toFixed(2)} m</td></tr>
+                        <tr><td>السماكة الكلية (H)</td><td>${height.toFixed(2)} m</td></tr>
+                        <tr><td>الارتفاع النافع (h)</td><td>${h.toFixed(2)} m</td></tr>
+                        <tr><td>الضغط الترابي الفعلي</td><td>${sigmaSol.toFixed(2)} MPa</td></tr>
+                        <tr><td>الضغط الترابي المسموح</td><td>${soilStressMPa.toFixed(2)} MPa</td></tr>
+                        <tr><td>تحقق الضغط الترابي</td><td><span class="${stressCheck.includes('نجاح') ? 'pass' : 'fail'}">${stressCheck}</span></td></tr>
+                        <tr><td>القص الثاقب (Nu')</td><td>${(NuPrime / 1000).toFixed(2)} kN</td></tr>
+                        <tr><td>مقاومة القص الثاقب (Vrdc)</td><td>${(Vrdc / 1000).toFixed(2)} kN</td></tr>
+                        <tr><td>تحقق القص الثاقب</td><td><span class="${punchCheck.includes('نجاح') ? 'pass' : 'fail'}">${punchCheck}</span></td></tr>
+                        <tr><td>مساحة التسليح (A)</td><td>${(AsA * 1e4).toFixed(2)} cm²</td></tr>
+                        <tr><td>قضبان (A)</td><td>${numBarsA} × ${barDiameterA} mm</td></tr>
+                        <tr><td>مساحة التسليح (B)</td><td>${(AsB * 1e4).toFixed(2)} cm²</td></tr>
+                        <tr><td>قضبان (B)</td><td>${numBarsB} × ${barDiameterB} mm</td></tr>
+                    </table>
+                `;
+
+                // Draw horizontal section
+                const canvasHorizontal = document.getElementById('diagramHorizontal');
+                const ctxHorizontal = canvasHorizontal.getContext('2d');
+                ctxHorizontal.clearRect(0, 0, canvasHorizontal.width, canvasHorizontal.height);
+
+                const scaleHorizontal = Math.min(canvasHorizontal.width / width, canvasHorizontal.height / depth) * 0.8;
+                const offsetXHorizontal = (canvasHorizontal.width - width * scaleHorizontal) / 2;
+                const offsetYHorizontal = (canvasHorizontal.height - depth * scaleHorizontal) / 2;
+
+                ctxHorizontal.fillStyle = '#d3d3d3';
+                ctxHorizontal.fillRect(offsetXHorizontal, offsetYHorizontal, width * scaleHorizontal, depth * scaleHorizontal);
+                ctxHorizontal.strokeStyle = '#1a3c6e';
+                ctxHorizontal.lineWidth = 2;
+                ctxHorizontal.strokeRect(offsetXHorizontal, offsetYHorizontal, width * scaleHorizontal, depth * scaleHorizontal);
+
+                ctxHorizontal.fillStyle = '#b0c4de';
+                ctxHorizontal.fillRect(offsetXHorizontal + (width - columnWidth) * scaleHorizontal / 2, offsetYHorizontal + (depth - columnDepth) * scaleHorizontal / 2, columnWidth * scaleHorizontal, columnDepth * scaleHorizontal);
+                ctxHorizontal.strokeRect(offsetXHorizontal + (width - columnWidth) * scaleHorizontal / 2, offsetYHorizontal + (depth - columnDepth) * scaleHorizontal / 2, columnWidth * scaleHorizontal, columnDepth * scaleHorizontal);
+
+                // Draw bars in horizontal section as full lines
+                const barRadius = (barDiameterA / 2000) * scaleHorizontal;
+                ctxHorizontal.strokeStyle = '#ff0000';
+                ctxHorizontal.lineWidth = barRadius * 2;
+                const barSpacingX = (width - 2 * cover) / (numBarsA - 1);
+                const barSpacingY = (depth - 2 * cover) / (numBarsB - 1);
+                for (let i = 0; i < numBarsA; i++) {
+                    const xStart = offsetXHorizontal + cover * scaleHorizontal + i * barSpacingX * scaleHorizontal;
+                    ctxHorizontal.beginPath();
+                    ctxHorizontal.moveTo(xStart, offsetYHorizontal + cover * scaleHorizontal);
+                    ctxHorizontal.lineTo(xStart, offsetYHorizontal + (depth - cover) * scaleHorizontal);
+                    ctxHorizontal.stroke();
+                }
+                for (let i = 0; i < numBarsB; i++) {
+                    const yStart = offsetYHorizontal + cover * scaleHorizontal + i * barSpacingY * scaleHorizontal;
+                    ctxHorizontal.beginPath();
+                    ctxHorizontal.moveTo(offsetXHorizontal + cover * scaleHorizontal, yStart);
+                    ctxHorizontal.lineTo(offsetXHorizontal + (width - cover) * scaleHorizontal, yStart);
+                    ctxHorizontal.stroke();
+                }
+
+                ctxHorizontal.fillStyle = '#1a3c6e';
+                ctxHorizontal.font = '12px Arial';
+                ctxHorizontal.textAlign = 'center';
+                ctxHorizontal.fillText(`العرض (A): ${width.toFixed(2)} m`, offsetXHorizontal + (width * scaleHorizontal) / 2, offsetYHorizontal - 10);
+                ctxHorizontal.textAlign = 'left';
+                ctxHorizontal.fillText(`العمق (B): ${depth.toFixed(2)} m`, offsetXHorizontal + width * scaleHorizontal + 10, offsetYHorizontal + (depth * scaleHorizontal) / 2);
+
+                // Draw vertical section
+                const canvasVertical = document.getElementById('diagramVertical');
+                const ctxVertical = canvasVertical.getContext('2d');
+                ctxVertical.clearRect(0, 0, canvasVertical.width, canvasVertical.height);
+
+                const scaleVertical = Math.min(canvasVertical.width / width, canvasVertical.height / (height + columnHeight)) * 0.8;
+                const offsetXVertical = (canvasVertical.width - width * scaleVertical) / 2;
+                const offsetYVertical = (canvasVertical.height - (height + columnHeight) * scaleVertical) / 2;
+
+                ctxVertical.fillStyle = '#d3d3d3';
+                ctxVertical.fillRect(offsetXVertical, offsetYVertical + columnHeight * scaleVertical, width * scaleVertical, height * scaleVertical);
+                ctxVertical.strokeStyle = '#1a3c6e';
+                ctxVertical.lineWidth = 2;
+                ctxVertical.strokeRect(offsetXVertical, offsetYVertical + columnHeight * scaleVertical, width * scaleVertical, height * scaleVertical);
+
+                ctxVertical.fillStyle = '#b0c4de';
+                ctxVertical.fillRect(offsetXVertical + (width - columnWidth) * scaleVertical / 2, offsetYVertical, columnWidth * scaleVertical, (columnHeight + height) * scaleVertical);
+                ctxVertical.strokeRect(offsetXVertical + (width - columnWidth) * scaleVertical / 2, offsetYVertical, columnWidth * scaleVertical, (columnHeight + height) * scaleVertical);
+
+                // Draw bars in vertical section as red lines
+                ctxVertical.strokeStyle = '#ff0000';
+                ctxVertical.lineWidth = barRadius * 2;
+                const barSpacingVertical = (width - 2 * cover) / (numBarsA - 1);
+                for (let i = 0; i < numBarsA; i++) {
+                    const x = offsetXVertical + cover * scaleVertical + i * barSpacingVertical * scaleVertical;
+                    ctxVertical.beginPath();
+                    ctxVertical.moveTo(x, offsetYVertical + columnHeight * scaleVertical + height * scaleVertical);
+                    ctxVertical.lineTo(x, offsetYVertical + columnHeight * scaleVertical);
+                    ctxVertical.stroke();
+                }
+
+                // Add labels to vertical section
+                ctxVertical.fillStyle = '#1a3c6e';
+                ctxVertical.font = '12px Arial';
+                ctxVertical.textAlign = 'center';
+                ctxVertical.fillText(`السماكة الكلية (H): ${height.toFixed(2)} m`, offsetXVertical + (width * scaleVertical) / 2, offsetYVertical + columnHeight * scaleVertical + height * scaleVertical + 20);
+                ctxVertical.fillText(`الارتفاع النافع (h): ${h.toFixed(2)} m`, offsetXVertical + (width * scaleVertical) / 2, offsetYVertical + columnHeight * scaleVertical + (height - d) * scaleVertical / 2);
+                ctxVertical.fillText(`Section A//A: ${(AsA * 1e4).toFixed(2)} cm²`, offsetXVertical + (width * scaleVertical) / 2, offsetYVertical + columnHeight * scaleVertical - 10);
+                ctxVertical.fillText(`Section B//B: ${(AsB * 1e4).toFixed(2)} cm²`, offsetXVertical + (width * scaleVertical) / 2, offsetYVertical + columnHeight * scaleVertical + height * scaleVertical + 30);
+                ctxVertical.fillText(`الغطاء: ${cover * 100} cm`, offsetXVertical + (width * scaleVertical) / 2, offsetYVertical + columnHeight * scaleVertical + height * scaleVertical + 50);
+                ctxVertical.fillText(`التباعد (A): ${(width - 2 * cover) / (numBarsA - 1) * 100}.cm`, offsetXVertical + (width * scaleVertical) / 2, offsetYVertical + columnHeight * scaleVertical + height * scaleVertical + 70);
+                ctxVertical.fillText(`ارتفاع العمود: ${columnHeight.toFixed(2)} m`, offsetXVertical + (width * scaleVertical) / 2, offsetYVertical - 10);
+
+                ctxVertical.textAlign = 'left';
+                ctxVertical.fillText(`العرض (A): ${width.toFixed(2)} m`, offsetXVertical + width * scaleVertical + 10, offsetYVertical + columnHeight * scaleVertical + (height * scaleVertical) / 2);
+
+                // Generate report
+                const reportDiv = document.getElementById('report');
+                const date = new Date().toLocaleString('ar-MA', { dateStyle: 'full', timeStyle: 'short', timeZone: 'America/New_York' });
+                reportDiv.innerHTML = `
+                    <h4>تقرير التكلفة / Rapport de coût</h4>
+                    <p>تاريخ التقرير: ${date}</p>
+                    <ul>
+                        <li>القضبان (A): ${numBarsA} × ${barDiameterA} mm، الطول: ${BAR_LENGTH} m، الكتلة: ${costA.mass.toFixed(2)} kg، التكلفة: ${costA.cost.toFixed(2)} DH</li>
+                        <li>القضبان (B): ${numBarsB} × ${barDiameterB} mm، الطول: ${BAR_LENGTH} m، الكتلة: ${costB.mass.toFixed(2)} kg، التكلفة: ${costB.cost.toFixed(2)} DH</li>
+                        <li>سعر الوحدة: ${COST_PER_KG} DH/kg (قابل للتعديل لاحقًا)</li>
+                    </ul>
+                    <p>ملاحظة: السعر لكل قضيب من 12 م سيتم تحديثه لاحقًا بناءً على البيانات المقدمة.</p>
+                `;
+            } catch (e) {
+                const errorDiv = document.getElementById('error');
+                errorDiv.textContent = `خطأ في الحساب / Erreur de calcul: ${e.message}`;
+            }
+        }
+
+        updateInputs();
+        drawInputDiagram();
+    </script>
