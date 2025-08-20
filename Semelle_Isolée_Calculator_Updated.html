@@ -385,15 +385,15 @@
             <label for="height">السماكة (h) / Épaisseur (m) <span class="tooltip">ⓘ<span class="tooltiptext">سمك القاعدة</span></span>:</label>
             <input type="number" id="height" step="0.01" min="0.1" value="0.25" oninput="drawInputDiagram()">
             <label for="permanentLoad">الحمولة الدائمة (G) / Charge permanente (T) <span class="tooltip">ⓘ<span class="tooltiptext">الحمولة الدائمة</span></span>:</label>
-            <input type="number" id="permanentLoad" min="0" value="15" oninput="drawInputDiagram()">
+            <input type="number" id="permanentLoad" min="0" value="20" oninput="drawInputDiagram()">
             <label for="variableLoad">الحمولة المتغيرة (Q) / Charge variable (T) <span class="tooltip">ⓘ<span class="tooltiptext">الحمولة المتغيرة</span></span>:</label>
-            <input type="number" id="variableLoad" min="0" value="5" oninput="drawInputDiagram()">
+            <input type="number" id="variableLoad" min="0" value="6" oninput="drawInputDiagram()">
             <label for="soilStress">إجهاد التربة المسموح (ത 𝜎𝑠𝑜𝑙) / Contrainte admissible du sol (Bars) <span class="tooltip">ⓘ<span class="tooltiptext">1 Bar = 0.1 MPa</span></span>:</label>
-            <input type="number" id="soilStress" step="0.1" min="0.1" value="1.5" oninput="drawInputDiagram()">
+            <input type="number" id="soilStress" step="0.1" min="0.1" value="2.5" oninput="drawInputDiagram()">
             <label for="columnWidth">عرض العمود (a) / Largeur du poteau (m) <span class="tooltip">ⓘ<span class="tooltiptext">عرض العمود</span></span>:</label>
             <input type="number" id="columnWidth" step="0.01" min="0.1" value="0.25" oninput="drawInputDiagram()">
             <label for="columnDepth">عمق العمود (b) / Profondeur du poteau (m) <span class="tooltip">ⓘ<span class="tooltiptext">عمق العمود</span></span>:</label>
-            <input type="number" id="columnDepth" step="0.01" min="0.1" value="0.25" oninput="drawInputDiagram()">
+            <input type="number" id="columnDepth" step="0.01" min="0.1" value="0.35" oninput="drawInputDiagram()">
             <label for="columnHeight">ارتفاع العمود / Hauteur du poteau (m) <span class="tooltip">ⓘ<span class="tooltiptext">ارتفاع العمود فوق القاعدة</span></span>:</label>
             <input type="number" id="columnHeight" step="0.01" min="0.1" value="0.5" oninput="drawInputDiagram()">
             <h3>المواد (Matériaux)</h3>
@@ -514,6 +514,8 @@
             ctx.fillText(`الغطاء: ${cover * 100} cm`, offsetX + 10, offsetY + columnHeight * scale + depth * scale + 30);
         }
 
+        function ceilTo(value, step) { return Math.ceil(value / step) * step; }
+
         function calculate() {
             try {
                 const width = parseFloat(document.getElementById('width').value) || 1.15;
@@ -549,11 +551,13 @@
                     return;
                 }
 
+              const g = 10;  // 9.81
+  
                 // Convert units
-                const Nser = (permanentLoad + variableLoad) * 9.81 * 1000; // Service load in N
-                const Nu = (1.35 * permanentLoad + 1.5 * variableLoad) * 9.81 * 1000; // Ultimate load in N
+                const Nser = (permanentLoad + variableLoad) * g * 1000; // Service load in N
+                const Nu = (1.35 * permanentLoad + 1.5 * variableLoad) * g * 1000; // Ultimate load in N
                 const soilStressMPa = soilStress * 0.1; // Convert Bars to MPa
-                const Ppropre = width * depth * height * 2500 * 9.81; // Self-weight in N
+                const Ppropre = width * depth * height * 2500 * g; // Self-weight in N
                 const fck = concreteClass; // Concrete compressive strength
                 const fyk = steelStrength; // Steel yield strength
                 const gammaC = 1.5; // Partial safety factor for concrete
@@ -562,13 +566,37 @@
                 const fyd = fyk / gammaS; // Design yield strength
 
                 // Effective height calculation as per video
-                const h = Math.max((width - columnWidth) / 4, (depth - columnDepth) / 4); // 0.225 m, rounded to 0.25 m
+//                const h = Math.max((width - columnWidth) / 4, (depth - columnDepth) / 4); // 0.225 m, rounded to 0.25 m
+				
+				 const h = Math.max(0.25, ceilTo(Math.max((width - columnWidth) / 4, (depth - columnDepth) / 4), 0.05));
+ 	
+				
                 const d = h; // Effective depth, assuming cover is included in height for simplicity
 
+                  // choose effective depth d (simple MVP heuristic)
+                    // d ~ max((A - a)/4 , (B - b)/4) but ensure reasonable minimum 150 mm
+				
+    
+ 
+
+					
                 // Dimensioning
                 const requiredArea = Nser / (soilStressMPa * 1e6); // m²
-                const A = Math.sqrt(requiredArea * (columnWidth / columnDepth));
-                const B = Math.sqrt(requiredArea * (columnDepth / columnWidth));
+                const A_req = Math.sqrt(requiredArea * (columnWidth / columnDepth));
+                const B_req = Math.sqrt(requiredArea * (columnDepth / columnWidth));
+
+
+                   let A = ceilTo(A_req, 0.05);
+                   let B = ceilTo(B_req, 0.05);
+
+console.log("Required Area (m²):", requiredArea);
+console.log("columnWidth (m):", columnWidth);
+console.log("columnDepth (m):", columnDepth);
+
+
+
+console.log("A (m):", A);
+console.log("B (m):", B);
 
                 // Stress verification
                 const sigmaSol = (Nser + Ppropre) / (width * depth * 1e6); // Actual soil stress in MPa
