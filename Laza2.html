@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hazard Walking Creature</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: black;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    background: black;
+  }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+// Creature parameters
+const segments = 30;
+const segLength = 20;
+let angle = 0;
+let t = 0;
+
+// Tail and limb frequency
+const waveFreq = 0.15;
+const limbFreq = 0.08;
+
+// limb drawing function
+function drawLimb(x, y, angle, scale = 1) {
+  const len = 20 * scale;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + Math.cos(angle) * len, y + Math.sin(angle) * len);
+  ctx.moveTo(x + Math.cos(angle) * len, y + Math.sin(angle) * len);
+  ctx.lineTo(x + Math.cos(angle + 0.4) * len * 0.4, y + Math.sin(angle + 0.4) * len * 0.4);
+  ctx.moveTo(x + Math.cos(angle) * len, y + Math.sin(angle) * len);
+  ctx.lineTo(x + Math.cos(angle - 0.4) * len * 0.4, y + Math.sin(angle - 0.4) * len * 0.4);
+  ctx.stroke();
+}
+
+// Animation loop
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+
+  let points = [];
+  for (let i = 0; i < segments; i++) {
+    const phase = i * 0.5;
+    const x = cx + i * segLength * Math.cos(angle + Math.sin(t * 0.03 + phase) * 0.6);
+    const y = cy + i * segLength * Math.sin(angle + Math.sin(t * 0.03 + phase) * 0.6);
+    points.push({ x, y });
+  }
+
+  // draw spine
+  for (let i = 0; i < points.length - 1; i++) {
+    ctx.moveTo(points[i].x, points[i].y);
+    ctx.lineTo(points[i + 1].x, points[i + 1].y);
+  }
+  ctx.stroke();
+
+  // draw limbs
+  for (let i = 4; i < points.length - 4; i += 4) {
+    const p = points[i];
+    const a = Math.atan2(points[i + 1].y - points[i].y, points[i + 1].x - points[i].x);
+    const wiggle = Math.sin(t * limbFreq + i * 0.6) * 0.6;
+    drawLimb(p.x, p.y, a + Math.PI / 2 + wiggle);
+    drawLimb(p.x, p.y, a - Math.PI / 2 - wiggle);
+  }
+
+  // head
+  const head = points[0];
+  ctx.beginPath();
+  ctx.arc(head.x, head.y, 4, 0, Math.PI * 2);
+  ctx.stroke();
+
+  t += 1.5;
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>
